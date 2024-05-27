@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from .models import ArtPiece
 
 
 class RegisterForm(UserCreationForm):
@@ -12,3 +13,9 @@ class RegisterForm(UserCreationForm):
         model = User
         fields = ["first_name", "last_name", "username",
                   "email", "password1", "password2"]
+
+
+class ArtPieceForm(forms.ModelForm):
+    class Meta:
+        model = ArtPiece
+        fields = ["artist_name", "piece_name", "piece_description", "link"]
