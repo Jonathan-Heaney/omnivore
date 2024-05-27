@@ -6,10 +6,14 @@
 
 {% for piece in pieces %}
 <div class="card mt-2">
-    <div class="card-header"><strong>@{{ piece.user }}</strong></div>
+    <div class="card-header"><strong>{{ piece.artist_name }}</strong></div>
     <div class="card-body d-flex flex-row justify-content-between">
       <div>
-        <h5 class="card-title">{{piece.piece_name}}</h5>
+        {% if piece.link %}
+        <a href="{{piece.link}}" target="_blank"><span class="card-title">{{piece.piece_name}}</span></a>
+        {% else %}
+        <span class="card-title">{{piece.piece_name}}</span>
+        {% endif %}
         <p>{{piece.piece_description}}</p>
       </div>
     </div>

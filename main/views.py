@@ -30,7 +30,7 @@ def share_art(request):
             art_piece = form.save(commit=False)
             art_piece.user = request.user
             art_piece.save()
-            return redirect("/home")
+            return redirect("/my-shared-art")
     else:
         form = ArtPieceForm()
 
@@ -40,7 +40,7 @@ def share_art(request):
 @login_required(login_url="/login")
 def my_shared_art(request):
     user = request.user
-    my_pieces = ArtPiece.objects.filter(user=user)
+    my_pieces = ArtPiece.objects.filter(user=user).order_by('-created_at')
 
     return render(request, 'main/my_shared_art.html', {"pieces": my_pieces})
 
