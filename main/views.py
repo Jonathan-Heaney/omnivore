@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from .forms import RegisterForm, ArtPieceForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
+from .models import ArtPiece
 
 
 def home(request):
@@ -34,6 +35,14 @@ def share_art(request):
         form = ArtPieceForm()
 
     return render(request, 'main/share_art.html', {"form": form})
+
+
+@login_required(login_url="/login")
+def my_shared_art(request):
+    user = request.user
+    my_pieces = ArtPiece.objects.filter(user=user)
+
+    return render(request, 'main/my_shared_art.html', {"pieces": my_pieces})
 
 
 def LogOut(request):
