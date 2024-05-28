@@ -42,6 +42,14 @@ def my_shared_art(request):
     user = request.user
     my_pieces = ArtPiece.objects.filter(user=user).order_by('-created_at')
 
+    if request.method == 'POST':
+        piece_id = request.POST.get("piece-id")
+
+        if piece_id:
+            piece = ArtPiece.objects.filter(id=piece_id).first()
+            if piece:
+                piece.delete()
+
     return render(request, 'main/my_shared_art.html', {"pieces": my_pieces})
 
 

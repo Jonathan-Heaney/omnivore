@@ -16,6 +16,19 @@
         {% endif %}
         <p>{{piece.piece_description}}</p>
       </div>
+      <div>
+        <form method="post">
+          {% csrf_token %}
+          <button
+            type="submit"
+            class="btn btn-danger"
+            name="piece-id"
+            value="{{piece.id}}"
+          >
+            Delete
+          </button>
+        </form>
+      </div>
     </div>
     <div class="card-footer text-muted">{{piece.created_at}}</div>
   </div>
