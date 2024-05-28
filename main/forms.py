@@ -18,4 +18,10 @@ class RegisterForm(UserCreationForm):
 class ArtPieceForm(forms.ModelForm):
     class Meta:
         model = ArtPiece
-        fields = ["artist_name", "piece_name", "piece_description", "link"]
+        fields = ["piece_name", "artist_name", "piece_description", "link"]
+        labels = {
+            "artist_name": "Who is the artist/creator(s)?",
+            "piece_name": "What is the name of the artwork?",
+            "link": "Include a link to view the piece online, if applicable.",
+            "piece_description": "Tell us a bit about the piece and what it means to you. Why are you sharing it? What should people know about it? "
+        }
