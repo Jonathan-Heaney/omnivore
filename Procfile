@@ -1,0 +1,1 @@
+web: gunicorn omnivore.wsgi --log-file -
