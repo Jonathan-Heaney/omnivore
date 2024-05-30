@@ -3,11 +3,13 @@ from .forms import RegisterForm, ArtPieceForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 import os
+import random
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.conf import settings
-from .models import ArtPiece
+from .models import ArtPiece, SentArtPiece
+from django.contrib.auth.models import User
 
 
 def home(request):
@@ -63,34 +65,65 @@ def LogOut(request):
     return redirect("/login/")
 
 
-def load_email_template():
+def choose_art_piece(user):
+    # Get all approved art pieces that the user did not submit and have not been sent to them
+    art_pieces = ArtPiece.objects.filter(
+        approved_status=True
+    ).exclude(
+        user=user
+    ).exclude(
+        id__in=SentArtPiece.objects.filter(
+            user=user).values_list('art_piece_id', flat=True)
+    )
+
+    # Select a random art piece from the filtered queryset
+    if art_pieces.exists():
+        return random.choice(art_pieces)
+    else:
+        return None
+
+
+def mark_art_piece_as_sent(user, art_piece):
+    # Create a record in the SentArtPiece model
+    SentArtPiece.objects.create(
+        user=user, art_piece=art_piece)
+
+
+def send_art_piece_email(request, user_id):
+    user = User.objects.get(id=user_id)
+    art_piece = choose_art_piece(user)
+
+    if not art_piece:
+        return HttpResponse('No eligible art piece to send.')
+
+    # Mark the art piece as sent
+    mark_art_piece_as_sent(user, art_piece)
+
+    # Load the email template
     template_path = os.path.join(
         settings.BASE_DIR, 'main/templates/emails/email_template.html')
     with open(template_path, 'r') as file:
-        template = file.read()
-    return template
-
-
-def send_test_email(request):
-    # Load the email template
-    html_template = load_email_template()
+        html_template = file.read()
 
     # Define the context to be used in the template
     context = {
-        'username': 'Jonathan',
-        'art_image_url': 'https://plus.unsplash.com/premium_photo-1669863280125-7789ef60adc0?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        'art_description': 'This is a beautiful piece of art created by a renowned artist.',
+        'username': user.first_name,
+        'art_link': art_piece.link,
+        'art_name': art_piece.piece_name,
+        'artist_name': art_piece.artist_name,
+        'piece_description': art_piece.piece_description,
+        'sender': f'{art_piece.user.first_name} {art_piece.user.last_name}'
     }
 
     # Render the HTML content with the context
     html_content = render_to_string('emails/email_template.html', context)
 
-    subject = 'Test Email with MJML'
+    subject = 'Your Daily Art Piece from Omnivore Arts'
     from_email = 'Omnivore Arts <oliver@omnivorearts.com>'
-    to = ['jonathan.heaney@gmail.com']
+    to = [user.email]
 
     msg = EmailMultiAlternatives(subject, '', from_email, to)
     msg.attach_alternative(html_content, "text/html")
     msg.send()
 
-    return HttpResponse('Test email sent!')
+    return HttpResponse('Art piece email sent!')

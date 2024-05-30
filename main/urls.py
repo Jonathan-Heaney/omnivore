@@ -8,5 +8,6 @@ urlpatterns = [
     path("logout/", views.LogOut, name="logout"),
     path("share-art", views.share_art, name="share_art"),
     path("my-shared-art", views.my_shared_art, name="my_shared_art"),
-    path('send-test-email/', views.send_test_email, name='send_test_email'),
+    path('send-art-piece-email/<int:user_id>',
+         views.send_art_piece_email, name='send_art_piece_email'),
 ]

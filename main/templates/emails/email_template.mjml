@@ -5,11 +5,13 @@
         <mj-text font-size="20px" font-weight="bold">
           Hello, {{ username }}!
         </mj-text>
+        <mj-text> Today's artwork comes from {{ sender }}. </mj-text>
         <mj-text>
-          Welcome to Omnivore Arts. Here is your daily piece of art.
+          Piece Name:
+          <a href="{{ art_link }}" target="_blank">{{ art_name }}</a>
         </mj-text>
-        <mj-image width="400px" src="{{ art_image_url }}" alt="Art Image" />
-        <mj-text> {{ art_description }} </mj-text>
+        <mj-text> Artist Name: {{ artist_name }} </mj-text>
+        <mj-text> {{ piece_description }} </mj-text>
       </mj-column>
     </mj-section>
   </mj-body>

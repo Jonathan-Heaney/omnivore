@@ -19,7 +19,7 @@ class ArtPiece(models.Model):
 class SentArtPiece(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     art_piece = models.ForeignKey(ArtPiece, on_delete=models.CASCADE)
-    sent_date = models.DateField()
+    sent_date = models.DateField(auto_now_add=True)
 
     class Meta:
         unique_together = ('user', 'art_piece')
