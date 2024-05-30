@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -139,5 +139,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = '/home'
 LOGOUT_REDIRECT_URL = '/login'
 
-CSRF_TRUSTED_ORIGINS = ['web-production-4a6f.up.railway.app']
+CSRF_TRUSTED_ORIGINS = [
+    'https://web-production-4a6f.up.railway.app',
+    'http://localhost',
+    'http://127.0.0.1',
+    'http://localhost:8001',
+    'http://127.0.0.1:8001'
+]
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from .forms import RegisterForm, ArtPieceForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
+from django.http import HttpResponse
 from .models import ArtPiece
 
 
@@ -56,3 +58,14 @@ def my_shared_art(request):
 def LogOut(request):
     logout(request)
     return redirect("/login/")
+
+
+def send_test_email(request):
+    send_mail(
+        'Test Email',
+        'This is a test email sent from Django using Amazon SES.',
+        'Omnivore Arts <oliver@omnivorearts.com>',
+        ['jonathan.heaney@gmail.com'],
+        fail_silently=False,
+    )
+    return HttpResponse('Test email sent!')
