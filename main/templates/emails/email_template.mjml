@@ -1,0 +1,16 @@
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-text font-size="20px" font-weight="bold">
+          Hello, {{ username }}!
+        </mj-text>
+        <mj-text>
+          Welcome to Omnivore Arts. Here is your daily piece of art.
+        </mj-text>
+        <mj-image width="400px" src="{{ art_image_url }}" alt="Art Image" />
+        <mj-text> {{ art_description }} </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

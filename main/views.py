@@ -2,8 +2,11 @@ from django.shortcuts import render, redirect
 from .forms import RegisterForm, ArtPieceForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
-from django.core.mail import send_mail
+import os
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
 from django.http import HttpResponse
+from django.conf import settings
 from .models import ArtPiece
 
 
@@ -60,12 +63,34 @@ def LogOut(request):
     return redirect("/login/")
 
 
+def load_email_template():
+    template_path = os.path.join(
+        settings.BASE_DIR, 'main/templates/emails/email_template.html')
+    with open(template_path, 'r') as file:
+        template = file.read()
+    return template
+
+
 def send_test_email(request):
-    send_mail(
-        'Test Email',
-        'This is a test email sent from Django using Amazon SES.',
-        'Omnivore Arts <oliver@omnivorearts.com>',
-        ['jonathan.heaney@gmail.com'],
-        fail_silently=False,
-    )
+    # Load the email template
+    html_template = load_email_template()
+
+    # Define the context to be used in the template
+    context = {
+        'username': 'Jonathan',
+        'art_image_url': 'https://plus.unsplash.com/premium_photo-1669863280125-7789ef60adc0?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+        'art_description': 'This is a beautiful piece of art created by a renowned artist.',
+    }
+
+    # Render the HTML content with the context
+    html_content = render_to_string('emails/email_template.html', context)
+
+    subject = 'Test Email with MJML'
+    from_email = 'Omnivore Arts <oliver@omnivorearts.com>'
+    to = ['jonathan.heaney@gmail.com']
+
+    msg = EmailMultiAlternatives(subject, '', from_email, to)
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
+
     return HttpResponse('Test email sent!')
