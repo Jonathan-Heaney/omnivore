@@ -1,1 +1,1 @@
-web: gunicorn omnivore.wsgi --log-file -
+web: python manage.py collectstatic --noinput && gunicorn omnivore.wsgi --log-file -
