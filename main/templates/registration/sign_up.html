@@ -1,10 +1,16 @@
 {% extends 'main/base.html' %}
+{% load static %}
 
 {% block title %}Sign Up{% endblock%}
+{% block css_files %}
+  <link rel="stylesheet" href="{% static "css/styles.css" %}">
+{% endblock %}
 
 {% load crispy_forms_tags %}
 
 {% block content %} 
+
+<h1 class="header">Sign Up</h1>
 
 <form action="" method="post">
     {% csrf_token %}{{ form|crispy }}

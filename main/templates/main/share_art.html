@@ -1,12 +1,16 @@
 {% extends 'main/base.html' %}
+{% load static %}
 
 {% block title %}Share Your Art{% endblock%}
+{% block css_files %}
+  <link rel="stylesheet" href="{% static "css/styles.css" %}">
+{% endblock %}
 
 {% load crispy_forms_tags %}
 
 {% block content %} 
 
-<h1>Share a piece of art you love!</h1>
+<h1 class="header">Share a piece of art you love!</h1>
 
 <form action="" method="post">
     {% csrf_token %}{{ form|crispy }}

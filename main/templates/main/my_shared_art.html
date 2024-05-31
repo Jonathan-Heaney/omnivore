@@ -1,8 +1,14 @@
 {% extends 'main/base.html' %}
+{% load static %}
 
 {% block title %} My Shared Art {% endblock %}
+{% block css_files %}
+  <link rel="stylesheet" href="{% static "css/styles.css" %}">
+{% endblock %}
 
 {% block content %}
+
+<h1 class="header">My Shared Art</h1>
 
 {% for piece in pieces %}
 <div class="card mt-2">
