@@ -1,7 +1,9 @@
 {% extends 'main/base.html' %}
+{% load static %}
 
 {% block title %} Home Page {% endblock %}
 
 {% block content %}
-<h1>Home Page!</h1>
+<h1>Welcome to Omnivore Arts!</h1>
+<img src="{% static 'images/oliver.jpg' %}" alt="Oliver the Omnivore">
 {% endblock %}
