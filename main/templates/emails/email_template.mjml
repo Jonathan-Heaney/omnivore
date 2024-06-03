@@ -6,10 +6,7 @@
           Hello, {{ username }}!
         </mj-text>
         <mj-text> Today's artwork comes from {{ sender }}. </mj-text>
-        <mj-text>
-          Piece Name:
-          <a href="{{ art_link }}" target="_blank">{{ art_name }}</a>
-        </mj-text>
+        <mj-text> Piece Name: {{ art_link_or_name }}</mj-text>
         <mj-text> Artist Name: {{ artist_name }} </mj-text>
         <mj-text> {{ piece_description }} </mj-text>
       </mj-column>

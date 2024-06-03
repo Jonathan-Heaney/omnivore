@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from .forms import RegisterForm, ArtPieceForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
+from django.utils.safestring import mark_safe
 import os
 import random
 from django.core.mail import EmailMultiAlternatives
@@ -99,6 +100,13 @@ def send_art_piece_email(request, user_id):
     # Mark the art piece as sent
     mark_art_piece_as_sent(user, art_piece)
 
+    # Prepare the link or plain text based on the existence of art_link
+    if art_piece.link:
+        art_link_or_name = mark_safe(
+            f'<a href="{art_piece.link}" target="_blank">{art_piece.piece_name}</a>')
+    else:
+        art_link_or_name = art_piece.piece_name
+
     # Load the email template
     template_path = os.path.join(
         settings.BASE_DIR, 'main/templates/emails/email_template.html')
@@ -108,8 +116,7 @@ def send_art_piece_email(request, user_id):
     # Define the context to be used in the template
     context = {
         'username': user.first_name,
-        'art_link': art_piece.link,
-        'art_name': art_piece.piece_name,
+        'art_link_or_name': art_link_or_name,
         'artist_name': art_piece.artist_name,
         'piece_description': art_piece.piece_description,
         'sender': f'{art_piece.user.first_name} {art_piece.user.last_name}'
