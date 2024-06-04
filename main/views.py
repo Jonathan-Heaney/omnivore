@@ -133,7 +133,7 @@ def send_art_piece_email(request, user_id):
     # Render the HTML content with the context
     html_content = render_to_string('emails/email_template.html', context)
 
-    subject = 'Your Daily Art Piece from Omnivore Arts'
+    subject = f"You've received art from {art_piece.user.first_name}!"
     from_email = 'Omnivore Arts <oliver@omnivorearts.com>'
     to = [user.email]
 
