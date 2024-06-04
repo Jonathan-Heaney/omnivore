@@ -134,3 +134,7 @@ def send_art_piece_email(request, user_id):
     msg.send()
 
     return HttpResponse('Art piece email sent!')
+
+
+def custom_404(request, exception):
+    return render(request, 'main/404.html', status=404)
