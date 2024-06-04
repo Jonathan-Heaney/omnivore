@@ -8,6 +8,7 @@ urlpatterns = [
     path("logout/", views.LogOut, name="logout"),
     path("share-art", views.share_art, name="share_art"),
     path("my-shared-art", views.my_shared_art, name="my_shared_art"),
+    path("my-received-art", views.my_received_art, name="my_received_art"),
     path('send-art-piece-email/<int:user_id>',
          views.send_art_piece_email, name='send_art_piece_email'),
 ]

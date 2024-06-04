@@ -61,6 +61,14 @@ def my_shared_art(request):
     return render(request, 'main/my_shared_art.html', {"pieces": my_pieces})
 
 
+@login_required(login_url="/login")
+def my_received_art(request):
+    user = request.user
+    my_pieces = SentArtPiece.objects.filter(user=user)
+
+    return render(request, 'main/my_received_art.html', {"pieces": my_pieces})
+
+
 def LogOut(request):
     logout(request)
     return redirect("/login/")
