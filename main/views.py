@@ -64,9 +64,14 @@ def my_shared_art(request):
 @login_required(login_url="/login")
 def my_received_art(request):
     user = request.user
-    my_pieces = SentArtPiece.objects.filter(user=user)
+    received_pieces = SentArtPiece.objects.filter(
+        user=user).select_related('art_piece__user').order_by('-sent_time')
 
-    return render(request, 'main/my_received_art.html', {"pieces": my_pieces})
+    print(received_pieces)
+
+    pieces = [received_piece.art_piece for received_piece in received_pieces]
+
+    return render(request, 'main/my_received_art.html', {"pieces": pieces})
 
 
 def LogOut(request):

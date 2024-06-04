@@ -12,14 +12,18 @@
 
 {% for piece in pieces %}
 <div class="card mt-2">
-    <div class="card-header"><strong>{{ piece.artist_name }}</strong></div>
-    <div class="card-body d-flex flex-row justify-content-between">
-      <div>
-        {% if piece.link %}
+    <div class="card-header"><strong>
+      {% if piece.link %}
         <a href="{{piece.link}}" target="_blank"><span class="card-title">{{piece.piece_name}}</span></a>
         {% else %}
         <span class="card-title">{{piece.piece_name}}</span>
         {% endif %}
+        </strong></div>
+    <div class="card-body d-flex flex-row justify-content-between">
+      <div>
+        Artist: {{ piece.artist_name }}
+        <br>
+        <br>
         <p>{{piece.piece_description}}</p>
       </div>
       <div>
