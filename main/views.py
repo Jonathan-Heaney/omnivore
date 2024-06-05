@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.safestring import mark_safe
 import os
 import random
+import bleach
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.http import HttpResponse
