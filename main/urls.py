@@ -12,4 +12,6 @@ urlpatterns = [
     path('send-art-piece-email/<int:user_id>',
          views.send_art_piece_email, name='send_art_piece_email'),
     path('edit-art-piece/<int:pk>', views.edit_art_piece, name='edit_art_piece'),
+    path('delete-art-piece/<int:pk>',
+         views.delete_art_piece, name='delete_art_piece'),
 ]

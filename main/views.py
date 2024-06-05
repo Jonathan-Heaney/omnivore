@@ -62,17 +62,27 @@ def edit_art_piece(request, pk):
 
 
 @login_required(login_url="/login")
+def delete_art_piece(request, pk):
+    art_piece = get_object_or_404(ArtPiece, pk=pk)
+    if request.method == 'POST':
+        art_piece.delete()
+        return redirect('my_shared_art')
+
+    return redirect('my_shared_art')
+
+
+@login_required(login_url="/login")
 def my_shared_art(request):
     user = request.user
     my_pieces = ArtPiece.objects.filter(user=user).order_by('-created_at')
 
-    if request.method == 'POST':
-        piece_id = request.POST.get("piece-id")
+    # if request.method == 'POST':
+    #     piece_id = request.POST.get("piece-id")
 
-        if piece_id:
-            piece = ArtPiece.objects.filter(id=piece_id).first()
-            if piece:
-                piece.delete()
+    #     # if piece_id:
+    #     #     piece = ArtPiece.objects.filter(id=piece_id).first()
+    #     #     if piece:
+    #     #         piece.delete()
 
     return render(request, 'main/my_shared_art.html', {"pieces": my_pieces})
 

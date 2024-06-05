@@ -28,17 +28,10 @@
       </div>
       <div>
         <a href="{% url 'edit_art_piece' piece.id %}" class="btn btn-primary edit-btn">Edit</a>
-        <form method="post">
+        <form method="post" action="{% url 'delete_art_piece' piece.id %}" style="display:inline;" onsubmit="return confirmDelete();">
           {% csrf_token %}
-          <button
-            type="submit"
-            class="btn btn-danger"
-            name="piece-id"
-            value="{{piece.id}}"
-          >
-            Delete
-          </button>
-        </form>
+          <button type="submit" class="btn btn-danger">Delete</button>
+      </form>
       </div>
     </div>
     <div class="card-footer text-muted">{{piece.created_at}}</div>
@@ -47,4 +40,9 @@
   <p>Nothing shared yet!</p>
 {% endfor %}
 
+<script>
+  function confirmDelete() {
+      return confirm('Are you sure you want to delete this post? This cannot be undone.');
+  }
+  </script>
 {% endblock %}
