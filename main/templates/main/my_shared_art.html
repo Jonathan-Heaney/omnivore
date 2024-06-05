@@ -28,7 +28,7 @@
       </div>
       <div>
         <a href="{% url 'edit_art_piece' piece.id %}" class="btn btn-primary edit-btn">Edit</a>
-        <form method="post" action="{% url 'delete_art_piece' piece.id %}" style="display:inline;" onsubmit="return confirmDelete();">
+        <form method="post" action="{% url 'delete_art_piece' piece.id %}" onsubmit="return confirmDelete();">
           {% csrf_token %}
           <button type="submit" class="btn btn-danger">Delete</button>
       </form>
