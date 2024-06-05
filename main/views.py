@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .forms import RegisterForm, ArtPieceForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
@@ -44,6 +44,21 @@ def share_art(request):
         form = ArtPieceForm()
 
     return render(request, 'main/share_art.html', {"form": form})
+
+
+@login_required(login_url="/login")
+def edit_art_piece(request, pk):
+    art_piece = get_object_or_404(ArtPiece, pk=pk)
+
+    if request.method == 'POST':
+        form = ArtPieceForm(request.POST, instance=art_piece)
+        if form.is_valid():
+            form.save()
+            return redirect("/my-shared-art")
+    else:
+        form = ArtPieceForm(instance=art_piece)
+
+    return render(request, 'main/edit_art_piece.html', {'form': form})
 
 
 @login_required(login_url="/login")

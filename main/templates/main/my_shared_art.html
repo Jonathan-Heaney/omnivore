@@ -27,6 +27,7 @@
         <p>{{piece.piece_description|linebreaksbr}}</p>
       </div>
       <div>
+        <a href="{% url 'edit_art_piece' piece.id %}" class="btn btn-primary edit-btn">Edit</a>
         <form method="post">
           {% csrf_token %}
           <button

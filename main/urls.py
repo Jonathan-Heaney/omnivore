@@ -11,4 +11,5 @@ urlpatterns = [
     path("my-received-art", views.my_received_art, name="my_received_art"),
     path('send-art-piece-email/<int:user_id>',
          views.send_art_piece_email, name='send_art_piece_email'),
+    path('edit-art-piece/<int:pk>', views.edit_art_piece, name='edit_art_piece'),
 ]
