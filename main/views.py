@@ -75,14 +75,6 @@ def my_shared_art(request):
     user = request.user
     my_pieces = ArtPiece.objects.filter(user=user).order_by('-created_at')
 
-    # if request.method == 'POST':
-    #     piece_id = request.POST.get("piece-id")
-
-    #     # if piece_id:
-    #     #     piece = ArtPiece.objects.filter(id=piece_id).first()
-    #     #     if piece:
-    #     #         piece.delete()
-
     return render(request, 'main/my_shared_art.html', {"pieces": my_pieces})
 
 
@@ -149,19 +141,21 @@ def send_art_piece_email(request, user_id):
     with open(template_path, 'r') as file:
         html_template = file.read()
 
+    sender = f'{art_piece.user.first_name} {art_piece.user.last_name}'
+
     # Define the context to be used in the template
     context = {
         'username': user.first_name,
         'art_link_or_name': art_link_or_name,
         'artist_name': art_piece.artist_name,
         'piece_description': art_piece.piece_description,
-        'sender': f'{art_piece.user.first_name} {art_piece.user.last_name}'
+        'sender': sender
     }
 
     # Render the HTML content with the context
     html_content = render_to_string('emails/email_template.html', context)
 
-    subject = f"You've received art from {art_piece.user.first_name}!"
+    subject = f"You have new art from {sender}!"
     from_email = 'Omnivore Arts <oliver@omnivorearts.com>'
     to = [user.email]
 
