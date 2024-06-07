@@ -118,12 +118,11 @@ def mark_art_piece_as_sent(user, art_piece):
         user=user, art_piece=art_piece)
 
 
-def send_art_piece_email(request, user_id):
-    user = User.objects.get(id=user_id)
+def send_art_piece_email(user):
     art_piece = choose_art_piece(user)
 
     if not art_piece:
-        return HttpResponse('No eligible art piece to send.')
+        return
 
     # Mark the art piece as sent
     mark_art_piece_as_sent(user, art_piece)
@@ -136,10 +135,10 @@ def send_art_piece_email(request, user_id):
         art_link_or_name = art_piece.piece_name
 
     # Load the email template
-    template_path = os.path.join(
-        settings.BASE_DIR, 'main/templates/emails/email_template.html')
-    with open(template_path, 'r') as file:
-        html_template = file.read()
+    # template_path = os.path.join(
+    #     settings.BASE_DIR, 'main/templates/emails/email_template.html')
+    # with open(template_path, 'r') as file:
+    #     html_template = file.read()
 
     sender = f'{art_piece.user.first_name} {art_piece.user.last_name}'
 
@@ -162,8 +161,6 @@ def send_art_piece_email(request, user_id):
     msg = EmailMultiAlternatives(subject, '', from_email, to)
     msg.attach_alternative(html_content, "text/html")
     msg.send()
-
-    return HttpResponse('Art piece email sent!')
 
 
 def custom_404(request, exception):
