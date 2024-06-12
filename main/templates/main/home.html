@@ -9,6 +9,8 @@
 {% block content %}
 <h1 class="header">Welcome to Omnivore Arts!</h1>
 <img class="oliver" src="{% static 'images/oliver-no-bg.png' %}" alt="Oliver the Omnivore">
+<h1>Share and discover art, music, and culture.</h1>
+<h4>Our first round begins July 1st - join us!</h4>
 {% if user.is_authenticated %}
 <h3>Share a piece of art <a href="/share-art">here</a>!</h3>
 {% else %}
