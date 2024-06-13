@@ -3,6 +3,7 @@ a {
 }
 
 .oliver {
+  width: 50%;
   max-width: 400px;
 }
 
@@ -14,23 +15,23 @@ a {
   margin-bottom: 8px;
 }
 
-.container {
+/* .container {
   display: flex;
   flex-direction: column;
-}
-
+/* } */
+/* 
 .home-container {
   display: flex;
   flex-direction: row;
   justify-content: space-around;
   align-items: center;
-}
+} */
 
-.oliver-container {
+/* .oliver-container {
   text-align: center;
 }
 
 .cta-container {
   text-align: center;
   margin-top: 1rem;
-}
+} */
