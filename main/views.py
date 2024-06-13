@@ -183,4 +183,4 @@ class CustomPasswordResetView(auth_views.PasswordResetView):
             'html_email_template_name': self.email_template_name,
         }
         form.save(**opts)
-        return super().form_valid(form)
+        return super(auth_views.PasswordResetView, self).form_valid(form)
