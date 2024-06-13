@@ -1,12 +1,36 @@
+a {
+  text-decoration: none;
+}
+
 .oliver {
   max-width: 400px;
-  margin-bottom: 1rem;
 }
 
 .header {
-  margin: 1rem auto;
+  margin: 2rem auto;
 }
 
 .edit-btn {
   margin-bottom: 8px;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.home-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.oliver-container {
+  text-align: center;
+}
+
+.cta-container {
+  text-align: center;
+  margin-top: 1rem;
 }
