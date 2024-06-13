@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import RegisterForm, ArtPieceForm
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import login, logout, authenticate, views as auth_views
 from django.contrib.auth.decorators import login_required
-from django.utils.safestring import mark_safe
+from django.utils.html import strip_tags
+from django.core.mail import send_mail
 import os
 import random
 from django.core.mail import EmailMultiAlternatives
@@ -152,3 +153,34 @@ def send_art_piece_email(user):
 
 def custom_404(request, exception):
     return render(request, 'main/404.html', status=404)
+
+
+class CustomPasswordResetView(auth_views.PasswordResetView):
+    email_template_name = 'registration/password_reset_email.html'
+
+    def send_mail(self, subject_template_name, email_template_name,
+                  context, from_email, to_email, html_email_template_name=None):
+        """
+        Send a django.core.mail.EmailMultiAlternatives to `to_email`.
+        """
+        subject = render_to_string(subject_template_name, context)
+        # Email subject *must not* contain newlines
+        subject = ''.join(subject.splitlines())
+        body = render_to_string(email_template_name, context)
+        plain_body = strip_tags(body)
+        send_mail(subject, plain_body, from_email,
+                  [to_email], html_message=body)
+
+    # Override the method to use custom email subject and content
+    def form_valid(self, form):
+        opts = {
+            'use_https': self.request.is_secure(),
+            'token_generator': self.token_generator,
+            'from_email': self.from_email,
+            'email_template_name': self.email_template_name,
+            'subject_template_name': 'registration/password_reset_subject.txt',
+            'request': self.request,
+            'html_email_template_name': self.email_template_name,
+        }
+        form.save(**opts)
+        return super().form_valid(form)
