@@ -15,6 +15,10 @@ a {
   margin-bottom: 8px;
 }
 
+.info-container {
+  margin: 2rem auto;
+}
+
 /* .container {
   display: flex;
   flex-direction: column;
