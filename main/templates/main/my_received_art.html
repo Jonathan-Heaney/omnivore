@@ -18,12 +18,9 @@
         {% else %}
         <span class="card-title">{{piece.piece_name}}</span>
         {% endif %}
-        </strong></div>
+        </strong>({{ piece.artist_name }})</div>
     <div class="card-body d-flex flex-row justify-content-between">
       <div>
-        Artist: {{ piece.artist_name }}
-        <br>
-        <br>
         <p>{{piece.piece_description|linebreaksbr}}</p>
       </div>
     </div>
