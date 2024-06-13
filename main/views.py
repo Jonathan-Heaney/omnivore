@@ -130,14 +130,12 @@ def send_art_piece_email(user):
     sender = f'{art_piece.user.first_name} {art_piece.user.last_name}'
 
     art_page_link = 'https://omnivorearts.com/my-received-art'
-    embedded_link = mark_safe(
-        f'<a href="{art_page_link}" target="_blank">here!</a>')
 
     # Define the context to be used in the template
     context = {
         'username': user.first_name,
         'sender': sender,
-        'link': embedded_link
+        'link': art_page_link
     }
 
     # Render the HTML content with the context
