@@ -127,28 +127,17 @@ def send_art_piece_email(user):
     # Mark the art piece as sent
     mark_art_piece_as_sent(user, art_piece)
 
-    # Prepare the link or plain text based on the existence of art_link
-    if art_piece.link:
-        art_link_or_name = mark_safe(
-            f'<a href="{art_piece.link}" target="_blank">{art_piece.piece_name}</a>')
-    else:
-        art_link_or_name = art_piece.piece_name
-
-    # Load the email template
-    # template_path = os.path.join(
-    #     settings.BASE_DIR, 'main/templates/emails/email_template.html')
-    # with open(template_path, 'r') as file:
-    #     html_template = file.read()
-
     sender = f'{art_piece.user.first_name} {art_piece.user.last_name}'
+
+    art_page_link = 'https://omnivorearts.com/my-received-art'
+    embedded_link = mark_safe(
+        f'<a href="{art_page_link}" target="_blank">here!</a>')
 
     # Define the context to be used in the template
     context = {
         'username': user.first_name,
-        'art_link_or_name': art_link_or_name,
-        'artist_name': art_piece.artist_name,
-        'piece_description': art_piece.piece_description,
-        'sender': sender
+        'sender': sender,
+        'link': embedded_link
     }
 
     # Render the HTML content with the context
