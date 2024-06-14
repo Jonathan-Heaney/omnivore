@@ -10,6 +10,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.conf import settings
+from django.utils import timezone
 from .models import ArtPiece, SentArtPiece
 from django.contrib.auth.models import User
 
@@ -33,6 +34,16 @@ def sign_up(request):
 
 @login_required(login_url="/login")
 def share_art(request):
+    today = timezone.now().date()
+    first_day_of_month = timezone.make_aware(
+        timezone.datetime(today.year, today.month, 1))
+    user = request.user
+    already_submitted = ArtPiece.objects.filter(
+        user=user).filter(created_at__gte=first_day_of_month)
+
+    if already_submitted:
+        return render(request, 'main/already_submitted.html')
+
     if request.method == 'POST':
         form = ArtPieceForm(request.POST)
         if form.is_valid():

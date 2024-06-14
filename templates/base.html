@@ -35,9 +35,11 @@
                     <li class="nav-item">
                         <a href="/my-received-art" class="nav-link">My Received Art</a>
                     </li>
+                    {% if not has_submitted_art_this_month %}
                     <li class="nav-item">
                         <a href="/share-art" class="nav-link">Share Art</a>
                     </li>
+                    {% endif %}
                     <span class="navbar-text">Welcome, {{user.first_name}} | </span>
                     <li class="nav-item">
                         <a href="/logout" class="nav-link">Logout</a>
