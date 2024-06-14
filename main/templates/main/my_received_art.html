@@ -11,7 +11,7 @@
 <h1 class="header">My Received Art</h1>
 
 {% for piece in pieces %}
-<div class="card mt-2">
+<div class="card mt-2 art-piece">
     <div class="card-header"><strong>
         {% if piece.link %}
         <a href="{{piece.link}}" target="_blank"><span class="card-title">{{piece.piece_name}}</span></a>
@@ -24,7 +24,7 @@
         <p>{{piece.piece_description|linebreaksbr}}</p>
       </div>
     </div>
-    <div class="card-footer text-muted">Shared by {{piece.user.first_name}} {{piece.user.last_name}}   ({{piece.created_at}})</div>
+    <div class="card-footer text-muted">Shared by <strong>{{piece.user.first_name}} {{piece.user.last_name}}</strong></div>
   </div>
   {% empty %}
   <p>You haven't received anything yet!</p>
