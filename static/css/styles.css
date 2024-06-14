@@ -19,6 +19,10 @@ a {
   margin: 2rem auto;
 }
 
+.info {
+  margin-bottom: 2rem;
+}
+
 /* .container {
   display: flex;
   flex-direction: column;
