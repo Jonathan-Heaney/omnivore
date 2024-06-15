@@ -31,6 +31,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
+# Enable time zone support
+USE_TZ = True
+
+# Set time zone to Central Time in US
+TIME_ZONE = 'America/Chicago'
 
 # Application definition
 
@@ -60,6 +65,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'main.middleware.BlockWordPressPathsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'omnivore.urls'
