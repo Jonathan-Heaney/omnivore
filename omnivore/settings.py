@@ -36,12 +36,14 @@ ALLOWED_HOSTS = ["*"]
 USE_TZ = True
 TIME_ZONE = 'UTC'
 
-warnings.filterwarnings(
-    "error",
-    r"DateTimeField .* received a naive datetime",
-    RuntimeWarning,
-    r"django\.db\.models\.fields",
-)
+
+# Throw an exception when getting a naive datetime error - used for debugging
+# warnings.filterwarnings(
+#     "error",
+#     r"DateTimeField .* received a naive datetime",
+#     RuntimeWarning,
+#     r"django\.db\.models\.fields",
+# )
 
 # Application definition
 
