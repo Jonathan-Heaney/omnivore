@@ -2,6 +2,7 @@ from pathlib import Path
 import os
 from os import getenv
 from dotenv import load_dotenv
+import warnings
 
 load_dotenv()
 
@@ -34,6 +35,13 @@ ALLOWED_HOSTS = ["*"]
 # Enable time zone support
 USE_TZ = True
 TIME_ZONE = 'UTC'
+
+warnings.filterwarnings(
+    "error",
+    r"DateTimeField .* received a naive datetime",
+    RuntimeWarning,
+    r"django\.db\.models\.fields",
+)
 
 # Application definition
 
