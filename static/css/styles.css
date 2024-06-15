@@ -2,14 +2,6 @@ a {
   text-decoration: none;
 }
 
-/* .oliver {
-  max-width: 80%;
-}
-
-.header {
-  margin: 2rem auto;
-}
-
 .edit-btn {
   margin-bottom: 8px;
 }
@@ -23,31 +15,12 @@ a {
 }
 
 .art-piece {
-  margin-bottom: 3rem;
-} */
-
-/* .container {
-  display: flex;
-  flex-direction: column;
-/* } */
-/* 
-.home-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  align-items: center;
-} */
+  margin-bottom: 2.5rem;
+}
 
 .oliver-container {
   text-align: center;
 }
-
-.cta-container {
-  text-align: center;
-  margin-top: 1rem;
-}
-
-/* Bootstrap GPT suggestions */
 
 .header {
   margin-top: 20px;
@@ -56,6 +29,10 @@ a {
 .home-container {
   margin-top: 30px;
   margin-bottom: 30px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
 
 .oliver {
@@ -64,6 +41,7 @@ a {
 }
 
 .cta-container {
+  text-align: center;
   margin-top: 20px;
 }
 
@@ -81,6 +59,10 @@ a {
 }
 
 @media (min-width: 768px) and (max-width: 991.98px) {
+  .oliver {
+    max-width: 300px;
+  }
+
   .header {
     font-size: 2rem;
   }
@@ -93,6 +75,10 @@ a {
 }
 
 @media (min-width: 992px) {
+  .oliver {
+    max-width: 300px;
+  }
+
   .header {
     font-size: 2.5rem;
   }
