@@ -33,9 +33,7 @@ ALLOWED_HOSTS = ["*"]
 
 # Enable time zone support
 USE_TZ = True
-
-# Set time zone to Central Time in US
-TIME_ZONE = 'America/Chicago'
+TIME_ZONE = 'UTC'
 
 # Application definition
 
