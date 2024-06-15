@@ -30,6 +30,7 @@ a {
 
 .header {
   margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 .home-container {
@@ -146,18 +147,17 @@ a {
 
 /* Ensure the footer stays at the bottom */
 footer {
-  background-color: #343a40; /* Dark background color */
-  color: white;
-  padding: 1rem 0;
-  text-align: center;
+  color: #ffffff8c;
+  padding-top: 1rem;
   width: 100%;
 }
 
 footer a {
-  color: white;
+  color: #ffffff8c;
   text-decoration: none;
 }
 
 footer a:hover {
+  color: #ffffffcc;
   text-decoration: underline;
 }
