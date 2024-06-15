@@ -1,3 +1,9 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
 a {
   text-decoration: none;
 }
@@ -27,7 +33,7 @@ a {
 }
 
 .home-container {
-  margin-top: 30px;
+  margin-top: 10px;
   margin-bottom: 30px;
   display: flex;
   flex-direction: row;
@@ -55,6 +61,10 @@ a {
   }
   .cta-container h4 {
     font-size: 1rem;
+  }
+
+  .oliver-caption {
+    font-size: 0.8rem;
   }
 }
 
@@ -112,6 +122,9 @@ a {
   background-color: #212529; /* Match the navbar dark background */
   border-color: #ffffff8c;
   color: #ffffff8c; /* White text for dropdown items */
+  max-width: 250px; /* Set the maximum width of the dropdown menu */
+  width: auto; /* Ensure the dropdown does not stretch beyond the content */
+  margin: 0 auto; /* Center the dropdown menu */
 }
 
 .navbar-dark .dropdown-item {
@@ -129,4 +142,22 @@ a {
   .navbar-dark .dropdown-item {
     text-align: left;
   }
+}
+
+/* Ensure the footer stays at the bottom */
+footer {
+  background-color: #343a40; /* Dark background color */
+  color: white;
+  padding: 1rem 0;
+  text-align: center;
+  width: 100%;
+}
+
+footer a {
+  color: white;
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
 }
