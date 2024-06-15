@@ -7,21 +7,26 @@
 {% endblock %}
 
 {% block content %}
-<h1 class="header">Welcome to Omnivore Arts!</h1>
+<h1 class="header text-center">Welcome to Omnivore Arts!</h1>
 <div class="container">
-  <div class="home-container">
-    <div class="oliver-container">
-      <img class="oliver" src="{% static 'images/oliver-no-bg.png' %}" alt="Oliver the Omnivore">
-      <p>Oliver the Omnivore</p>
+    <div class="row home-container">
+        <div class="col-md-6 text-center oliver-container">
+            <img class="oliver img-fluid" src="{% static 'images/oliver-no-bg.png' %}" alt="Oliver the Omnivore">
+            <p>Oliver the Omnivore</p>
+        </div>
+        <div class="col-md-6 text-center">
+            <h1>Share and discover art, music, and culture.</h1>
+        </div>
     </div>
-    <h1>Share and discover art, music, and culture.</h1>
-  </div>
-  <div class="cta-container">
-    {% if user.is_authenticated %}
-    <h4>Our first round begins July 1st - until then, check out <a href="/how-it-works">how Omnivore works</a>!</h4>
-    {% else %}
-    <h4>Our first round begins July 1st - <a href="/sign-up">join us</a>!</h4>
-  </div>
+    <div class="row cta-container">
+        <div class="col-12 text-center">
+            {% if user.is_authenticated %}
+            <h4>Our first round begins July 1st - until then, check out <a href="/how-it-works">how Omnivore works</a>!</h4>
+            {% else %}
+            <h4>Our first round begins July 1st - <a href="/sign-up">join us</a>!</h4>
+            {% endif %}
+        </div>
+    </div>
 </div>
-{% endif %}
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 {% endblock %}
