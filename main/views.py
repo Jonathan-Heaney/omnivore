@@ -187,7 +187,7 @@ class CustomPasswordResetView(auth_views.PasswordResetView):
         opts = {
             'use_https': self.request.is_secure(),
             'token_generator': self.token_generator,
-            'from_email': 'Omnivore Arts <jonathan@omnivorearts.com>',
+            'from_email': 'Omnivore Arts <support@omnivorearts.com>',
             'email_template_name': self.email_template_name,
             'subject_template_name': 'registration/password_reset_subject.txt',
             'request': self.request,
