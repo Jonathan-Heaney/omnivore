@@ -1,5 +1,26 @@
 from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from django.db import models
+
+
+# class CustomUser(AbstractUser):
+#     email = models.EmailField(unique=True)
+
+#     USERNAME_FIELD = 'email'
+#     REQUIRED_FIELDS = ['first_name', 'last_name']
+
+#     def save(self, *args, **kwargs):
+#         self.first_name = self.first_name.capitalize()
+#         self.last_name = self.last_name.capitalize()
+#         if not self.username:
+#             base_username = f"{self.first_name}{self.last_name}".lower()
+#             username = base_username
+#             counter = 1
+#             while CustomUser.objects.filter(username=username).exists():
+#                 username = f"{base_username}{counter}"
+#                 counter += 1
+#             self.username = username
+#         super().save(*args, **kwargs)
 
 
 class ArtPiece(models.Model):
