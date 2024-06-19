@@ -61,3 +61,8 @@ class SentArtPiece(models.Model):
 
     def __str__(self):
         return f'{self.user} - {self.art_piece}'
+
+    def art_piece_submitter(self):
+        return self.art_piece.user
+
+    art_piece_submitter.short_description = 'Submitted By'

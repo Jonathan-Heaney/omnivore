@@ -9,7 +9,10 @@ class ArtPieceAdmin(admin.ModelAdmin):
 
 
 class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ("username", "first_name", "last_name", "email")
+    list_filter = ("date_joined", "last_login", "is_active", "is_staff")
+
+    list_display = ("username", "first_name",
+                    "last_name", "email", "date_joined", "last_login", "is_active")
 
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
@@ -26,6 +29,12 @@ class CustomUserAdmin(admin.ModelAdmin):
     )
 
 
+class SentArtPieceAdmin(admin.ModelAdmin):
+    list_filter = ("user", "art_piece", "sent_time")
+    list_display = ("user", "art_piece",
+                    "art_piece_submitter", "sent_time")
+
+
 admin.site.register(ArtPiece, ArtPieceAdmin)
-admin.site.register(SentArtPiece)
+admin.site.register(SentArtPiece, SentArtPieceAdmin)
 admin.site.register(CustomUser, CustomUserAdmin)
