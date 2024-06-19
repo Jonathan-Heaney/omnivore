@@ -1,30 +1,40 @@
 from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.conf import settings
 
 
-# class CustomUser(AbstractUser):
-#     email = models.EmailField(unique=True)
+class CustomUser(AbstractUser):
+    email = models.EmailField(unique=True)
 
-#     USERNAME_FIELD = 'email'
-#     REQUIRED_FIELDS = ['first_name', 'last_name']
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
-#     def save(self, *args, **kwargs):
-#         self.first_name = self.first_name.capitalize()
-#         self.last_name = self.last_name.capitalize()
-#         if not self.username:
-#             base_username = f"{self.first_name}{self.last_name}".lower()
-#             username = base_username
-#             counter = 1
-#             while CustomUser.objects.filter(username=username).exists():
-#                 username = f"{base_username}{counter}"
-#                 counter += 1
-#             self.username = username
-#         super().save(*args, **kwargs)
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='customuser_set',
+        blank=True,
+        help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.',
+        verbose_name='groups',
+    )
+
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='customuser_set',
+        blank=True,
+        help_text='Specific permissions for this user.',
+        verbose_name='user permissions',
+    )
+
+    def save(self, *args, **kwargs):
+        self.first_name = self.first_name.capitalize().strip()
+        self.last_name = self.last_name.capitalize().strip()
+        super().save(*args, **kwargs)
 
 
 class ArtPiece(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE)
     artist_name = models.CharField(max_length=200)
     piece_name = models.CharField(max_length=300)
     piece_description = models.TextField()
@@ -38,7 +48,8 @@ class ArtPiece(models.Model):
 
 
 class SentArtPiece(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE)
     art_piece = models.ForeignKey(ArtPiece, on_delete=models.CASCADE)
     sent_time = models.DateTimeField(auto_now_add=True)
 
