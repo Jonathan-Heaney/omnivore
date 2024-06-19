@@ -10,6 +10,5 @@ def faq(request):
     return render(request, 'about/faq.html')
 
 
-@login_required(login_url="/login")
 def submission_guidelines(request):
     return render(request, 'about/submission_guidelines.html')
