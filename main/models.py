@@ -31,6 +31,9 @@ class CustomUser(AbstractUser):
         self.last_name = self.last_name.capitalize().strip()
         super().save(*args, **kwargs)
 
+    def __str__(self):
+        return f'{self.first_name} {self.last_name}'
+
 
 class ArtPiece(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
