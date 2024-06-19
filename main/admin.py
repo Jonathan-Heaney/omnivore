@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ArtPiece, SentArtPiece
+from .models import ArtPiece, SentArtPiece, CustomUser
 
 
 class ArtPieceAdmin(admin.ModelAdmin):
@@ -8,5 +8,10 @@ class ArtPieceAdmin(admin.ModelAdmin):
                     "approved_status", "created_at")
 
 
+class CustomUserAdmin(admin.ModelAdmin):
+    list_display = ("first_name", "last_name", "username", "email")
+
+
 admin.site.register(ArtPiece, ArtPieceAdmin)
 admin.site.register(SentArtPiece)
+admin.site.register(CustomUser, CustomUserAdmin)
