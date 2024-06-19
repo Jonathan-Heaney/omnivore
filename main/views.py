@@ -49,7 +49,9 @@ def share_art(request):
             art_piece = form.save(commit=False)
             art_piece.user = request.user
             art_piece.save()
-            return redirect("/my-shared-art")
+            piece_to_share = choose_art_piece(user)
+            mark_art_piece_as_sent(user, piece_to_share)
+            return render(request, 'main/thanks_for_sharing.html')
     else:
         form = ArtPieceForm()
 

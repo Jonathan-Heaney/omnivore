@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} Thanks for your submission! {% endblock %}
+{% block css_files %}
+  <link rel="stylesheet" href="{% static "css/styles.css" %}">
+{% endblock %}
+
+{% block content %}
+<h1 class="header">Thanks for your submission!</h1>
+
+<p>You can view and edit your piece on the <a href="/my-shared-art">My Shared Art</a> page.</p>
+<p>You'll receive art from others in the community every Tuesday/Friday starting July 5th, but as a thank you, we've shared a piece with you now - check it out on the <a href="/my-received-art">My Received Art</a> page!</p>
+{% endblock %}
