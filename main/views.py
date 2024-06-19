@@ -11,8 +11,7 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.conf import settings
 from django.utils import timezone
-from .models import ArtPiece, SentArtPiece
-from django.contrib.auth.models import User
+from .models import ArtPiece, SentArtPiece, CustomUser
 
 
 def home(request):
