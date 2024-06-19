@@ -1,8 +1,7 @@
 import random
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from django.contrib.auth.models import User
-from main.models import ArtPiece, SentArtPiece
+from main.models import ArtPiece, SentArtPiece, CustomUser
 from main.views import choose_art_piece, mark_art_piece_as_sent, send_art_piece_email
 
 
@@ -22,7 +21,7 @@ class Command(BaseCommand):
                 timezone.datetime(today.year, today.month, 1))
 
             # Get all users who submitted art this month
-            users = User.objects.filter(
+            users = CustomUser.objects.filter(
                 artpiece__created_at__gte=first_day_of_month
             ).distinct()
 
