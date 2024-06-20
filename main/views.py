@@ -167,6 +167,10 @@ def custom_404(request, exception):
     return render(request, 'main/404.html', status=404)
 
 
+def custom_500(request):
+    return render(request, 'main/404.html', status=500)
+
+
 class CustomPasswordResetView(auth_views.PasswordResetView):
     email_template_name = 'registration/password_reset_email.html'
 
