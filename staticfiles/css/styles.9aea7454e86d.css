@@ -1,0 +1,195 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+a {
+  text-decoration: none;
+}
+
+.container a {
+  color: #108dca;
+}
+
+.edit-btn {
+  margin-bottom: 8px;
+}
+
+.info-container {
+  margin: 2rem auto;
+}
+
+.info {
+  margin-bottom: 2rem;
+}
+
+.art-piece {
+  margin-bottom: 2.5rem;
+}
+
+.oliver-container {
+  text-align: center;
+}
+
+.header {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-family: 'Madimi One';
+}
+
+.container,
+.navbar a {
+  font-family: 'Noto Sans';
+}
+
+#navbar-brand {
+  font-family: 'Madimi One';
+}
+
+.container p,
+.container ul,
+.form-text,
+.text-muted {
+  font-weight: 300;
+}
+
+.container h4,
+.container h5,
+.tagline {
+  font-weight: 900;
+}
+
+.container button,
+.edit-btn {
+  font-weight: 700;
+}
+
+.home-container {
+  margin-top: 10px;
+  margin-bottom: 30px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.oliver {
+  max-width: 60%;
+  height: auto;
+}
+
+.cta-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Additional media queries for fine-tuning responsiveness */
+@media (max-width: 767.98px) {
+  .header {
+    font-size: 1.5rem;
+  }
+  .home-container h1 {
+    font-size: 1.2rem;
+  }
+  .cta-container h4 {
+    font-size: 1rem;
+  }
+
+  .oliver-caption {
+    font-size: 0.8rem;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .oliver {
+    max-width: 300px;
+  }
+
+  .header {
+    font-size: 2rem;
+  }
+  .home-container h1 {
+    font-size: 1.5rem;
+  }
+  .cta-container h4 {
+    font-size: 1.2rem;
+  }
+}
+
+@media (min-width: 992px) {
+  .oliver {
+    max-width: 300px;
+  }
+
+  .header {
+    font-size: 2.5rem;
+  }
+  .home-container h1 {
+    font-size: 2rem;
+  }
+  .cta-container h4 {
+    font-size: 1.5rem;
+  }
+}
+
+/* Custom styles for the navbar */
+.navbar-brand {
+  font-weight: bold;
+}
+
+@media (max-width: 991.98px) {
+  .navbar-nav .nav-item {
+    text-align: center;
+  }
+}
+
+.navbar-oliver {
+  height: 30px; /* Adjust the height as needed */
+  width: auto;
+  vertical-align: top;
+}
+
+/* Custom styles for the dropdown menu */
+.navbar-dark .dropdown-menu {
+  background-color: #212529; /* Match the navbar dark background */
+  border-color: #ffffff8c;
+  color: #ffffff8c; /* White text for dropdown items */
+  max-width: 250px; /* Set the maximum width of the dropdown menu */
+  width: auto; /* Ensure the dropdown does not stretch beyond the content */
+  margin: 0 auto; /* Center the dropdown menu */
+}
+
+.navbar-dark .dropdown-item {
+  text-align: center;
+  color: #ffffff8c; /* White text for dropdown items */
+}
+
+.navbar-dark .dropdown-item:hover,
+.navbar-dark .dropdown-item:focus {
+  color: #212529; /* Dark text on hover */
+  background-color: white; /* White background on hover */
+}
+
+@media (min-width: 992px) {
+  .navbar-dark .dropdown-item {
+    text-align: left;
+  }
+}
+
+/* Ensure the footer stays at the bottom */
+footer {
+  color: #ffffff8c;
+  padding-top: 1rem;
+  width: 100%;
+}
+
+footer a {
+  color: #ffffff8c;
+  text-decoration: none;
+}
+
+footer a:hover {
+  color: #ffffffcc;
+  text-decoration: underline;
+}
