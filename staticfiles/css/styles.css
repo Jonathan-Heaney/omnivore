@@ -12,8 +12,9 @@ a {
   color: #108dca;
 }
 
-.edit-btn {
+#edit-btn {
   margin-bottom: 8px;
+  color: #fff;
 }
 
 .info-container {
