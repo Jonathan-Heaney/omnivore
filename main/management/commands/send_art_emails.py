@@ -28,6 +28,9 @@ class Command(BaseCommand):
             for user in users:
                 send_art_piece_email(user)
 
+            self.stdout.write(self.style.SUCCESS(
+                'Successfully sent art emails.'))
+
         else:
             self.stdout.write(self.style.WARNING(
                 f"Today's date {today} is not within the specified range. No emails sent."))
