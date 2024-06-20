@@ -37,10 +37,7 @@ a {
   margin-top: 20px;
   margin-bottom: 20px;
   font-family: 'Madimi One';
-}
-
-.container .header {
-  font-size: 32px;
+  font-size: 2rem;
 }
 
 .container,
@@ -56,13 +53,13 @@ a {
 .container ul,
 .form-text,
 .text-muted {
-  font-weight: 400;
+  font-weight: 300;
 }
 
 .container h4,
 .container h5,
 .tagline {
-  font-weight: 700;
+  font-weight: 900;
 }
 
 .container button,
@@ -111,7 +108,7 @@ a {
     max-width: 300px;
   }
 
-  .container .header {
+  .header {
     font-size: 2.5rem;
   }
   .home-container h1 {
@@ -127,7 +124,7 @@ a {
     max-width: 300px;
   }
 
-  .container .header {
+  .header {
     font-size: 3rem;
   }
   .home-container h1 {

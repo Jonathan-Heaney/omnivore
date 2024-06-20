@@ -56,13 +56,13 @@ a {
 .container ul,
 .form-text,
 .text-muted {
-  font-weight: 400;
+  font-weight: 300;
 }
 
 .container h4,
 .container h5,
 .tagline {
-  font-weight: 700;
+  font-weight: 900;
 }
 
 .container button,

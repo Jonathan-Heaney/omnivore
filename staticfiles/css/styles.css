@@ -39,6 +39,10 @@ a {
   font-family: 'Madimi One';
 }
 
+.container .header {
+  font-size: 32px;
+}
+
 .container,
 .navbar a {
   font-family: 'Noto Sans';
@@ -52,13 +56,13 @@ a {
 .container ul,
 .form-text,
 .text-muted {
-  font-weight: 300;
+  font-weight: 400;
 }
 
 .container h4,
 .container h5,
 .tagline {
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .container button,
@@ -107,8 +111,8 @@ a {
     max-width: 300px;
   }
 
-  .header {
-    font-size: 2rem;
+  .container .header {
+    font-size: 2.5rem;
   }
   .home-container h1 {
     font-size: 1.5rem;
@@ -123,8 +127,8 @@ a {
     max-width: 300px;
   }
 
-  .header {
-    font-size: 2.5rem;
+  .container .header {
+    font-size: 3rem;
   }
   .home-container h1 {
     font-size: 2rem;
