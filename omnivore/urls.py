@@ -18,13 +18,19 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls import handler404, handler500
 from main import views as main_views
+from django.views.generic import RedirectView
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('main.urls')),
     path('', include('about.urls')),
     path('', include('django.contrib.auth.urls')),
-]
+    path('favicon.ico', RedirectView.as_view(
+        url=settings.STATIC_URL + 'images/favicon.ico')),
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 handler404 = main_views.custom_404
 handler500 = main_views.custom_500
