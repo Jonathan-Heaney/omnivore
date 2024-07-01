@@ -17,6 +17,18 @@ a {
   color: #fff;
 }
 
+.card-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.art-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 1rem;
+}
+
 .info-container {
   margin: 2rem auto;
 }
@@ -103,6 +115,22 @@ a {
 
   .oliver-caption {
     font-size: 0.8rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .card-body {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+
+  .art-buttons {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 5px;
   }
 }
 

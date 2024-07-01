@@ -19,11 +19,11 @@
         <span class="card-title">{{piece.piece_name}}</span>
         {% endif %}
         </strong>({{piece.artist_name}})</div>
-    <div class="card-body d-flex flex-row justify-content-between">
+    <div class="card-body">
       <div>
         <p>{{piece.piece_description|linebreaksbr}}</p>
       </div>
-      <div>
+      <div class="art-buttons">
         <a href="{% url 'edit_art_piece' piece.id %}" class="btn btn-primary edit-btn" id="edit-btn">Edit</a>
         <form method="post" action="{% url 'delete_art_piece' piece.id %}" onsubmit="return confirmDelete();">
           {% csrf_token %}
