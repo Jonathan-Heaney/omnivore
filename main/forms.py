@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import ArtPiece, CustomUser
+from .models import ArtPiece, CustomUser, Comment
 
 
 class RegisterForm(UserCreationForm):
@@ -31,3 +31,9 @@ class ArtPieceForm(forms.ModelForm):
             "link": "Include a link to view the piece online, if applicable.",
             "piece_description": "Tell us a bit about the piece and what it means to you. Why are you sharing it? What should people know about it? "
         }
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['text']
