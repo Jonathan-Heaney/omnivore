@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -178,6 +178,7 @@ LOGOUT_REDIRECT_URL = '/login'
 
 CSRF_TRUSTED_ORIGINS = [
     'https://web-production-4a6f.up.railway.app',
+    'https://web-staging-f21f.up.railway.app'
     'http://localhost',
     'http://127.0.0.1',
     'http://localhost:8001',
