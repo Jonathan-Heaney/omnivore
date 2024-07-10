@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import RegisterForm, ArtPieceForm
+from .forms import RegisterForm, ArtPieceForm, CommentForm
 from django.contrib.auth import login, logout, authenticate, views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.utils.html import strip_tags
@@ -11,7 +11,7 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.conf import settings
 from django.utils import timezone
-from .models import ArtPiece, SentArtPiece, CustomUser
+from .models import ArtPiece, SentArtPiece, CustomUser, Comment
 
 
 def home(request):
@@ -100,10 +100,28 @@ def my_received_art(request):
     user = request.user
     received_pieces = SentArtPiece.objects.filter(
         user=user).select_related('art_piece__user').order_by('-sent_time')
-
     pieces = [received_piece.art_piece for received_piece in received_pieces]
+    comments = Comment.objects.filter(recipient=user)
 
-    return render(request, 'main/my_received_art.html', {"pieces": pieces})
+    if request.method == 'POST' and 'add_comment' in request.POST:
+        art_piece_id = request.POST.get('art_piece_id')
+        art_piece = get_object_or_404(ArtPiece, id=art_piece_id)
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.sender = request.user
+            comment.recipient = art_piece.user
+            comment.art_piece = art_piece
+            comment.save()
+            return redirect('my_received_art')
+
+    context = {
+        'pieces': pieces,
+        'comments': comments,
+        'comment_form': CommentForm()
+    }
+
+    return render(request, 'main/my_received_art.html', context)
 
 
 def LogOut(request):
