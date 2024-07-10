@@ -91,8 +91,27 @@ def delete_art_piece(request, pk):
 def my_shared_art(request):
     user = request.user
     my_pieces = ArtPiece.objects.filter(user=user).order_by('-created_at')
+    comments = Comment.objects.filter(art_piece__in=my_pieces)
 
-    return render(request, 'main/my_shared_art.html', {"pieces": my_pieces})
+    if request.method == 'POST' and 'reply_comment' in request.POST:
+        parent_comment_id = request.POST.get('parent_comment_id')
+        parent_comment = get_object_or_404(Comment, id=parent_comment_id)
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.sender = request.user
+            comment.recipient = parent_comment.sender
+            comment.art_piece = parent_comment.art_piece
+            comment.save()
+            return redirect('my_shared_art')
+
+    context = {
+        'pieces': my_pieces,
+        'comments': comments,
+        'comment_form': CommentForm()
+    }
+
+    return render(request, 'main/my_shared_art.html', context)
 
 
 @login_required(login_url="/login")
