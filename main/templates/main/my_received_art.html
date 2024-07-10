@@ -11,7 +11,7 @@
 <h1 class="header">My Received Art</h1>
 
 {% for piece in pieces %}
-<div class="card mt-2 art-piece">
+  <div class="card mt-2 art-piece">
     <div class="card-header"><strong>
         {% if piece.link %}
         <a href="{{piece.link}}" target="_blank"><span class="card-title">{{piece.piece_name}}</span></a>
@@ -25,7 +25,32 @@
       </div>
     </div>
     <div class="card-footer text-muted">Shared by <strong>{{piece.user.first_name}} {{piece.user.last_name}}</strong></div>
+
+    <div class="comments-section">
+      <h5>Comments</h5>
+      {% for comment in comments %}
+        {% if comment.art_piece == piece and comment.parent_comment is None %}
+          <p><strong>{{ comment.sender.first_name }}:</strong> {{comment.text}}</p>
+          {% for reply in comment.replies.all %}
+            <p style="margin-left: 20px;">-- <strong>{{ reply.sender.first_name }}:</strong> {{reply.text}}</p>
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+
+      <form method="post" action="">
+        {% csrf_token %}
+        {{ comment_form.as_p }}
+        <input type="hidden" name="art_piece_id" value="{{ piece.id }}">
+        <button type="submit" name="add_comment" class="btn btn-primary">Add Comment</button>
+      </form>
+
+    </div>
+
   </div>
+
+  
+
+
   {% empty %}
   <p>You haven't received anything yet - make sure to <a href="/share-art">share something</a> by July 5th so that don't miss out on getting any art!</p>
 {% endfor %}
