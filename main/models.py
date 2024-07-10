@@ -66,3 +66,19 @@ class SentArtPiece(models.Model):
         return self.art_piece.user
 
     art_piece_submitter.short_description = 'Submitted By'
+
+
+class Comment(models.Model):
+    sender = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='sent_comments')
+    recipient = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='received_comments')
+    art_piece = models.ForeignKey(ArtPiece, on_delete=models.CASCADE)
+    text = models.TextField()
+    parent_comment = models.ForeignKey(
+        'self', null=True, blank=True, on_delete=models.CASCADE, related_name='replies')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'Comment by {self.sender} on {self.art_piece}'
