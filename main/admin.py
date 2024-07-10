@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ArtPiece, SentArtPiece, CustomUser
+from .models import ArtPiece, SentArtPiece, CustomUser, Comment
 
 
 class ArtPieceAdmin(admin.ModelAdmin):
@@ -38,3 +38,4 @@ class SentArtPieceAdmin(admin.ModelAdmin):
 admin.site.register(ArtPiece, ArtPieceAdmin)
 admin.site.register(SentArtPiece, SentArtPieceAdmin)
 admin.site.register(CustomUser, CustomUserAdmin)
+admin.site.register(Comment)

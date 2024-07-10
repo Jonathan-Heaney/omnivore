@@ -120,7 +120,8 @@ def my_received_art(request):
     received_pieces = SentArtPiece.objects.filter(
         user=user).select_related('art_piece__user').order_by('-sent_time')
     pieces = [received_piece.art_piece for received_piece in received_pieces]
-    comments = Comment.objects.filter(recipient=user)
+    comments = Comment.objects.filter(art_piece__in=pieces, sender=user) | Comment.objects.filter(
+        art_piece__in=pieces, recipient=user)
 
     if request.method == 'POST' and 'add_comment' in request.POST:
         art_piece_id = request.POST.get('art_piece_id')
