@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load custom_filters %}
+
 
 {% block title %} My Shared Art {% endblock %}
 {% block css_files %}
@@ -35,23 +37,13 @@
 
     <div class="comments-section">
       <h5>Comments</h5>
-      {% for comment in comments %}
-        {% if comment.art_piece == piece and comment.parent_comment is None %}
-          <p><strong>{{ comment.sender.first_name }}:</strong> {{ comment.text }}</p>
-          {% for reply in comment.replies.all %}
-            <p style="margin-left: 20px;">-- <strong>{{ reply.sender.first_name }}:</strong> {{ reply.text }}</p>
-          {% endfor %}
-          <!-- Reply form -->
-          <form method="post" action="">
-            {% csrf_token %}
-            {{ comment_form.as_p }}
-            <input type="hidden" name="parent_comment_id" value="{{ comment.id }}">
-            <button type="submit" name="reply_comment" class="btn btn-secondary">Reply</button>
-          </form>
-        {% endif %}
+      {% for comment in conversations|dict_get:piece %}
+          <div class="conversation">
+              {% include 'main/comment_thread.html' with comment=comment level=0 %}
+          </div>
       {% endfor %}
-    </div>
   </div>
+</div>
 
   {% empty %}
   <p>Nothing shared yet - share something <a href="/share-art">here</a>!</p>

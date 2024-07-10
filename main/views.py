@@ -91,23 +91,29 @@ def delete_art_piece(request, pk):
 def my_shared_art(request):
     user = request.user
     my_pieces = ArtPiece.objects.filter(user=user).order_by('-created_at')
-    comments = Comment.objects.filter(art_piece__in=my_pieces)
+
+    conversations = {}
+    for piece in my_pieces:
+        piece_comments = Comment.objects.filter(
+            art_piece=piece, parent_comment__isnull=True).select_related('sender', 'recipient')
+        conversations[piece] = piece_comments
 
     if request.method == 'POST' and 'reply_comment' in request.POST:
-        parent_comment_id = request.POST.get('parent_comment_id')
-        parent_comment = get_object_or_404(Comment, id=parent_comment_id)
+        comment_id = request.POST.get('comment_id')
+        comment = get_object_or_404(Comment, id=comment_id)
         form = CommentForm(request.POST)
         if form.is_valid():
-            comment = form.save(commit=False)
-            comment.sender = request.user
-            comment.recipient = parent_comment.sender
-            comment.art_piece = parent_comment.art_piece
-            comment.save()
+            reply = form.save(commit=False)
+            reply.sender = request.user
+            reply.recipient = comment.sender if comment.sender != request.user else comment.recipient
+            reply.art_piece = comment.art_piece
+            reply.parent_comment = comment
+            reply.save()
             return redirect('my_shared_art')
 
     context = {
         'pieces': my_pieces,
-        'comments': comments,
+        'conversations': conversations,
         'comment_form': CommentForm()
     }
 
