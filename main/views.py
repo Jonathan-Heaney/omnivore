@@ -132,8 +132,8 @@ def my_received_art(request):
         user=user).select_related('art_piece__user').order_by('-sent_time')
 
     pieces = [received_piece.art_piece for received_piece in received_pieces]
-    comments = Comment.objects.filter(recipient=user).select_related(
-        'art_piece', 'sender', 'parent_comment').prefetch_related('replies')
+    comments = Comment.objects.filter(art_piece__in=pieces, sender=user) | Comment.objects.filter(
+        art_piece__in=pieces, recipient=user)
 
     conversations = {}
     for comment in comments:
@@ -141,7 +141,7 @@ def my_received_art(request):
             conversations[comment.art_piece] = []
         conversations[comment.art_piece].append(comment)
 
-     # Handle new comment submission
+        # Handle new comment submission
     if request.method == 'POST' and 'add_comment' in request.POST:
         art_piece_id = request.POST.get('art_piece_id')
         art_piece = get_object_or_404(ArtPiece, id=art_piece_id)

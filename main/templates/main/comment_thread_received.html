@@ -1,8 +1,5 @@
 <div class="comment" style="margin-left: {{ level }}em;">
     <p><strong>{{ comment.sender.first_name }} {{ comment.sender.last_name }}</strong>: {{ comment.text }}</p>
-    {% for reply in comment.replies.all %}
-        {% include 'main/comment_thread_received.html' with comment=reply level=level %}
-    {% endfor %}
     {% if forloop.last %}
         <form method="post" action="{% url 'my_received_art' %}">
             {% csrf_token %}
