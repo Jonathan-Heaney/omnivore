@@ -81,4 +81,4 @@ class Comment(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f'Comment by {self.sender} on {self.art_piece}'
+        return f'{self.sender} on {self.art_piece}: {self.text[:30]}'

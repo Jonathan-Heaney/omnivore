@@ -38,11 +38,9 @@
     <div class="comments-section">
       <h5>Comments</h5>
       {% for comment in conversations|dict_get:piece %}
-          {% if not comment.parent_comment %}
           <div class="conversation">
               {% include 'main/comment_thread.html' with comment=comment level=0 %}
           </div>
-          {% endif %}
       {% endfor %}
     </div>
 </div>

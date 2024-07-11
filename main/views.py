@@ -91,25 +91,27 @@ def delete_art_piece(request, pk):
 def my_shared_art(request):
     user = request.user
     my_pieces = ArtPiece.objects.filter(user=user).order_by('-created_at')
-    comments = Comment.objects.filter(art_piece__in=my_pieces).select_related(
-        'sender', 'recipient', 'parent_comment')
+    comments = Comment.objects.filter(art_piece__user=user).select_related(
+        'art_piece', 'sender', 'recipient', 'parent_comment').prefetch_related('replies')
 
     conversations = {}
     for comment in comments:
         if comment.art_piece not in conversations:
             conversations[comment.art_piece] = []
-        conversations[comment.art_piece].append(comment)
+        if not comment.parent_comment:
+            conversations[comment.art_piece].append(comment)
 
+      # Handle reply submission
     if request.method == 'POST' and 'reply_comment' in request.POST:
         comment_id = request.POST.get('comment_id')
-        parent_comment = get_object_or_404(Comment, id=comment_id)
+        comment = get_object_or_404(Comment, id=comment_id)
         form = CommentForm(request.POST)
         if form.is_valid():
             reply = form.save(commit=False)
             reply.sender = request.user
-            reply.recipient = parent_comment.sender if parent_comment.sender != request.user else parent_comment.recipient
-            reply.art_piece = parent_comment.art_piece
-            reply.parent_comment = parent_comment
+            reply.recipient = comment.sender if comment.sender != request.user else comment.recipient
+            reply.art_piece = comment.art_piece
+            reply.parent_comment = comment
             reply.save()
             return redirect('my_shared_art')
 
@@ -155,6 +157,20 @@ def my_received_art(request):
             if parent_comment:
                 new_comment.parent_comment = parent_comment
             new_comment.save()
+            return redirect('my_received_art')
+
+    # Handle reply submission
+    if request.method == 'POST' and 'reply_comment' in request.POST:
+        comment_id = request.POST.get('comment_id')
+        parent_comment = get_object_or_404(Comment, id=comment_id)
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            reply = form.save(commit=False)
+            reply.sender = request.user
+            reply.recipient = parent_comment.sender if parent_comment.sender != request.user else parent_comment.recipient
+            reply.art_piece = parent_comment.art_piece
+            reply.parent_comment = parent_comment
+            reply.save()
             return redirect('my_received_art')
 
     context = {
