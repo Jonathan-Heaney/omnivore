@@ -128,8 +128,8 @@ def my_received_art(request):
         user=user).select_related('art_piece__user').order_by('-sent_time')
 
     pieces = [received_piece.art_piece for received_piece in received_pieces]
-    comments = Comment.objects.filter(recipient=user).select_related(
-        'art_piece', 'sender', 'parent_comment')
+    comments = Comment.objects.filter(art_piece__in=pieces, sender=user) | Comment.objects.filter(
+        art_piece__in=pieces, recipient=user)
 
     conversations = {}
     for comment in comments:
