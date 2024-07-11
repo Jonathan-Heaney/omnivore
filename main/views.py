@@ -101,17 +101,19 @@ def my_shared_art(request):
         if not comment.parent_comment:
             conversations[comment.art_piece].append(comment)
 
-      # Handle reply submission
+     # Handle reply submission
     if request.method == 'POST' and 'reply_comment' in request.POST:
         comment_id = request.POST.get('comment_id')
-        comment = get_object_or_404(Comment, id=comment_id)
+        parent_comment = get_object_or_404(Comment, id=comment_id)
+        while parent_comment.parent_comment:
+            parent_comment = parent_comment.parent_comment
         form = CommentForm(request.POST)
         if form.is_valid():
             reply = form.save(commit=False)
             reply.sender = request.user
-            reply.recipient = comment.sender if comment.sender != request.user else comment.recipient
-            reply.art_piece = comment.art_piece
-            reply.parent_comment = comment
+            reply.recipient = parent_comment.sender if parent_comment.sender != request.user else parent_comment.recipient
+            reply.art_piece = parent_comment.art_piece
+            reply.parent_comment = parent_comment
             reply.save()
             return redirect('my_shared_art')
 
