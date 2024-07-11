@@ -91,23 +91,25 @@ def delete_art_piece(request, pk):
 def my_shared_art(request):
     user = request.user
     my_pieces = ArtPiece.objects.filter(user=user).order_by('-created_at')
+    comments = Comment.objects.filter(art_piece__in=my_pieces).select_related(
+        'sender', 'recipient', 'parent_comment')
 
     conversations = {}
-    for piece in my_pieces:
-        piece_comments = Comment.objects.filter(
-            art_piece=piece, parent_comment__isnull=True).select_related('sender', 'recipient')
-        conversations[piece] = piece_comments
+    for comment in comments:
+        if comment.art_piece not in conversations:
+            conversations[comment.art_piece] = []
+        conversations[comment.art_piece].append(comment)
 
     if request.method == 'POST' and 'reply_comment' in request.POST:
         comment_id = request.POST.get('comment_id')
-        comment = get_object_or_404(Comment, id=comment_id)
+        parent_comment = get_object_or_404(Comment, id=comment_id)
         form = CommentForm(request.POST)
         if form.is_valid():
             reply = form.save(commit=False)
             reply.sender = request.user
-            reply.recipient = comment.sender if comment.sender != request.user else comment.recipient
-            reply.art_piece = comment.art_piece
-            reply.parent_comment = comment
+            reply.recipient = parent_comment.sender if parent_comment.sender != request.user else parent_comment.recipient
+            reply.art_piece = parent_comment.art_piece
+            reply.parent_comment = parent_comment
             reply.save()
             return redirect('my_shared_art')
 
@@ -125,6 +127,7 @@ def my_received_art(request):
     user = request.user
     received_pieces = SentArtPiece.objects.filter(
         user=user).select_related('art_piece__user').order_by('-sent_time')
+
     pieces = [received_piece.art_piece for received_piece in received_pieces]
     comments = Comment.objects.filter(art_piece__in=pieces, sender=user) | Comment.objects.filter(
         art_piece__in=pieces, recipient=user)
