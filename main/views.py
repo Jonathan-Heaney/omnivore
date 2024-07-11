@@ -132,8 +132,8 @@ def my_received_art(request):
         user=user).select_related('art_piece__user').order_by('-sent_time')
 
     pieces = [received_piece.art_piece for received_piece in received_pieces]
-    comments = Comment.objects.filter(art_piece__in=pieces, sender=user) | Comment.objects.filter(
-        art_piece__in=pieces, recipient=user)
+    comments = Comment.objects.filter(recipient=user).select_related(
+        'art_piece', 'sender', 'parent_comment').prefetch_related('replies')
 
     conversations = {}
     for comment in comments:
@@ -165,6 +165,8 @@ def my_received_art(request):
     if request.method == 'POST' and 'reply_comment' in request.POST:
         comment_id = request.POST.get('comment_id')
         parent_comment = get_object_or_404(Comment, id=comment_id)
+        while parent_comment.parent_comment:
+            parent_comment = parent_comment.parent_comment
         form = CommentForm(request.POST)
         if form.is_valid():
             reply = form.save(commit=False)
