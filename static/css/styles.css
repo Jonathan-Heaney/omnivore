@@ -101,6 +101,10 @@ a {
   margin-top: 20px;
 }
 
+.comments-section {
+  padding: 12px;
+}
+
 /* Additional media queries for fine-tuning responsiveness */
 @media (max-width: 767.98px) {
   .header {
