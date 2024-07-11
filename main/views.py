@@ -116,7 +116,6 @@ def my_shared_art(request):
     context = {
         'pieces': my_pieces,
         'conversations': conversations,
-        'comment_form': CommentForm()
     }
 
     return render(request, 'main/my_shared_art.html', context)
@@ -129,25 +128,38 @@ def my_received_art(request):
         user=user).select_related('art_piece__user').order_by('-sent_time')
 
     pieces = [received_piece.art_piece for received_piece in received_pieces]
-    comments = Comment.objects.filter(art_piece__in=pieces, sender=user) | Comment.objects.filter(
-        art_piece__in=pieces, recipient=user)
+    comments = Comment.objects.filter(recipient=user).select_related(
+        'art_piece', 'sender', 'parent_comment')
 
+    conversations = {}
+    for comment in comments:
+        if comment.art_piece not in conversations:
+            conversations[comment.art_piece] = []
+        conversations[comment.art_piece].append(comment)
+
+     # Handle new comment submission
     if request.method == 'POST' and 'add_comment' in request.POST:
         art_piece_id = request.POST.get('art_piece_id')
         art_piece = get_object_or_404(ArtPiece, id=art_piece_id)
+
+        # Check if the user already has a parent comment for this piece
+        parent_comment = Comment.objects.filter(
+            art_piece=art_piece, recipient=user, parent_comment__isnull=True).first()
+
         form = CommentForm(request.POST)
         if form.is_valid():
-            comment = form.save(commit=False)
-            comment.sender = request.user
-            comment.recipient = art_piece.user
-            comment.art_piece = art_piece
-            comment.save()
+            new_comment = form.save(commit=False)
+            new_comment.sender = request.user
+            new_comment.recipient = art_piece.user
+            new_comment.art_piece = art_piece
+            if parent_comment:
+                new_comment.parent_comment = parent_comment
+            new_comment.save()
             return redirect('my_received_art')
 
     context = {
         'pieces': pieces,
-        'comments': comments,
-        'comment_form': CommentForm()
+        'conversations': conversations,
     }
 
     return render(request, 'main/my_received_art.html', context)

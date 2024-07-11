@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load custom_filters %}
 
 {% block title %} My Received Art {% endblock %}
 {% block css_files %}
@@ -28,22 +29,21 @@
 
     <div class="comments-section">
       <h5>Comments</h5>
-      {% for comment in comments %}
-        {% if comment.art_piece == piece and comment.parent_comment is None %}
-          <p><strong>{{ comment.sender.first_name }}:</strong> {{comment.text}}</p>
-          {% for reply in comment.replies.all %}
-            <p style="margin-left: 20px;">-- <strong>{{ reply.sender.first_name }}:</strong> {{reply.text}}</p>
-          {% endfor %}
-        {% endif %}
+      {% for comment in conversations|dict_get:piece %}
+          {% if not comment.parent_comment %}
+          <div class="conversation">
+              {% include 'main/comment_thread.html' with comment=comment level=0 %}
+          </div>
+          {% endif %}
       {% endfor %}
-
-      <form method="post" action="">
-        {% csrf_token %}
-        {{ comment_form.as_p }}
-        <input type="hidden" name="art_piece_id" value="{{ piece.id }}">
-        <button type="submit" name="add_comment" class="btn btn-primary">Add Comment</button>
+      {% if not conversations|dict_get:piece %}
+      <form method="post" action="{% url 'my_received_art' %}">
+          {% csrf_token %}
+          <input type="hidden" name="art_piece_id" value="{{ piece.id }}">
+          <textarea name="text" rows="2" class="form-control mb-2" placeholder="Add a comment..."></textarea>
+          <button type="submit" name="add_comment" class="btn btn-primary">Add Comment</button>
       </form>
-
+      {% endif %}
     </div>
 
   </div>
