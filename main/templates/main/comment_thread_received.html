@@ -4,7 +4,7 @@
         <form method="post" action="{% url 'my_received_art' %}">
             {% csrf_token %}
             <input type="hidden" name="comment_id" value="{{ comment.id }}">
-            <textarea name="text" rows="2" class="form-control mb-2" placeholder="Reply..."></textarea>
+            <textarea name="text" rows="2" class="form-control mb-2" placeholder="Reply to {{comment.recipient.first_name}}..."></textarea>
             <button type="submit" name="reply_comment" class="btn btn-primary">Reply</button>
         </form>
     {% endif %}

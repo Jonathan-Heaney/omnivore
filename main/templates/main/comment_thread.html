@@ -1,14 +1,15 @@
 <div class="comment" style="margin-left: {{ level }}em;">
     <p><strong>{{ comment.sender.first_name }} {{ comment.sender.last_name }}</strong>: {{ comment.text }}</p>
     {% for reply in comment.replies.all %}
-        {% include 'main/comment_thread.html' with comment=reply level=level %}
-    {% endfor %}
-    {% if forloop.last %}
+        {% include 'main/comment_thread.html' with comment=reply level=1 %}
+        {% if forloop.last %}
         <form method="post" action="{% url 'my_shared_art' %}">
             {% csrf_token %}
             <input type="hidden" name="comment_id" value="{{ comment.id }}">
-            <textarea name="text" rows="2" class="form-control mb-2" placeholder="Reply..."></textarea>
+            <textarea name="text" rows="2" class="form-control mb-2" placeholder="Reply to {{comment.sender.first_name}}..."></textarea>
             <button type="submit" name="reply_comment" class="btn btn-primary">Reply</button>
         </form>
     {% endif %}
+    {% endfor %}
+    
 </div>
