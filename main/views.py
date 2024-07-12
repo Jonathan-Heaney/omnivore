@@ -18,10 +18,6 @@ def home(request):
     return render(request, 'main/home.html')
 
 
-def redirect_fail(request):
-    return redirect('/home')
-
-
 def sign_up(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
