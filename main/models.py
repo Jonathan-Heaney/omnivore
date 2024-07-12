@@ -22,13 +22,13 @@ class CustomUser(AbstractUser):
         'auth.Permission',
         related_name='customuser_set',
         blank=True,
-        help_text='Specific permissions for this user.',
+        help_text='Specific permission set for this user.',
         verbose_name='user permissions',
     )
 
     def save(self, *args, **kwargs):
-        self.first_name = self.first_name.capitalize().strip()
-        self.last_name = self.last_name.capitalize().strip()
+        self.first_name = self.first_name.strip()
+        self.last_name = self.last_name.strip()
         super().save(*args, **kwargs)
 
     def __str__(self):
