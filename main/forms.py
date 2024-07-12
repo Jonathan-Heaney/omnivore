@@ -1,12 +1,24 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import ArtPiece, CustomUser, Comment
+from django.core.exceptions import ValidationError
+
+
+def validate_username(value):
+    if '@' in value:
+        raise ValidationError("Username cannot contain the '@' symbol.")
 
 
 class RegisterForm(UserCreationForm):
-    first_name = forms.CharField(required=True)
+    first_name = forms.CharField(
+        required=True, widget=forms.TextInput(attrs={'autofocus': 'autofocus'}))
     last_name = forms.CharField(required=True)
     email = forms.EmailField(required=True)
+    username = forms.CharField(
+        required=True,
+        validators=[validate_username],
+        help_text="Please choose a unique username. Do not use your email address."
+    )
 
     class Meta:
         model = CustomUser
