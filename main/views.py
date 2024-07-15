@@ -148,7 +148,7 @@ def my_received_art(request):
         art_piece_id = request.POST.get('art_piece_id')
         art_piece = get_object_or_404(ArtPiece, id=art_piece_id)
 
-        # Check if the user already has a parent comment for this piece
+        # Check if the user already has a top level comment for this piece
         parent_comment = Comment.objects.filter(
             art_piece=art_piece, recipient=user, parent_comment__isnull=True).first()
 
@@ -166,16 +166,20 @@ def my_received_art(request):
     # Handle reply submission
     if request.method == 'POST' and 'reply_comment' in request.POST:
         comment_id = request.POST.get('comment_id')
-        parent_comment = get_object_or_404(Comment, id=comment_id)
-        while parent_comment.parent_comment:
-            parent_comment = parent_comment.parent_comment
+        current_comment = get_object_or_404(Comment, id=comment_id)
+
+        # Traverse to top-level parent comment
+        while current_comment.parent_comment:
+            current_comment = current_comment.parent_comment
+        top_level_comment = current_comment
+
         form = CommentForm(request.POST)
         if form.is_valid():
             reply = form.save(commit=False)
             reply.sender = request.user
-            reply.recipient = parent_comment.sender if parent_comment.sender != request.user else parent_comment.recipient
-            reply.art_piece = parent_comment.art_piece
-            reply.parent_comment = parent_comment
+            reply.recipient = top_level_comment.recipient
+            reply.art_piece = top_level_comment.art_piece
+            reply.parent_comment = top_level_comment
             reply.save()
             return redirect('my_received_art')
 
