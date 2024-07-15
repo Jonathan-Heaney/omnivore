@@ -1,22 +1,12 @@
 <div class="comment" style="margin-left: {{ level }}em;">
     {% include 'main/comment_text.html' %}
     {% if not comment.replies.all %}
-        <form method="post" action="{% url 'my_shared_art' %}">
-            {% csrf_token %}
-            <input type="hidden" name="comment_id" value="{{ comment.id }}">
-            <textarea name="text" rows="2" class="form-control mb-2" placeholder="Reply to {{comment.sender.first_name}}..."></textarea>
-            <button type="submit" name="reply_comment" class="btn btn-primary">Reply</button>
-        </form>
+         {% include 'main/reply_form.html' with reply_recipient=comment.sender.first_name redirect_url=redirect_url%}
     {% endif %}
     {% for reply in comment.replies.all %}
         {% include 'main/comment_text.html' with comment=reply level=1%}
         {% if forloop.last %}
-        <form method="post" action="{% url 'my_shared_art' %}">
-            {% csrf_token %}
-            <input type="hidden" name="comment_id" value="{{ comment.id }}">
-            <textarea name="text" rows="2" class="form-control mb-2" placeholder="Reply to {{comment.sender.first_name}}..."></textarea>
-            <button type="submit" name="reply_comment" class="btn btn-primary">Reply</button>
-        </form>
+        {% include 'main/reply_form.html' with reply_recipient=comment.sender.first_name redirect_url=redirect_url%}
         {% endif %}
     {% endfor %}
     
