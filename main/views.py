@@ -6,6 +6,7 @@ from django.utils.html import strip_tags
 from django.core.mail import send_mail
 import os
 import random
+import logging
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.http import HttpResponse
@@ -90,6 +91,7 @@ def my_shared_art(request):
     comments = Comment.objects.filter(art_piece__user=user).select_related(
         'art_piece', 'sender', 'recipient', 'parent_comment')
 
+    # Creates all the conversations on an art piece, by setting up the top-level comments that start each conversation
     conversations = {}
     for comment in comments:
         if comment.art_piece not in conversations:
@@ -97,10 +99,11 @@ def my_shared_art(request):
         if not comment.parent_comment:
             conversations[comment.art_piece].append(comment)
 
-     # Handle reply submission
+    # Handle reply submission
     if request.method == 'POST' and 'reply_comment' in request.POST:
         comment_id = request.POST.get('comment_id')
         parent_comment = get_object_or_404(Comment, id=comment_id)
+        # Traverse to the top-level parent comment
         while parent_comment.parent_comment:
             parent_comment = parent_comment.parent_comment
         form = CommentForm(request.POST)
@@ -136,6 +139,8 @@ def my_received_art(request):
         if comment.art_piece not in conversations:
             conversations[comment.art_piece] = []
         conversations[comment.art_piece].append(comment)
+
+    print(conversations)
 
     # Handle new comment submission
     if request.method == 'POST' and 'add_comment' in request.POST:

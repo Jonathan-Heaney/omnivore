@@ -9,7 +9,7 @@
         </form>
     {% endif %}
     {% for reply in comment.replies.all %}
-        {% include 'main/comment_text.html' with comment=reply level=1 %}
+        {% include 'main/comment_text.html' with comment=reply level=1%}
         {% if forloop.last %}
         <form method="post" action="{% url 'my_shared_art' %}">
             {% csrf_token %}

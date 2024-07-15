@@ -35,14 +35,15 @@
     </div>
     <div class="card-footer text-muted">Shared {{piece.created_at|date:"F j, Y" }}</div>
 
+
     <div class="comments-section">
-      <h5>Comments</h5>
       {% for comment in conversations|dict_get:piece %}
           <div class="conversation">
               {% include 'main/comment_thread.html' with comment=comment level=0 %}
           </div>
       {% endfor %}
     </div>
+    
 </div>
 
   {% empty %}

@@ -28,7 +28,6 @@
     <div class="card-footer text-muted">Shared by <strong>{{piece.user.first_name}} {{piece.user.last_name}}</strong></div>
 
     <div class="comments-section">
-      <h5>Comments</h5>
       {% for comment in conversations|dict_get:piece %}
           <div class="conversation">
               {% include 'main/comment_thread_received.html' with comment=comment level=0 %}
