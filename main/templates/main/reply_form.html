@@ -1,6 +1,12 @@
-<form method="post" action="{% url redirect_url %}">
+<form method="post" action="{% url redirect_url %}" class="comment-form">
     {% csrf_token %}
     <input type="hidden" name="comment_id" value="{{ comment.id }}">
-    <textarea name="text" rows="2" class="form-control mb-2" placeholder="Reply to {{reply_recipient}}..."></textarea>
-    <button type="submit" name="reply_comment" class="btn btn-primary">Reply</button>
+    <div class="input-group">
+        <textarea name="text" rows="1" class="form-control replyTextArea" placeholder="Reply to {{ reply_recipient }}..." required></textarea>
+        <button type="submit" name="reply_comment" class="sendButton">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" />
+            </svg>
+        </button>
+    </div>
 </form>

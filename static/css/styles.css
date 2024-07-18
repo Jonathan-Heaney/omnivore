@@ -105,6 +105,71 @@ a {
   padding: 12px;
 }
 
+.comment-form {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.input-group {
+  display: flex;
+  width: 100%;
+}
+
+.form-control {
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 10px;
+  resize: none;
+  flex-grow: 1;
+}
+
+.replyTextarea {
+  width: 100%;
+  box-sizing: border-box; /* Ensure padding and border are included in the width */
+  min-height: 40px; /* Set a minimum height */
+  max-height: 200px; /* Set a maximum height */
+  overflow-y: auto; /* Allow scrolling if the content exceeds the max height */
+  resize: none; /* Prevent manual resizing by the user */
+  padding: 8px; /* Add some padding for aesthetics */
+}
+
+.sendButton {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  padding: 0 5px;
+}
+
+.sendButton svg {
+  width: 24px;
+  height: 24px;
+}
+
+.sendButton:disabled {
+  cursor: not-allowed;
+}
+
+/* Disabled state */
+.sendButton:disabled svg {
+  color: gray;
+}
+
+/* Active state (enabled but not hovered) */
+.sendButton:not(:disabled) svg {
+  color: #007bff;
+}
+
+/* Hover state */
+.sendButton:not(:disabled):hover {
+  cursor: pointer;
+}
+
+.sendButton:not(:disabled):hover svg {
+  color: #0056b3;
+}
+
 /* Additional media queries for fine-tuning responsiveness */
 @media (max-width: 767.98px) {
   .header {
