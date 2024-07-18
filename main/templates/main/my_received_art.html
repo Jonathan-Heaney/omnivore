@@ -30,16 +30,20 @@
 
     <div id="comments-{{ piece.id }}" class="comments-section">
       {% for comment in conversations|dict_get:piece %}
-          <div class="conversation">
-              {% include 'main/comment_thread_received.html' with comment=comment level=0 redirect_url='my_received_art'%}
-          </div>
+        {% include 'main/comment_thread_received.html' with comment=comment level=0 redirect_url='my_received_art'%}
       {% endfor %}
       {% if not conversations|dict_get:piece %}
-      <form method="post" action="{% url 'my_received_art' %}">
+      <form method="post" action="{% url 'my_received_art' %}" class="comment-form">
           {% csrf_token %}
           <input type="hidden" name="art_piece_id" value="{{ piece.id }}">
-          <textarea name="text" rows="2" class="form-control mb-2" placeholder="Tell {{piece.user.first_name}} what you think!"></textarea>
-          <button type="submit" name="add_comment" class="btn btn-primary">Add Comment</button>
+          <div class="input-group">
+            <textarea name="text" rows="1" class="form-control replyTextArea" placeholder="Tell {{piece.user.first_name}} what you think!" required></textarea>
+            <button type="submit" name="add_comment" class="sendButton">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" />
+            </svg>
+            </button>
+        </div>
       </form>
       {% endif %}
     </div>

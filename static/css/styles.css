@@ -112,7 +112,6 @@ a {
 .comment-form {
   display: flex;
   align-items: center;
-  margin-top: 10px;
 }
 
 .input-group {
@@ -135,15 +134,15 @@ a {
   max-height: 200px; /* Set a maximum height */
   overflow-y: auto; /* Allow scrolling if the content exceeds the max height */
   resize: none; /* Prevent manual resizing by the user */
-  padding: 8px; /* Add some padding for aesthetics */
+  /* padding-left: 20px; Add some padding for aesthetics */
 }
 
 .sendButton {
   border: none;
   background: none;
-  padding: 0;
   cursor: pointer;
-  padding: 0 5px;
+  padding-left: 10px;
+  margin-right: -10px;
 }
 
 .sendButton svg {
