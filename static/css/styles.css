@@ -105,6 +105,10 @@ a {
   padding: 12px;
 }
 
+.conversation {
+  margin-bottom: 2rem;
+}
+
 .comment-form {
   display: flex;
   align-items: center;
