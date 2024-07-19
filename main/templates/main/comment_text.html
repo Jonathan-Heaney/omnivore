@@ -1,3 +1,4 @@
 <div class="comment" style="margin-left: {{ level }}em;">
     <p><strong>{{ comment.sender.first_name }} {{ comment.sender.last_name }}</strong>: {{ comment.text|linebreaksbr }}</p>
 </div>
+<div id="comment-{{ comment.id }}-container"></div>
