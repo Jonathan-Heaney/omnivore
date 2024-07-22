@@ -1,6 +1,8 @@
 <div class="comment">
     {% include 'main/comment_text.html' %}
     {% if forloop.last %}
-    {% include 'main/reply_form.html' with reply_recipient=comment.art_piece.user.first_name redirect_url=redirect_url%}
+        <div id="comment-{{ top_level_comment.id }}-container" class="reply-container">
+            {% include 'main/reply_form.html' with reply_recipient=comment.art_piece.user.first_name redirect_url=redirect_url top_level_comment=top_level_comment%}
+        </div>
     {% endif %}
 </div>

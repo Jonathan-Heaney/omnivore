@@ -151,45 +151,60 @@ def my_received_art(request):
             conversations[comment.art_piece] = []
         conversations[comment.art_piece].append(comment)
 
-    # Handle new comment submission
-    if request.method == 'POST' and 'add_comment' in request.POST:
-        art_piece_id = request.POST.get('art_piece_id')
-        art_piece = get_object_or_404(ArtPiece, id=art_piece_id)
+    if 'hx-request' in request.headers:
+        # Handle new comment submission
+        if 'add_comment' in request.POST:
+            art_piece_id = request.POST.get('art_piece_id')
+            art_piece = get_object_or_404(ArtPiece, id=art_piece_id)
 
-        # Check if the user already has a top level comment for this piece
-        parent_comment = Comment.objects.filter(
-            art_piece=art_piece, recipient=user, parent_comment__isnull=True).first()
+            # Check if the user already has a top level comment for this piece
+            parent_comment = Comment.objects.filter(
+                art_piece=art_piece, recipient=user, parent_comment__isnull=True).first()
 
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            new_comment = form.save(commit=False)
-            new_comment.sender = request.user
-            new_comment.recipient = art_piece.user
-            new_comment.art_piece = art_piece
-            if parent_comment:
-                new_comment.parent_comment = parent_comment
-            new_comment.save()
-            return redirect('my_received_art')
+            form = CommentForm(request.POST)
+            if form.is_valid():
+                new_comment = form.save(commit=False)
+                new_comment.sender = request.user
+                new_comment.recipient = art_piece.user
+                new_comment.art_piece = art_piece
+                if parent_comment:
+                    new_comment.parent_comment = parent_comment
+                new_comment.save()
 
-    # Handle reply submission
-    if request.method == 'POST' and 'reply_comment' in request.POST:
-        comment_id = request.POST.get('comment_id')
-        current_comment = get_object_or_404(Comment, id=comment_id)
+                context = {
+                    'comment': new_comment,
+                }
 
-        # Traverse to top-level parent comment
-        while current_comment.parent_comment:
-            current_comment = current_comment.parent_comment
-        top_level_comment = current_comment
+                html = render_to_string(
+                    'main/comment_text.html', context, request=request)
+                return HttpResponse(html)
 
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            reply = form.save(commit=False)
-            reply.sender = request.user
-            reply.recipient = top_level_comment.recipient
-            reply.art_piece = top_level_comment.art_piece
-            reply.parent_comment = top_level_comment
-            reply.save()
-            return redirect('my_received_art')
+        # Handle reply submission
+        if 'reply_comment' in request.POST:
+            comment_id = request.POST.get('comment_id')
+            current_comment = get_object_or_404(Comment, id=comment_id)
+
+            # Traverse to top-level parent comment
+            while current_comment.parent_comment:
+                current_comment = current_comment.parent_comment
+            top_level_comment = current_comment
+
+            form = CommentForm(request.POST)
+            if form.is_valid():
+                reply = form.save(commit=False)
+                reply.sender = request.user
+                reply.recipient = top_level_comment.recipient
+                reply.art_piece = top_level_comment.art_piece
+                reply.parent_comment = top_level_comment
+                reply.save()
+
+                context = {
+                    'comment': reply,
+                }
+
+                html = render_to_string(
+                    'main/comment_text.html', context, request=request)
+                return HttpResponse(html)
 
     context = {
         'pieces': pieces,
