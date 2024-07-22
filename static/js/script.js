@@ -41,3 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
     textarea.dispatchEvent(new Event('input'));
   });
 });
+
+function clearForm(form) {
+  form.querySelector('textarea').value = '';
+}

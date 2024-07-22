@@ -1,9 +1,9 @@
-<div class="comment" style="margin-left: {{ level }}em;">
+<div class="comment">
     {% include 'main/comment_text.html' %}
 </div>
 
 {% for reply in comment.replies.all %}
-    {% include 'main/comment_thread.html' with comment=reply level=level|add:1 redirect_url=redirect_url top_level_comment=top_level_comment %}
+    {% include 'main/comment_thread.html' with comment=reply redirect_url=redirect_url top_level_comment=top_level_comment %}
 {% endfor %}
 
 {% if forloop.last %}
@@ -12,18 +12,3 @@
     </div>
 {% endif %}
 
-
-
-{% comment %} 
-<div class="comment" style="margin-left: {{ level }}em;">
-    {% include 'main/comment_text.html' %}
-    {% if not comment.replies.all %}
-         {% include 'main/reply_form.html' with reply_recipient=comment.sender.first_name redirect_url=redirect_url%}
-    {% endif %}
-    {% for reply in comment.replies.all %}
-        {% include 'main/comment_text.html' with comment=reply level=1%}
-        {% if forloop.last %}
-        {% include 'main/reply_form.html' with reply_recipient=comment.sender.first_name redirect_url=redirect_url%}
-        {% endif %}
-    {% endfor %}
-</div> {% endcomment %}
