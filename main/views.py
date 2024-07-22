@@ -121,7 +121,7 @@ def my_shared_art(request):
 
                 context = {
                     'comment': reply,
-                    'level': 1,  # Adjust as necessary
+                    'level': 0,  # Adjust as necessary
                 }
 
                 html = render_to_string(
