@@ -44,4 +44,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 function clearForm(form) {
   form.querySelector('textarea').value = '';
+  var button = form.querySelector('.sendButton');
+  button.disabled = true;
 }
