@@ -92,35 +92,32 @@ def my_shared_art(request):
     comments = Comment.objects.filter(art_piece__user=user).select_related(
         'art_piece', 'sender', 'recipient', 'parent_comment')
 
-    # Group conversations by recipient
+    # Creates all the conversations on an art piece, by setting up the top-level comments that start each conversation
     conversations = {}
     for comment in comments:
         if comment.art_piece not in conversations:
-            conversations[comment.art_piece] = {}
-        if comment.sender not in conversations[comment.art_piece]:
-            conversations[comment.art_piece][comment.sender] = []
-        conversations[comment.art_piece][comment.sender].append(comment)
-
-    # Sort comments chronologically within each conversation
-    for art_piece, recipients in conversations.items():
-        for recipient, conversation in recipients.items():
-            recipients[recipient] = sorted(
-                conversation, key=lambda x: x.created_at)
-
-    pprint.pprint(conversations)  # Debug print statement
+            conversations[comment.art_piece] = []
+        if not comment.parent_comment:
+            conversations[comment.art_piece].append(comment)
 
     if 'hx-request' in request.headers:
+        # Handle reply submission
         if 'reply_comment' in request.POST:
             comment_id = request.POST.get('comment_id')
-            parent_comment = get_object_or_404(Comment, id=comment_id)
+            current_comment = get_object_or_404(Comment, id=comment_id)
+
+            # Traverse to the top-level parent comment
+            while current_comment.parent_comment:
+                current_comment = current_comment.parent_comment
+            top_level_comment = current_comment
 
             form = CommentForm(request.POST)
             if form.is_valid():
                 reply = form.save(commit=False)
                 reply.sender = request.user
-                reply.recipient = parent_comment.sender
-                reply.art_piece = parent_comment.art_piece
-                reply.parent_comment = parent_comment
+                reply.recipient = top_level_comment.sender
+                reply.art_piece = top_level_comment.art_piece
+                reply.parent_comment = top_level_comment
                 reply.save()
 
                 context = {
@@ -135,8 +132,6 @@ def my_shared_art(request):
         'pieces': my_pieces,
         'conversations': conversations,
     }
-
-    print(f"Context: {context}")  # Debug print statement
 
     return render(request, 'main/my_shared_art.html', context)
 
