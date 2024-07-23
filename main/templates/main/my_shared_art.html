@@ -36,16 +36,19 @@
     <div class="card-footer text-muted">Shared {{piece.created_at|date:"F j, Y" }}</div>
 
 
-    <div class="comments-section">
-      {% for key, comments in conversations.items %}
-        {% if key.0 == piece %}
+    <div id="comments-{{ piece.id }}-container" class="comments-section">
+      <h5>Debug: {{ conversations|default:"No conversations" }}</h5> <!-- Add this debug line -->
+      {% if piece in conversations %}
+        {% for recipient, conversation in conversations.piece.items %}
           <div class="conversation">
-            {% for comment in comments %}
-              {% include 'main/comment_thread_shared.html' with comment=comment top_level_comment=comments.0 redirect_url='my_shared_art' %}
+            <h5>Conversation with {{ recipient.first_name }}</h5>
+            {% for comment in conversation %}
+              {% include 'main/comment_text.html' with comment=comment %}
             {% endfor %}
+            {% include 'main/reply_form.html' with reply_recipient=recipient.first_name redirect_url='my_shared_art' top_level_comment=conversation.0 %}
           </div>
-        {% endif %}
-      {% endfor %}
+        {% endfor %}
+      {% endif %}
     </div>
     
 </div>

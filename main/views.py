@@ -7,6 +7,7 @@ from django.core.mail import send_mail
 import os
 import random
 import logging
+import pprint
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.http import HttpResponse, JsonResponse
@@ -91,32 +92,35 @@ def my_shared_art(request):
     comments = Comment.objects.filter(art_piece__user=user).select_related(
         'art_piece', 'sender', 'recipient', 'parent_comment')
 
+    # Group conversations by recipient
     conversations = {}
     for comment in comments:
-        key = (comment.art_piece, comment.sender)
-        if key not in conversations:
-            conversations[key] = []
-        if not comment.parent_comment:
-            conversations[key].append(comment)
+        if comment.art_piece not in conversations:
+            conversations[comment.art_piece] = {}
+        if comment.sender not in conversations[comment.art_piece]:
+            conversations[comment.art_piece][comment.sender] = []
+        conversations[comment.art_piece][comment.sender].append(comment)
+
+    # Sort comments chronologically within each conversation
+    for art_piece, recipients in conversations.items():
+        for recipient, conversation in recipients.items():
+            recipients[recipient] = sorted(
+                conversation, key=lambda x: x.created_at)
+
+    pprint.pprint(conversations)  # Debug print statement
 
     if 'hx-request' in request.headers:
-        # Handle reply submission
         if 'reply_comment' in request.POST:
             comment_id = request.POST.get('comment_id')
-            current_comment = get_object_or_404(Comment, id=comment_id)
-
-            # Traverse to the top-level parent comment
-            while current_comment.parent_comment:
-                current_comment = current_comment.parent_comment
-            top_level_comment = current_comment
+            parent_comment = get_object_or_404(Comment, id=comment_id)
 
             form = CommentForm(request.POST)
             if form.is_valid():
                 reply = form.save(commit=False)
                 reply.sender = request.user
-                reply.recipient = top_level_comment.sender
-                reply.art_piece = top_level_comment.art_piece
-                reply.parent_comment = top_level_comment
+                reply.recipient = parent_comment.sender
+                reply.art_piece = parent_comment.art_piece
+                reply.parent_comment = parent_comment
                 reply.save()
 
                 context = {
@@ -132,7 +136,7 @@ def my_shared_art(request):
         'conversations': conversations,
     }
 
-    print(conversations)
+    print(f"Context: {context}")  # Debug print statement
 
     return render(request, 'main/my_shared_art.html', context)
 
