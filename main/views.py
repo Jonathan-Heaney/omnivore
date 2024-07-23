@@ -91,13 +91,13 @@ def my_shared_art(request):
     comments = Comment.objects.filter(art_piece__user=user).select_related(
         'art_piece', 'sender', 'recipient', 'parent_comment')
 
-    # Creates all the conversations on an art piece, by setting up the top-level comments that start each conversation
     conversations = {}
     for comment in comments:
-        if comment.art_piece not in conversations:
-            conversations[comment.art_piece] = []
+        key = (comment.art_piece, comment.sender)
+        if key not in conversations:
+            conversations[key] = []
         if not comment.parent_comment:
-            conversations[comment.art_piece].append(comment)
+            conversations[key].append(comment)
 
     if 'hx-request' in request.headers:
         # Handle reply submission
@@ -132,6 +132,8 @@ def my_shared_art(request):
         'conversations': conversations,
     }
 
+    print(conversations)
+
     return render(request, 'main/my_shared_art.html', context)
 
 
@@ -145,70 +147,28 @@ def my_received_art(request):
     comments = Comment.objects.filter(art_piece__in=pieces, sender=user) | Comment.objects.filter(
         art_piece__in=pieces, recipient=user)
 
-    conversations = {}
-    for comment in comments:
-        if comment.art_piece not in conversations:
-            conversations[comment.art_piece] = []
-        conversations[comment.art_piece].append(comment)
-
     if 'hx-request' in request.headers:
-        # Handle new comment submission
-        if 'add_comment' in request.POST:
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            new_comment = form.save(commit=False)
+            new_comment.sender = request.user
             art_piece_id = request.POST.get('art_piece_id')
-            art_piece = get_object_or_404(ArtPiece, id=art_piece_id)
+            new_comment.art_piece = get_object_or_404(
+                ArtPiece, id=art_piece_id)
+            new_comment.recipient = new_comment.art_piece.user
+            new_comment.save()
 
-            # Check if the user already has a top level comment for this piece
-            parent_comment = Comment.objects.filter(
-                art_piece=art_piece, recipient=user, parent_comment__isnull=True).first()
+            context = {
+                'comment': new_comment,
+            }
 
-            form = CommentForm(request.POST)
-            if form.is_valid():
-                new_comment = form.save(commit=False)
-                new_comment.sender = request.user
-                new_comment.recipient = art_piece.user
-                new_comment.art_piece = art_piece
-                if parent_comment:
-                    new_comment.parent_comment = parent_comment
-                new_comment.save()
-
-                context = {
-                    'comment': new_comment,
-                }
-
-                html = render_to_string(
-                    'main/comment_text.html', context, request=request)
-                return HttpResponse(html)
-
-        # Handle reply submission
-        if 'reply_comment' in request.POST:
-            comment_id = request.POST.get('comment_id')
-            current_comment = get_object_or_404(Comment, id=comment_id)
-
-            # Traverse to top-level parent comment
-            while current_comment.parent_comment:
-                current_comment = current_comment.parent_comment
-            top_level_comment = current_comment
-
-            form = CommentForm(request.POST)
-            if form.is_valid():
-                reply = form.save(commit=False)
-                reply.sender = request.user
-                reply.recipient = top_level_comment.recipient
-                reply.art_piece = top_level_comment.art_piece
-                reply.parent_comment = top_level_comment
-                reply.save()
-
-                context = {
-                    'comment': reply,
-                }
-
-                html = render_to_string(
-                    'main/comment_text.html', context, request=request)
-                return HttpResponse(html)
+            html = render_to_string(
+                'main/comment_text.html', context, request=request)
+            return HttpResponse(html)
 
     context = {
         'pieces': pieces,
-        'conversations': conversations,
+        'comments': comments,
     }
 
     return render(request, 'main/my_received_art.html', context)

@@ -37,10 +37,14 @@
 
 
     <div class="comments-section">
-      {% for comment in conversations|dict_get:piece %}
+      {% for key, comments in conversations.items %}
+        {% if key.0 == piece %}
           <div class="conversation">
-              {% include 'main/comment_thread.html' with comment=comment redirect_url='my_shared_art' top_level_comment=comment%}
+            {% for comment in comments %}
+              {% include 'main/comment_thread_shared.html' with comment=comment top_level_comment=comments.0 redirect_url='my_shared_art' %}
+            {% endfor %}
           </div>
+        {% endif %}
       {% endfor %}
     </div>
     
