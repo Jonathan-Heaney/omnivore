@@ -8,6 +8,7 @@ import os
 import random
 import logging
 import pprint
+from collections import defaultdict
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.http import HttpResponse, JsonResponse
@@ -89,20 +90,23 @@ def delete_art_piece(request, pk):
 def my_shared_art(request):
     user = request.user
     my_pieces = ArtPiece.objects.filter(user=user).order_by('-created_at')
-    comments = Comment.objects.filter(art_piece__user=user).select_related(
-        'art_piece', 'sender', 'recipient', 'parent_comment')
 
-    print(f"Comments: {comments}")
+    # Dictionary to hold conversations by art piece
+    conversations = defaultdict(lambda: defaultdict(list))
 
-    # Creates all the conversations on an art piece, by setting up the top-level comments that start each conversation
-    conversations = {}
-    for comment in comments:
-        if comment.art_piece not in conversations:
-            conversations[comment.art_piece] = []
-        if not comment.parent_comment:
-            conversations[comment.art_piece].append(comment)
+    for piece in my_pieces:
+        comments = Comment.objects.filter(art_piece=piece).select_related(
+            'sender', 'recipient').order_by('created_at')
+        for comment in comments:
+            recipient = comment.recipient if comment.sender == user else comment.sender
+            conversations[piece][recipient].append(comment)
 
-    pprint.pp(conversations)
+    # Debugging output
+    pprint.pprint(conversations)
+
+    # Convert defaultdict to regular dict for template
+    conversations_dict = {piece: dict(convo)
+                          for piece, convo in conversations.items()}
 
     if 'hx-request' in request.headers:
         # Handle reply submission
@@ -134,8 +138,10 @@ def my_shared_art(request):
 
     context = {
         'pieces': my_pieces,
-        'conversations': conversations,
+        'conversations': conversations_dict,
     }
+
+    pprint.pprint(context['conversations'])
 
     return render(request, 'main/my_shared_art.html', context)
 

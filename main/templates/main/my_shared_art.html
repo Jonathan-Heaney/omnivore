@@ -36,13 +36,20 @@
     <div class="card-footer text-muted">Shared {{piece.created_at|date:"F j, Y" }}</div>
 
 
-    <div class="comments-section">
-      {% for comment in conversations|dict_get:piece %}
-          <div class="conversation">
-              {% include 'main/comment_thread.html' with comment=comment redirect_url='my_shared_art' top_level_comment=comment%}
-          </div>
-      {% endfor %}
-    </div>
+    <div id="comments-{{ piece.id }}-container" class="comments-section">
+      {% with piece_conversations=conversations|dict_get:piece %}
+          {% if piece_conversations %}              
+              {% for recipient, conversation in piece_conversations.items %}
+                  <div class="conversation">
+                      {% for comment in conversation %}
+                          {% include 'main/comment_text.html' with comment=comment %}
+                      {% endfor %}
+                      {% include 'main/reply_form.html' with reply_recipient=recipient.first_name redirect_url='my_shared_art' top_level_comment=conversation.0 %}
+                  </div>
+              {% endfor %}
+          {% endif %}
+      {% endwith %}
+  </div>
     
 </div>
 
