@@ -92,6 +92,8 @@ def my_shared_art(request):
     comments = Comment.objects.filter(art_piece__user=user).select_related(
         'art_piece', 'sender', 'recipient', 'parent_comment')
 
+    print(f"Comments: {comments}")
+
     # Creates all the conversations on an art piece, by setting up the top-level comments that start each conversation
     conversations = {}
     for comment in comments:
@@ -99,6 +101,8 @@ def my_shared_art(request):
             conversations[comment.art_piece] = []
         if not comment.parent_comment:
             conversations[comment.art_piece].append(comment)
+
+    pprint.pp(conversations)
 
     if 'hx-request' in request.headers:
         # Handle reply submission

@@ -7,7 +7,8 @@
 {% endfor %}
 
 {% if forloop.last %}
-    <div id="comment-{{ top_level_comment.id }}-container" class="reply-container">
+    <div id="comment-{{ top_level_comment.id }}-container" class="reply-container"></div>
+    <div>
         {% include 'main/reply_form.html' with reply_recipient=top_level_comment.sender.first_name redirect_url=redirect_url top_level_comment=top_level_comment %}
     </div>
 {% endif %}
