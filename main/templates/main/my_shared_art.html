@@ -36,12 +36,12 @@
     <div class="card-footer text-muted">Shared {{piece.created_at|date:"F j, Y" }}</div>
 
 
-    <div id="comments-{{ piece.id }}-container" class="comments-section">
+    <div class="comments-section">
       {% with piece_conversations=conversations|dict_get:piece %}
           {% if piece_conversations %}              
               {% for recipient, conversation in piece_conversations.items %}
                   <div class="conversation">
-                    <div>
+                    <div id="comments-{{ piece.id }}-container">
                       {% for comment in conversation %}
                           {% include 'main/comment_text.html' with comment=comment %}
                       {% endfor %}
