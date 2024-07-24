@@ -41,10 +41,14 @@
           {% if piece_conversations %}              
               {% for recipient, conversation in piece_conversations.items %}
                   <div class="conversation">
+                    <div>
                       {% for comment in conversation %}
                           {% include 'main/comment_text.html' with comment=comment %}
                       {% endfor %}
-                      {% include 'main/reply_form.html' with reply_recipient=recipient.first_name redirect_url='my_shared_art' top_level_comment=conversation.0 %}
+                    </div>
+                    <div>
+                      {% include 'main/shared_reply_form.html' with reply_recipient=recipient.first_name redirect_url='my_shared_art' top_level_comment=conversation.0 %}
+                    </div>
                   </div>
               {% endfor %}
           {% endif %}
