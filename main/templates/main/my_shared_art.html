@@ -47,7 +47,7 @@
                       {% endfor %}
                     </div>
                     <div>
-                      {% include 'main/shared_reply_form.html' with reply_recipient=recipient.first_name redirect_url='my_shared_art' top_level_comment=conversation.0 %}
+                      {% include 'main/reply_form.html' with reply_recipient=recipient.first_name top_level_comment=conversation.0 %}
                     </div>
                   </div>
               {% endfor %}
