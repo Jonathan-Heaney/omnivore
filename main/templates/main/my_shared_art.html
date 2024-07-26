@@ -35,28 +35,28 @@
     </div>
     <div class="card-footer text-muted">Shared {{piece.created_at|date:"F j, Y" }}</div>
 
-
-    <div class="comments-section">
-      {% with piece_conversations=conversations|dict_get:piece %}
-          {% if piece_conversations %}              
-              {% for recipient, conversation in piece_conversations.items %}
-                  <div class="conversation">
-                    <div id="comments-{{ piece.id }}-{{ recipient.id }}-container">
-                      {% for comment in conversation %}
-                          {% include 'main/comment_text.html' with comment=comment %}
-                      {% endfor %}
-                    </div>
-                    <div class="reply-form">
-                      {% include 'main/reply_form.html' with reply_recipient=recipient.first_name top_level_comment=conversation.0 %}
-                    </div>
-                    {% if not forloop.last %}
-                      <hr class='divider'>
-                    {% endif %}
-                  </div>
-              {% endfor %}
-          {% endif %}
-      {% endwith %}
-  </div>
+    {% with piece_conversations=conversations|dict_get:piece %}
+      {% if piece_conversations %}     
+        <div class="comments-section">
+          {% for recipient, conversation in piece_conversations.items %}
+              <div class="conversation">
+                <div id="comments-{{ piece.id }}-{{ recipient.id }}-container">
+                  {% for comment in conversation %}
+                      {% include 'main/comment_text.html' with comment=comment %}
+                  {% endfor %}
+                </div>
+                <div class="reply-form">
+                  {% include 'main/reply_form.html' with reply_recipient=recipient.first_name top_level_comment=conversation.0 %}
+                </div>
+                {% if not forloop.last %}
+                  <hr class='divider'>
+                {% endif %}
+              </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+  
     
 </div>
 
