@@ -101,9 +101,6 @@ def my_shared_art(request):
             recipient = comment.recipient if comment.sender == user else comment.sender
             conversations[piece][recipient].append(comment)
 
-    # Debugging output
-    pprint.pprint(conversations)
-
     # Convert defaultdict to regular dict for template
     conversations_dict = {piece: dict(convo)
                           for piece, convo in conversations.items()}
@@ -140,8 +137,6 @@ def my_shared_art(request):
         'pieces': my_pieces,
         'conversations': conversations_dict,
     }
-
-    pprint.pprint(context['conversations'])
 
     return render(request, 'main/my_shared_art.html', context)
 
