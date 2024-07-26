@@ -1,9 +1,0 @@
-<div class="comment" style="margin-left: {{ level }}em;">
-    {% include 'main/comment_text.html' %}
-    {% if forloop.last %}
-        <div id="comment-{{ top_level_comment.id }}-container" class="reply-container"></div>
-        <div>    
-            {% include 'main/reply_form.html' with reply_recipient=top_level_comment.sender.first_name redirect_url=redirect_url top_level_comment=top_level_comment%}
-        </div>
-    {% endif %}
-</div>

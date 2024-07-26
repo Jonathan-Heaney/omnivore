@@ -40,7 +40,7 @@
         {% csrf_token %}
         <input type="hidden" name="art_piece_id" value="{{ piece.id }}">
         <div class="input-group">
-          <textarea name="text" rows="1" class="form-control replyTextArea" placeholder="Tell {{ piece.user.first_name }} what you think!" required></textarea>
+          <textarea name="text" rows="1" class="form-control replyTextArea" placeholder="Send a message to {{ piece.user.first_name }}..." required></textarea>
           <button type="submit" name="add_comment" class="sendButton">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
               <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" />
