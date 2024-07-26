@@ -35,7 +35,14 @@ class SentArtPieceAdmin(admin.ModelAdmin):
                     "art_piece_submitter", "sent_time")
 
 
+class CommentAdmin(admin.ModelAdmin):
+    list_filter = ("sender", "recipient", "art_piece",
+                   "text", "parent_comment")
+    list_display = ("sender", "recipient", "art_piece",
+                    "text", "parent_comment", "created_at")
+
+
 admin.site.register(ArtPiece, ArtPieceAdmin)
 admin.site.register(SentArtPiece, SentArtPieceAdmin)
 admin.site.register(CustomUser, CustomUserAdmin)
-admin.site.register(Comment)
+admin.site.register(Comment, CommentAdmin)
