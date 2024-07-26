@@ -106,32 +106,30 @@ def my_shared_art(request):
                           for piece, convo in conversations.items()}
 
     if 'hx-request' in request.headers:
-        # Handle reply submission
-        if 'reply_comment' in request.POST:
-            comment_id = request.POST.get('comment_id')
-            current_comment = get_object_or_404(Comment, id=comment_id)
+        comment_id = request.POST.get('comment_id')
+        current_comment = get_object_or_404(Comment, id=comment_id)
 
-            # Traverse to the top-level parent comment
-            while current_comment.parent_comment:
-                current_comment = current_comment.parent_comment
-            top_level_comment = current_comment
+        # Traverse to the top-level parent comment
+        while current_comment.parent_comment:
+            current_comment = current_comment.parent_comment
+        top_level_comment = current_comment
 
-            form = CommentForm(request.POST)
-            if form.is_valid():
-                reply = form.save(commit=False)
-                reply.sender = request.user
-                reply.recipient = top_level_comment.sender
-                reply.art_piece = top_level_comment.art_piece
-                reply.parent_comment = top_level_comment
-                reply.save()
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            reply = form.save(commit=False)
+            reply.sender = request.user
+            reply.recipient = top_level_comment.sender
+            reply.art_piece = top_level_comment.art_piece
+            reply.parent_comment = top_level_comment
+            reply.save()
 
-                context = {
-                    'comment': reply,
-                }
+            context = {
+                'comment': reply,
+            }
 
-                html = render_to_string(
-                    'main/comment_text.html', context, request=request)
-                return HttpResponse(html)
+            html = render_to_string(
+                'main/comment_text.html', context, request=request)
+            return HttpResponse(html)
 
     context = {
         'pieces': my_pieces,
