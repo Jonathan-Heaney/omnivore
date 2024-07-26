@@ -47,3 +47,9 @@ function clearForm(form) {
   button = form.querySelector('.sendButton');
   button.disabled = true;
 }
+
+function confirmDelete() {
+  return confirm(
+    'Are you sure you want to delete this post? This cannot be undone.'
+  );
+}
