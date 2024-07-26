@@ -46,9 +46,12 @@
                           {% include 'main/comment_text.html' with comment=comment %}
                       {% endfor %}
                     </div>
-                    <div>
+                    <div class="reply-form">
                       {% include 'main/reply_form.html' with reply_recipient=recipient.first_name top_level_comment=conversation.0 %}
                     </div>
+                    {% if not forloop.last %}
+                      <hr class='divider'>
+                    {% endif %}
                   </div>
               {% endfor %}
           {% endif %}
