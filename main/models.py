@@ -82,3 +82,16 @@ class Comment(models.Model):
 
     def __str__(self):
         return f'{self.sender} on {self.art_piece}: {self.text[:30]}'
+
+
+class Like(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE)
+    art_piece = models.ForeignKey(ArtPiece, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'art_piece')
+
+    def __str__(self):
+        return f"{self.user} loves {self.art_piece}"

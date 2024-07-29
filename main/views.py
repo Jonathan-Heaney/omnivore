@@ -14,7 +14,8 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from django.utils import timezone
-from .models import ArtPiece, SentArtPiece, CustomUser, Comment
+from django.views.decorators.http import require_POST
+from .models import ArtPiece, SentArtPiece, CustomUser, Comment, Like
 
 
 def home(request):
@@ -174,6 +175,38 @@ def my_received_art(request):
     }
 
     return render(request, 'main/my_received_art.html', context)
+
+
+@require_POST
+def toggle_like(request, art_piece_id):
+    art_piece = get_object_or_404(ArtPiece, id=art_piece_id)
+    user = request.user
+
+    like, created = Like.objects.get_or_create(user=user, art_piece=art_piece)
+    if not created:
+        like.delete()
+        liked = False
+    else:
+        liked = True
+
+    likes = Like.objects.filter(art_piece=art_piece).select_related('user')
+    users = [like.user for like in likes]
+
+    context = {
+        'piece': art_piece,
+        'liked': liked,
+        'users': users
+    }
+
+    heart_html = render_to_string(
+        'main/heart_button.html', context, request=request)
+    likes_html = render_to_string(
+        'main/likes_display.html', context, request=request)
+
+    return JsonResponse({
+        'heart_html': heart_html,
+        'likes_html': likes_html
+    })
 
 
 def LogOut(request):
