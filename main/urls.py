@@ -13,6 +13,8 @@ urlpatterns = [
     path('edit-art-piece/<int:pk>', views.edit_art_piece, name='edit_art_piece'),
     path('delete-art-piece/<int:pk>',
          views.delete_art_piece, name='delete_art_piece'),
+    path('toggle_like/<int:art_piece_id>/',
+         views.toggle_like, name='toggle_like'),
     path('password_reset/', views.CustomPasswordResetView.as_view(template_name="registration/password_reset.html"),
          name='password_reset'),
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(

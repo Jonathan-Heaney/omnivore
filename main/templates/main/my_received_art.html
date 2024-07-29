@@ -28,6 +28,10 @@
     <div class="card-footer text-muted">Shared by <strong>{{piece.user.first_name}} {{piece.user.last_name}}</strong>
     </div>
 
+    <div id="heart-{{ piece.id }}-container">
+      {% include 'main/heart_button.html' with piece=piece %}
+    </div>
+
     <div class="comments-section">
       <div id="comments-{{ piece.id }}-container">
         {% for comment in comments %}
