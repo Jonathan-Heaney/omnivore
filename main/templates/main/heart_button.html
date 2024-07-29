@@ -1,4 +1,4 @@
-<form method="post" action="{% url 'toggle_like' piece.id %}" hx-post="{% url 'toggle_like' piece.id %}" hx-swap="outerHTML" hx-trigger="click" hx-target="#heart-{{ piece.id }}-container">
+<form method="post" action="{% url 'toggle_like' piece.id %}" class="heart-form" hx-post="{% url 'toggle_like' piece.id %}" hx-swap="outerHTML" hx-target="#heart-{{ piece.id }}-container">
     {% csrf_token %}
     <button type="submit" id="heart-{{ piece.id }}" class="heart-icon {% if liked %}liked{% endif %}">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">

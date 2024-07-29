@@ -189,24 +189,10 @@ def toggle_like(request, art_piece_id):
     else:
         liked = True
 
-    likes = Like.objects.filter(art_piece=art_piece).select_related('user')
-    users = [like.user for like in likes]
-
-    context = {
-        'piece': art_piece,
-        'liked': liked,
-        'users': users
-    }
-
     heart_html = render_to_string(
-        'main/heart_button.html', context, request=request)
-    likes_html = render_to_string(
-        'main/likes_display.html', context, request=request)
+        'main/heart_button.html', {'piece': art_piece, 'liked': liked}, request=request)
 
-    return JsonResponse({
-        'heart_html': heart_html,
-        'likes_html': likes_html
-    })
+    return JsonResponse({'heart_html': heart_html})
 
 
 def LogOut(request):
