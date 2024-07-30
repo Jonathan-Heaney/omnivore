@@ -200,7 +200,7 @@ def toggle_like(request, art_piece_id):
     heart_html = render_to_string(
         'main/heart_button.html', {'piece': art_piece, 'liked': liked}, request=request)
 
-    return JsonResponse({'heart_html': heart_html})
+    return HttpResponse(heart_html)
 
 
 def LogOut(request):
