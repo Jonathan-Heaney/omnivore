@@ -223,11 +223,12 @@ a {
   padding: 15px;
   border: 1px solid #888;
   width: 80%;
+  position: relative;
 }
 
 .modal-content ul {
   list-style: none;
-  margin: 0;
+  margin-top: 2.5rem;
   padding: 0;
 }
 
@@ -245,9 +246,12 @@ a {
 
 .close {
   color: #aaa;
-  float: right;
+  position: absolute; /* Position the close button absolutely */
+  left: 10px; /* Position it to the right */
+  top: 10px; /* Position it to the top */
   font-size: 28px;
   font-weight: bold;
+  cursor: pointer; /* Change cursor to indicate it's clickable */
 }
 
 .close:hover,
