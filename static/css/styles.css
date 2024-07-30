@@ -204,12 +204,6 @@ a {
   fill: darkgray;
 }
 
-.heart-emoji {
-  color: red;
-  font-size: 24px;
-  vertical-align: middle;
-}
-
 .modal {
   display: none;
   position: fixed;
@@ -226,9 +220,27 @@ a {
 .modal-content {
   background-color: #fefefe;
   margin: 15% auto;
-  padding: 20px;
+  padding: 15px;
   border: 1px solid #888;
   width: 80%;
+}
+
+.modal-content ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.modal ul li {
+  position: relative; /* For positioning the heart icon */
+  padding-left: 1.75em; /* Add space for the heart icon */
+}
+
+.modal ul li::before {
+  content: '❤️'; /* Add the heart emoji */
+  position: absolute;
+  left: 0; /* Position the heart icon to the left of the list item */
+  top: 0;
 }
 
 .close {
