@@ -188,8 +188,7 @@ a {
 }
 
 .heart-icon svg {
-  fill: gray;
-  transition: fill 0.3s;
+  fill: #ccc;
 }
 
 .heart-icon.liked svg {
