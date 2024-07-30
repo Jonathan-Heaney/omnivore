@@ -1,4 +1,5 @@
 <div id="likes-{{ piece.id }}-container">
+    <p>Likes Container</p>
     {% if users|length == 1 %}
         Loved by {{ users.0.get_full_name }}
     {% elif users|length == 2 %}

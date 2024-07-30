@@ -106,6 +106,13 @@ def my_shared_art(request):
     conversations_dict = {piece: dict(convo)
                           for piece, convo in conversations.items()}
 
+    for piece in my_pieces:
+        likes = Like.objects.filter(art_piece=piece).select_related('user')
+        users = [like.user for like in likes]
+
+    print(likes)
+    print(users)
+
     if 'hx-request' in request.headers:
         comment_id = request.POST.get('comment_id')
         current_comment = get_object_or_404(Comment, id=comment_id)
@@ -135,6 +142,7 @@ def my_shared_art(request):
     context = {
         'pieces': my_pieces,
         'conversations': conversations_dict,
+        'users': users
     }
 
     return render(request, 'main/my_shared_art.html', context)

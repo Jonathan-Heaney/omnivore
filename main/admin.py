@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ArtPiece, SentArtPiece, CustomUser, Comment
+from .models import ArtPiece, SentArtPiece, CustomUser, Comment, Like
 
 
 class ArtPieceAdmin(admin.ModelAdmin):
@@ -42,7 +42,13 @@ class CommentAdmin(admin.ModelAdmin):
                     "text", "parent_comment", "created_at")
 
 
+class LikeAdmin(admin.ModelAdmin):
+    list_filter = ("user", "art_piece", "created_at")
+    list_display = ("user", "art_piece", "created_at")
+
+
 admin.site.register(ArtPiece, ArtPieceAdmin)
 admin.site.register(SentArtPiece, SentArtPieceAdmin)
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Comment, CommentAdmin)
+admin.site.register(Like, LikeAdmin)

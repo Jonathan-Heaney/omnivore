@@ -35,7 +35,7 @@
     </div>
     <div class="card-footer text-muted">Shared {{piece.created_at|date:"F j, Y" }}</div>
 
-    <div id="likes-{{ piece.id }}-container">
+    <div> 
       {% include 'main/likes_display.html' with piece=piece %}
     </div>
 
