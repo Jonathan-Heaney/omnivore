@@ -158,6 +158,10 @@ def my_received_art(request):
     comments = Comment.objects.filter(art_piece__in=pieces, sender=user) | Comment.objects.filter(
         art_piece__in=pieces, recipient=user)
 
+    # Fetch liked pieces by the current user
+    liked_pieces = set(Like.objects.filter(
+        user=user).values_list('art_piece_id', flat=True))
+
     if 'hx-request' in request.headers:
         form = CommentForm(request.POST)
         if form.is_valid():
@@ -180,6 +184,7 @@ def my_received_art(request):
     context = {
         'pieces': pieces,
         'comments': comments,
+        'liked_pieces': liked_pieces
     }
 
     return render(request, 'main/my_received_art.html', context)
