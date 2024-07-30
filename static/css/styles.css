@@ -177,6 +177,11 @@ a {
   color: #0056b3;
 }
 
+.likes-container {
+  padding: 10px;
+  background-color: #fee;
+}
+
 .heart-icon {
   border: none;
   background: none;
@@ -197,6 +202,12 @@ a {
 
 .heart-icon:hover svg {
   fill: darkgray;
+}
+
+.heart-emoji {
+  color: red;
+  font-size: 24px;
+  vertical-align: middle;
 }
 
 .modal {

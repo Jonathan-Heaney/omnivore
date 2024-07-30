@@ -4,11 +4,11 @@
     {% with users=likes_dict|dict_get:piece %}
         {% if users %}
             {% if users|length == 1 %}
-                Loved by {{ users.0.get_full_name }}
+            <span class='heart-emoji'>&#9829;</span>  {{ users.0.get_full_name }}
             {% elif users|length == 2 %}
-                Loved by {{ users.0.get_full_name }} and {{ users.1.get_full_name }}
+            <span class='heart-emoji'>&#9829;</span> {{ users.0.get_full_name }}, {{ users.1.get_full_name }}
             {% elif users|length > 2 %}
-                Loved by {{ users.0.get_full_name }}, {{ users.1.get_full_name }}, and
+            <span class='heart-emoji'>&#9829;</span> {{ users.0.get_full_name }}, {{ users.1.get_full_name }}, and
                 <a href="#" onclick="document.getElementById('likesModal-{{ piece.id }}').style.display='block'">more</a>
                 <!-- Modal for more users -->
                 <div class="modal" id="likesModal-{{ piece.id }}">
