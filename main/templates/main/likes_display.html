@@ -1,23 +1,28 @@
+{% load custom_filters %}
+
 <div id="likes-{{ piece.id }}-container">
-    <p>Likes Container</p>
-    {% if users|length == 1 %}
-        Loved by {{ users.0.get_full_name }}
-    {% elif users|length == 2 %}
-        Loved by {{ users.0.get_full_name }} and {{ users.1.get_full_name }}
-    {% elif users|length > 2 %}
-        Loved by {{ users.0.get_full_name }}, {{ users.1.get_full_name }}, and
-        <a href="#" onclick="document.getElementById('likesModal-{{ piece.id }}').style.display='block'">more</a>
-        <!-- Modal for more users -->
-        <div class="modal" id="likesModal-{{ piece.id }}">
-            <div class="modal-content">
-                <span class="close" onclick="document.getElementById('likesModal-{{ piece.id }}').style.display='none'">&times;</span>
-                <h2>Loved by:</h2>
-                <ul>
-                    {% for user in users %}
-                        <li>{{ user.get_full_name }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
-    {% endif %}
+    {% with users=likes_dict|dict_get:piece %}
+        {% if users %}
+            {% if users|length == 1 %}
+                Loved by {{ users.0.get_full_name }}
+            {% elif users|length == 2 %}
+                Loved by {{ users.0.get_full_name }} and {{ users.1.get_full_name }}
+            {% elif users|length > 2 %}
+                Loved by {{ users.0.get_full_name }}, {{ users.1.get_full_name }}, and
+                <a href="#" onclick="document.getElementById('likesModal-{{ piece.id }}').style.display='block'">more</a>
+                <!-- Modal for more users -->
+                <div class="modal" id="likesModal-{{ piece.id }}">
+                    <div class="modal-content">
+                        <span class="close" onclick="document.getElementById('likesModal-{{ piece.id }}').style.display='none'">&times;</span>
+                        <h2>Loved by:</h2>
+                        <ul>
+                            {% for user in users %}
+                                <li>{{ user.get_full_name }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endwith %}
 </div>

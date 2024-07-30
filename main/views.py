@@ -94,6 +94,7 @@ def my_shared_art(request):
 
     # Dictionary to hold conversations by art piece
     conversations = defaultdict(lambda: defaultdict(list))
+    likes_dict = {}
 
     for piece in my_pieces:
         comments = Comment.objects.filter(art_piece=piece).select_related(
@@ -102,16 +103,14 @@ def my_shared_art(request):
             recipient = comment.recipient if comment.sender == user else comment.sender
             conversations[piece][recipient].append(comment)
 
+        # Fetch likes for each piece
+        likes = Like.objects.filter(art_piece=piece).select_related('user')
+        users = [like.user for like in likes]
+        likes_dict[piece] = users
+
     # Convert defaultdict to regular dict for template
     conversations_dict = {piece: dict(convo)
                           for piece, convo in conversations.items()}
-
-    for piece in my_pieces:
-        likes = Like.objects.filter(art_piece=piece).select_related('user')
-        users = [like.user for like in likes]
-
-    print(likes)
-    print(users)
 
     if 'hx-request' in request.headers:
         comment_id = request.POST.get('comment_id')
@@ -142,7 +141,7 @@ def my_shared_art(request):
     context = {
         'pieces': my_pieces,
         'conversations': conversations_dict,
-        'users': users
+        'likes_dict': likes_dict
     }
 
     return render(request, 'main/my_shared_art.html', context)
