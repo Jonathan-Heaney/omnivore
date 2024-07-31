@@ -92,3 +92,16 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 });
+
+function toggleHeartIcon(event) {
+  event.preventDefault();
+
+  // Find the button that was clicked
+  const button = event.target.querySelector('button.like-button');
+
+  // Toggle the "liked" class immediately
+  button.classList.toggle('liked');
+
+  // Let HTMX handle the form submission in the background
+  event.target.submit();
+}

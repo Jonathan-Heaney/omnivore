@@ -182,26 +182,23 @@ a {
   background-color: #fee;
 }
 
-.heart-icon {
+.like-button {
   border: none;
+  border-radius: 10px;
   background: none;
   cursor: pointer;
-  padding: 0;
+  padding: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.heart-icon svg {
-  fill: #ccc;
+.like-button:hover {
+  background-color: #eee;
 }
 
-.heart-icon.liked svg {
-  fill: red;
-}
-
-.heart-icon:hover svg {
-  fill: darkgray;
+.heart-icon {
+  margin-right: 6px;
 }
 
 .modal {
