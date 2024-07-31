@@ -49,6 +49,7 @@
         <div class="comments-section">
           {% for recipient, conversation in piece_conversations.items %}
               <div class='conversation-header'>
+                <button class='toggle-comment-btn' id="toggle-button-{{ piece.id}}-{{recipient.id}}" onclick="toggleComments({{ piece.id}}, {{recipient.id }})"><i class="fa-solid fa-minus"></i></button>
                 Conversation with <strong>{{ recipient.first_name }} {{ recipient.last_name }}</strong>
               </div>
               <div class="conversation">

@@ -1,12 +1,16 @@
-function toggleComments(artPieceId) {
-  var commentsSection = document.getElementById('comments-' + artPieceId);
-  var toggleButton = document.getElementById('toggle-button-' + artPieceId);
+function toggleComments(artPieceId, recipientId) {
+  var commentsSection = document.getElementById(
+    'comments-' + artPieceId + '-' + recipientId + '-container'
+  );
+  var toggleButton = document.getElementById(
+    'toggle-button-' + artPieceId + '-' + recipientId
+  );
   if (commentsSection.style.display === 'none') {
     commentsSection.style.display = 'block';
-    toggleButton.textContent = 'Hide comments';
+    toggleButton.innerHTML = '<i class="fa-solid fa-minus"></i>';
   } else {
     commentsSection.style.display = 'none';
-    toggleButton.textContent = 'Show comments';
+    toggleButton.innerHTML = '<i class="fa-solid fa-plus"></i>';
   }
 }
 
