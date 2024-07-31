@@ -35,9 +35,14 @@
     </div>
     <div class="card-footer text-muted">Shared {{piece.created_at|date:"F j, Y" }}</div>
 
-    <div class="likes-container" id="likes-{{ piece.id }}-container">
-      {% include 'main/likes_display.html' with piece=piece likes_dict=likes_dict %}
-    </div>
+    {% with users=likes_dict|dict_get:piece %}
+        {% if users %}
+          <div class="likes-container" id="likes-{{ piece.id }}-container">
+            {% include 'main/likes_display.html' with piece=piece likes_dict=likes_dict %}
+          </div>
+        {% endif %}
+    {% endwith %}
+
 
     {% with piece_conversations=conversations|dict_get:piece %}
       {% if piece_conversations %}     

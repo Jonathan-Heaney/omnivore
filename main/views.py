@@ -108,6 +108,8 @@ def my_shared_art(request):
         users = [like.user for like in likes]
         likes_dict[piece] = users
 
+    print(likes_dict)
+
     # Convert defaultdict to regular dict for template
     conversations_dict = {piece: dict(convo)
                           for piece, convo in conversations.items()}
