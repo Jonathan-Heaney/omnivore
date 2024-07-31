@@ -5,14 +5,46 @@ function toggleComments(artPieceId, recipientId) {
   var toggleButton = document.getElementById(
     'toggle-button-' + artPieceId + '-' + recipientId
   );
+
   if (commentsSection.style.display === 'none') {
     commentsSection.style.display = 'block';
     toggleButton.innerHTML = '<i class="fa-solid fa-minus"></i>';
+    localStorage.setItem(
+      'comments-' + artPieceId + '-' + recipientId + '-container',
+      'shown'
+    );
   } else {
     commentsSection.style.display = 'none';
     toggleButton.innerHTML = '<i class="fa-solid fa-plus"></i>';
+    localStorage.setItem(
+      'comments-' + artPieceId + '-' + recipientId + '-container',
+      'hidden'
+    );
   }
 }
+
+// Set the initial state based on localStorage
+document.addEventListener('DOMContentLoaded', function () {
+  var commentSections = document.querySelectorAll(
+    '[id^="comments-"][id$="-container"]'
+  );
+
+  commentSections.forEach(function (section) {
+    var sectionId = section.id;
+    var toggleButton = document.getElementById(
+      'toggle-button-' + sectionId.split('-')[1] + '-' + sectionId.split('-')[2]
+    );
+
+    var storedState = localStorage.getItem(sectionId);
+    if (storedState === 'hidden') {
+      section.style.display = 'none';
+      toggleButton.innerHTML = '<i class="fa-solid fa-plus"></i>';
+    } else {
+      section.style.display = 'block';
+      toggleButton.innerHTML = '<i class="fa-solid fa-minus"></i>';
+    }
+  });
+});
 
 document.addEventListener('DOMContentLoaded', function () {
   var textareas = document.querySelectorAll('.replyTextArea');
