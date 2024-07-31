@@ -181,13 +181,17 @@ a {
   color: #0056b3;
 }
 
+.received-comments-section {
+  padding: 12px;
+}
+
 .conversation-header {
   padding: 10px;
   background-color: #efe;
 }
 
 .likes-container {
-  padding: 10px;
+  padding: 5px;
   background-color: #fee;
 }
 

@@ -32,7 +32,7 @@
       {% include 'main/heart_button.html' with piece=piece %}
     </div>
 
-    <div class="comments-section">
+    <div class="received-comments-section">
       <div id="comments-{{ piece.id }}-container">
         {% for comment in comments %}
           {% if comment.art_piece == piece %}
