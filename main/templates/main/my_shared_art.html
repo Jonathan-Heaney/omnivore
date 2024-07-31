@@ -48,6 +48,9 @@
       {% if piece_conversations %}     
         <div class="comments-section">
           {% for recipient, conversation in piece_conversations.items %}
+              <div class='conversation-header'>
+                Conversation with <strong>{{ recipient.first_name }} {{ recipient.last_name }}</strong>
+              </div>
               <div class="conversation">
                 <div id="comments-{{ piece.id }}-{{ recipient.id }}-container">
                   {% for comment in conversation %}
@@ -57,9 +60,9 @@
                 <div class="reply-form">
                   {% include 'main/reply_form.html' with reply_recipient=recipient.first_name top_level_comment=conversation.0 %}
                 </div>
-                {% if not forloop.last %}
+                {% comment %} {% if not forloop.last %}
                   <hr class='divider'>
-                {% endif %}
+                {% endif %} {% endcomment %}
               </div>
           {% endfor %}
         </div>

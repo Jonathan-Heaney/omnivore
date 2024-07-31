@@ -101,13 +101,17 @@ a {
   margin-top: 20px;
 }
 
-.comments-section {
+/* .comments-section {
   padding: 12px;
-}
+} */
 
 .comment-form {
   display: flex;
   align-items: center;
+}
+
+.conversation {
+  padding: 12px;
 }
 
 .input-group {
@@ -124,7 +128,7 @@ a {
 }
 
 .reply-form {
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .divider {
@@ -175,6 +179,11 @@ a {
 
 .sendButton:not(:disabled):hover svg {
   color: #0056b3;
+}
+
+.conversation-header {
+  padding: 10px;
+  background-color: #efe;
 }
 
 .likes-container {
