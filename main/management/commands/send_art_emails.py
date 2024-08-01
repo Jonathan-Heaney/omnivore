@@ -12,8 +12,8 @@ class Command(BaseCommand):
         today = timezone.now().date()
 
         # Define the start and end dates for the range using timezone-aware datetimes
-        start_date = timezone.make_aware(timezone.datetime(2024, 7, 1))
-        end_date = timezone.make_aware(timezone.datetime(2024, 7, 31))
+        start_date = timezone.make_aware(timezone.datetime(2024, 8, 1))
+        end_date = timezone.make_aware(timezone.datetime(2024, 8, 31))
 
         # Check if today's date is within the range
         if start_date.date() <= today <= end_date.date():
@@ -24,6 +24,17 @@ class Command(BaseCommand):
             users = CustomUser.objects.filter(
                 artpiece__created_at__gte=first_day_of_month
             ).distinct()
+
+            # Manually add specific users based on their email addresses
+            specific_users = CustomUser.objects.filter(
+                email__in=['jonathan.heaney+tjackson@gmail.com',
+                           'jonathan.heaney+cjohnson@gmail.com']
+            )
+
+            # Combine the QuerySets using the union() method
+            users = users.union(specific_users)
+
+            print(users)
 
             for user in users:
                 send_art_piece_email(user)
