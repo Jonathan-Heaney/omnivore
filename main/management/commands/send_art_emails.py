@@ -27,8 +27,8 @@ class Command(BaseCommand):
 
             # Manually add specific users based on their email addresses
             specific_users = CustomUser.objects.filter(
-                email__in=['jonathan.heaney+tjackson@gmail.com',
-                           'jonathan.heaney+cjohnson@gmail.com']
+                email__in=['mtcc96@gmail.com',
+                           'benleach6@gmail.com']
             )
 
             # Combine the QuerySets using the union() method
