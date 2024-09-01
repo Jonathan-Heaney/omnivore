@@ -12,8 +12,8 @@ class Command(BaseCommand):
         today = timezone.now().date()
 
         # Define the start and end dates for the range using timezone-aware datetimes
-        start_date = timezone.make_aware(timezone.datetime(2024, 8, 1))
-        end_date = timezone.make_aware(timezone.datetime(2024, 8, 31))
+        start_date = timezone.make_aware(timezone.datetime(2024, 9, 1))
+        end_date = timezone.make_aware(timezone.datetime(2024, 9, 30))
 
         # Check if today's date is within the range
         if start_date.date() <= today <= end_date.date():
@@ -26,13 +26,13 @@ class Command(BaseCommand):
             ).distinct()
 
             # Manually add specific users based on their email addresses
-            specific_users = CustomUser.objects.filter(
-                email__in=['mtcc96@gmail.com',
-                           'benleach6@gmail.com']
-            )
+            # specific_users = CustomUser.objects.filter(
+            #     email__in=['mtcc96@gmail.com',
+            #                'benleach6@gmail.com']
+            # )
 
             # Combine the QuerySets using the union() method
-            users = users.union(specific_users)
+            # users = users.union(specific_users)
 
             print(users)
 
