@@ -3,6 +3,7 @@ bleach==6.1.0
 boto3==1.34.115
 botocore==1.34.115
 crispy-bootstrap5==2024.2
+dj-database-url==3.0.1
 Django==5.0.6
 django-crispy-forms==2.1
 django-ses==4.1.0
