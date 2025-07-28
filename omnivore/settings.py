@@ -3,8 +3,21 @@ import os
 from os import getenv
 from dotenv import load_dotenv
 import warnings
+import dj_database_url
 
 load_dotenv()
+
+
+ENVIRONMENT = os.getenv("ENVIRONMENT", "production")
+
+if ENVIRONMENT == "staging":
+    DATABASES = {
+        'default': dj_database_url.config(env="STAGING_DATABASE_URL", conn_max_age=600)
+    }
+else:
+    DATABASES = {
+        'default': dj_database_url.config(env="DATABASE_URL", conn_max_age=600)
+    }
 
 # DB info configuration
 DB_NAME = os.environ.get('DB_NAME')
@@ -99,21 +112,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'omnivore.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': DB_NAME,
-        'USER': DB_USERNAME,
-        'PASSWORD': DB_PASSWORD,
-        'HOST': DB_HOST,
-        'PORT': DB_PORT
-    }
-}
 
 STORAGES = {
     # ...
