@@ -5,16 +5,17 @@ from dotenv import load_dotenv
 import warnings
 import dj_database_url
 
-load_dotenv()
-
-
 ENVIRONMENT = os.getenv("ENVIRONMENT", "production")
 
 if ENVIRONMENT == "staging":
+    load_dotenv('.env.staging')
+    DEBUG = True
     DATABASES = {
         'default': dj_database_url.config(env="STAGING_DATABASE_URL", conn_max_age=600)
     }
 else:
+    load_dotenv('.env.production')
+    DEBUG = False
     DATABASES = {
         'default': dj_database_url.config(env="DATABASE_URL", conn_max_age=600)
     }
@@ -33,9 +34,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get("SECRET_KEY")
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
