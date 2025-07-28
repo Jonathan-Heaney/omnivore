@@ -11,15 +11,16 @@ if ENVIRONMENT == "staging":
     load_dotenv('.env.staging')
     DEBUG = True
     DATABASES = {
-        'default': dj_database_url.config(env="STAGING_DATABASE_URL", conn_max_age=600)
+        'default': dj_database_url.config(conn_max_age=600)
     }
 else:
     load_dotenv('.env.production')
     DEBUG = False
     DATABASES = {
-        'default': dj_database_url.config(env="DATABASE_URL", conn_max_age=600)
+        'default': dj_database_url.config(conn_max_age=600)
     }
 
+print(os.getenv("STAGING_DATABASE_URL"))
 
 # Amazon SES configuration
 EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND')
