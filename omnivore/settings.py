@@ -3,23 +3,33 @@ import os
 from os import getenv
 from dotenv import load_dotenv
 import warnings
-import dj_database_url
 
+# Figure out which environment we're in
+current_environment = os.getenv("ENVIRONMENT", "production")
 
-ENVIRONMENT = os.getenv("ENVIRONMENT", "production")
-
-if ENVIRONMENT == "staging":
-    load_dotenv('.env.staging')
-    DEBUG = True
-    DATABASES = {
-        'default': dj_database_url.config(env="STAGING_DATABASE_URL", conn_max_age=600)
-    }
+# Load the appropriate .env file based on the environment
+if current_environment == "staging":
+    load_dotenv(".env.staging")
 else:
-    load_dotenv('.env.production')
-    DEBUG = False
-    DATABASES = {
-        'default': dj_database_url.config(env="DATABASE_URL", conn_max_age=600)
+    load_dotenv(".env.production")
+
+
+DB_NAME = os.environ.get('DB_NAME')
+DB_USERNAME = os.environ.get('DB_USERNAME')
+DB_PASSWORD = os.environ.get('DB_PASSWORD')
+DB_HOST = os.environ.get('DB_HOST')
+DB_PORT = os.environ.get('DB_PORT')
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': DB_NAME,
+        'USER': DB_USERNAME,
+        'PASSWORD': DB_PASSWORD,
+        'HOST': DB_HOST,
+        'PORT': DB_PORT,
     }
+}
 
 # Amazon SES configuration
 EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND')
