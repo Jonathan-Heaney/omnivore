@@ -19,12 +19,6 @@ else:
         'default': dj_database_url.config(env="DATABASE_URL", conn_max_age=600)
     }
 
-# DB info configuration
-DB_NAME = os.environ.get('DB_NAME')
-DB_USERNAME = os.environ.get('DB_USERNAME')
-DB_PASSWORD = os.environ.get('DB_PASSWORD')
-DB_HOST = os.environ.get('DB_HOST')
-DB_PORT = os.environ.get('DB_PORT')
 
 # Amazon SES configuration
 EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND')
