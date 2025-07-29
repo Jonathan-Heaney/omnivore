@@ -132,6 +132,7 @@ class Notification(models.Model):
     )
     is_read = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
+    message = models.TextField()
 
     class Meta:
         ordering = ['-timestamp']

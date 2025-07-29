@@ -49,9 +49,9 @@ class LikeAdmin(admin.ModelAdmin):
 
 class NotificationAdmin(admin.ModelAdmin):
     list_filter = ("sender", "recipient", "notification_type",
-                   "art_piece", "is_read", "timestamp")
+                   "art_piece", "is_read", "timestamp", "message")
     list_display = ("sender", "recipient", "notification_type",
-                    "art_piece", "is_read", "timestamp")
+                    "art_piece", "is_read", "timestamp", "message")
 
 
 admin.site.register(ArtPiece, ArtPieceAdmin)
