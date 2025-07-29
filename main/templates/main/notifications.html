@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %} Notifications {% endblock %}
+{% block css_files %}
+  <link rel="stylesheet" href="{% static "css/styles.css" %}">
+{% endblock %}
+
+{% block content %}
+<h2>Your Notifications</h2>
+<ul>
+  {% for notification in notifications %}
+    <li style="{% if not notification.read %}font-weight: bold;{% endif %}">
+      <a href="{% url 'notification_redirect' notification.id %}">
+        {{ notification.message }}
+      </a>
+      <small>({{ notification.created_at|naturaltime }})</small>
+    </li>
+  {% empty %}
+    <li>No notifications yet.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

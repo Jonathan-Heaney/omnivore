@@ -15,7 +15,7 @@ from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from django.utils import timezone
 from django.views.decorators.http import require_POST
-from .models import ArtPiece, SentArtPiece, CustomUser, Comment, Like
+from .models import ArtPiece, SentArtPiece, CustomUser, Comment, Like, Notification
 
 
 def home(request):
@@ -205,6 +205,13 @@ def toggle_like(request, art_piece_id):
         'main/heart_button.html', {'piece': art_piece, 'liked': liked}, request=request)
 
     return HttpResponse(heart_html)
+
+
+@login_required
+def notifications_view(request):
+    notifications = Notification.objects.filter(
+        recipient=request.user).order_by('-timestamp')
+    return render(request, 'main/notifications.html', {'notifications': notifications})
 
 
 def LogOut(request):
