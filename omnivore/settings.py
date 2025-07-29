@@ -5,7 +5,9 @@ from dotenv import load_dotenv
 import warnings
 
 # Figure out which environment we're in
-current_environment = os.getenv("ENVIRONMENT", "production")
+# current_environment = os.getenv("ENVIRONMENT", "production")
+
+current_environment = "staging"
 
 # Load the appropriate .env file based on the environment
 if current_environment == "staging":
