@@ -101,7 +101,7 @@ class Notification(models.Model):
     NOTIFICATION_TYPES = [
         ('like', 'Like'),
         ('comment', 'Comment'),
-        ('shared', 'Shared Art'),
+        ('shared_art', 'Shared Art'),
     ]
 
     recipient = models.ForeignKey(

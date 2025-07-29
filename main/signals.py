@@ -1,6 +1,6 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import Like, Notification
+from .models import Like, Notification, Comment, SentArtPiece
 
 
 @receiver(post_save, sender=Like)
@@ -22,3 +22,44 @@ def create_like_notification(sender, instance, created, **kwargs):
         message=f"{sender_user} loved a piece of art you shared!",
         art_piece=instance.art_piece
     )
+
+
+@receiver(post_save, sender=Comment)
+def create_comment_notification(sender, instance, created, **kwargs):
+    if not created:
+        return
+
+    sender_user = instance.sender
+    recipient_user = instance.recipient
+
+    # Avoid self-notification
+    if sender_user == recipient_user:
+        return
+
+    Notification.objects.create(
+        recipient=recipient_user,
+        sender=sender_user,
+        notification_type='comment',
+        message=f"{sender_user} sent you a message!",
+        art_piece=instance.art_piece
+    )
+
+
+@receiver(post_save, sender=SentArtPiece)
+def create_sent_art_notification(sender, instance, created, **kwargs):
+    if created:
+        recipient = instance.user
+        sender_user = instance.art_piece.user
+        art_piece = instance.art_piece
+
+        # Don’t send a notification if the user received their own art
+        if recipient == sender_user:
+            return
+
+        Notification.objects.create(
+            recipient=recipient,
+            sender=sender_user,
+            notification_type='shared_art',
+            art_piece=art_piece,
+            message=f"{sender_user.first_name} {sender_user.last_name} shared some art with you!"
+        )
