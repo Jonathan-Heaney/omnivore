@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
+from django.urls import reverse
 
 
 class CustomUser(AbstractUser):
@@ -136,6 +137,20 @@ class Notification(models.Model):
 
     class Meta:
         ordering = ['-timestamp']
+
+    def get_redirect_url(self):
+        if self.notification_type == 'like':
+            return reverse('my_shared_art') + f"#art-{self.art_piece.id}"
+        elif self.notification_type == 'shared_art':
+            return reverse('my_received_art') + f"#art-{self.art_piece.id}"
+        elif self.notification_type == 'comment':
+            # Choose logic based on sender/recipient relationship
+            if self.recipient == self.art_piece.user:
+                return reverse('my_shared_art') + f"#art-{self.art_piece.id}"
+            else:
+                return reverse('my_received_art') + f"#art-{self.art_piece.id}"
+        else:
+            return reverse('notifications')  # fallback if something's wrong
 
     def __str__(self):
         return f'{self.sender} -> {self.recipient} ({self.notification_type})'

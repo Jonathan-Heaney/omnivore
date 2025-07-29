@@ -207,11 +207,23 @@ def toggle_like(request, art_piece_id):
     return HttpResponse(heart_html)
 
 
+# Notifications
 @login_required
 def notifications_view(request):
     notifications = Notification.objects.filter(
         recipient=request.user).order_by('-timestamp')
     return render(request, 'main/notifications.html', {'notifications': notifications})
+
+
+def notification_redirect(request, notification_id):
+    notification = get_object_or_404(Notification, id=notification_id)
+
+    # Mark as read
+    if not notification.is_read:
+        notification.is_read = True
+        notification.save()
+
+    return redirect(notification.get_redirect_url())
 
 
 def LogOut(request):

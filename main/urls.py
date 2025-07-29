@@ -16,6 +16,8 @@ urlpatterns = [
     path('toggle_like/<int:art_piece_id>/',
          views.toggle_like, name='toggle_like'),
     path('notifications/', views.notifications_view, name='notifications'),
+    path('notification/<int:notification_id>/',
+         views.notification_redirect, name='notification_redirect'),
     path('password_reset/', views.CustomPasswordResetView.as_view(template_name="registration/password_reset.html"),
          name='password_reset'),
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(

@@ -15,7 +15,7 @@
       <a href="{% url 'notification_redirect' notification.id %}">
         {{ notification.message }}
       </a>
-      <small>({{ notification.created_at|naturaltime }})</small>
+      <small>{{ notification.timestamp|naturaltime }}</small>
     </li>
   {% empty %}
     <li>No notifications yet.</li>
