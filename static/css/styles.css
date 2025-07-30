@@ -318,6 +318,12 @@ a {
   display: block;
 }
 
+.blue-dot {
+  margin-right: 8px;
+  font-size: 0.8em;
+  vertical-align: middle;
+}
+
 /* Additional media queries for fine-tuning responsiveness */
 @media (max-width: 767.98px) {
   .header {

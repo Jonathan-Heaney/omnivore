@@ -14,7 +14,13 @@
   {% for notification in notifications %}
     <li class="notification-item {% if not notification.is_read %}unread{% endif %}">
       <a href="{% url 'notification_redirect' notification.id %}" class="notification-link">
-        {{ notification.message }}
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <span>
+            {% if not notification.is_read %}
+              <span class="blue-dot" aria-label="Unread notification" title="Unread">🔵</span>
+            {% endif %}
+            {{ notification.message }}
+          </span>
         <span class="notification-timestamp">{{ notification.timestamp|naturaltime }}</span>
       </a>
     </li>
