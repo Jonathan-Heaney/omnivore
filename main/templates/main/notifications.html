@@ -8,17 +8,19 @@
 {% endblock %}
 
 {% block content %}
-<h2>Your Notifications</h2>
-<ul>
+<h1 class="header">Your Notifications</h1>
+
+<ul class="notification-list">
   {% for notification in notifications %}
-    <li style="{% if not notification.read %}font-weight: bold;{% endif %}">
-      <a href="{% url 'notification_redirect' notification.id %}">
+    <li class="notification-item {% if not notification.read %}unread{% endif %}">
+      <a href="{% url 'notification_redirect' notification.id %}" class="notification-link">
         {{ notification.message }}
+        <span class="notification-timestamp">{{ notification.timestamp|naturaltime }}</span>
       </a>
-      <small>{{ notification.timestamp|naturaltime }}</small>
     </li>
   {% empty %}
     <li>No notifications yet.</li>
   {% endfor %}
 </ul>
+
 {% endblock %}

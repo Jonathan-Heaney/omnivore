@@ -276,6 +276,44 @@ a {
   cursor: pointer;
 }
 
+/* Notifications */
+
+.notification-list {
+  list-style: none;
+  padding: 0;
+}
+
+.notification-item {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  transition: background-color 0.2s ease;
+}
+
+.notification-item:hover {
+  background-color: #f7f7f7;
+}
+
+.notification-item.unread {
+  font-weight: bold;
+  border-color: #007bff;
+  background-color: #eef6ff;
+}
+
+.notification-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.notification-timestamp {
+  font-size: 0.85em;
+  color: #666;
+  margin-top: 4px;
+  display: block;
+}
+
 /* Additional media queries for fine-tuning responsiveness */
 @media (max-width: 767.98px) {
   .header {
