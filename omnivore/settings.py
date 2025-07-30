@@ -5,9 +5,7 @@ from dotenv import load_dotenv
 import warnings
 
 # Figure out which environment we're in
-ENVIRONMENT = os.getenv("ENVIRONMENT", "production")
-
-ENVIRONMENT = "local"
+ENVIRONMENT = os.getenv("ENVIRONMENT", "local")
 
 # Load the appropriate .env file based on the environment
 if ENVIRONMENT == "local":
