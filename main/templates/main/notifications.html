@@ -10,23 +10,40 @@
 {% block content %}
 <h1 class="header">Your Notifications</h1>
 
-<ul class="notification-list">
-  {% for notification in notifications %}
-    <li class="notification-item {% if not notification.is_read %}unread{% endif %}">
-      <a href="{% url 'notification_redirect' notification.id %}" class="notification-link">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-          <span>
-            {% if not notification.is_read %}
-              <span class="blue-dot" aria-label="Unread notification" title="Unread">🔵</span>
-            {% endif %}
-            {{ notification.message }}
-          </span>
-        <span class="notification-timestamp">{{ notification.timestamp|naturaltime }}</span>
-      </a>
-    </li>
-  {% empty %}
-    <li>No notifications yet.</li>
-  {% endfor %}
-</ul>
+{% if unread_notifications %}
+    <h4 class="notification-section-heading">Unread</h4>
+    <ul class="notification-list">
+      {% for notification in unread_notifications %}
+        <li class="notification-item unread">
+          <a href="{% url 'notification_redirect' notification.id %}" class="notification-link">
+            <div class="notification-content">
+              <span><span class="blue-dot" aria-label="Unread notification">🔵</span> {{ notification.message }}</span>
+              <span class="notification-timestamp">{{ notification.timestamp|naturaltime }}</span>
+            </div>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if read_notifications %}
+    <h4 class="notification-section-heading">Earlier</h4>
+    <ul class="notification-list">
+      {% for notification in read_notifications %}
+        <li class="notification-item read">
+          <a href="{% url 'notification_redirect' notification.id %}" class="notification-link">
+            <div class="notification-content">
+              <span>{{ notification.message }}</span>
+              <span class="notification-timestamp">{{ notification.timestamp|naturaltime }}</span>
+            </div>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if not unread_notifications and not read_notifications %}
+    <p>No notifications yet.</p>
+  {% endif %}
 
 {% endblock %}

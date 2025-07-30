@@ -210,9 +210,16 @@ def toggle_like(request, art_piece_id):
 # Notifications
 @login_required
 def notifications_view(request):
-    notifications = Notification.objects.filter(
-        recipient=request.user).order_by('-timestamp')
-    return render(request, 'main/notifications.html', {'notifications': notifications})
+    user = request.user
+    unread_notifications = Notification.objects.filter(
+        recipient=user, is_read=False).order_by('-timestamp')
+    read_notifications = Notification.objects.filter(
+        recipient=user, is_read=True).order_by('-timestamp')
+
+    return render(request, 'main/notifications.html', {
+        'unread_notifications': unread_notifications,
+        'read_notifications': read_notifications,
+    })
 
 
 def notification_redirect(request, notification_id):
