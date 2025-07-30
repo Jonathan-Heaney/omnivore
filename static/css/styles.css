@@ -278,6 +278,29 @@ a {
 
 /* Notifications */
 
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-5deg);
+  }
+  75% {
+    transform: rotate(5deg);
+  }
+}
+
+#notification-link.has-unread {
+  color: #dc3545;
+  transition: color 0.2s ease;
+}
+
+#notification-link.has-unread:hover {
+  color: #bb2124;
+  animation: wiggle 0.3s ease;
+}
+
 .notification-section-heading {
   /* margin-top: 2rem; */
   font-size: 1.2rem;
