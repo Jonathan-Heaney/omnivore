@@ -11,7 +11,15 @@
 <h1 class="header">Your Notifications</h1>
 
 {% if unread_notifications %}
-    <h4 class="notification-section-heading">Unread</h4>
+    <div class="unread-container">
+      <h4 class="notification-section-heading">Unread</h4>
+      <form action="{% url 'mark_all_notifications_read' %}" method="post" class="mb-3">
+    {% csrf_token %}
+      <button type="submit" class="mark-read-btn">
+      Mark all as read
+      </button>
+    </form>
+  </div>
     <ul class="notification-list">
       {% for notification in unread_notifications %}
         <li class="notification-item unread">

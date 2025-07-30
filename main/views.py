@@ -233,6 +233,13 @@ def notification_redirect(request, notification_id):
     return redirect(notification.get_redirect_url())
 
 
+@login_required
+def mark_all_notifications_read(request):
+    Notification.objects.filter(
+        recipient=request.user, is_read=False).update(is_read=True)
+    return redirect('notifications')
+
+
 def LogOut(request):
     logout(request)
     return redirect("/login/")
