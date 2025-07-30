@@ -52,7 +52,9 @@
                     <ul class="navbar-nav">
                         {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a href="/notifications" class="nav-link">🔔 Notifications</a>
+                            <a href="/notifications" class="nav-link {% if has_unread_notifications %}text-danger{% endif %}" id="notification-link" aria-label="Notifications">
+                                <i class="{% if has_unread_notifications %}fa-solid{% else %}fa-regular{% endif %} fa-bell"></i>
+                            </a>
                         </li>
                         <li class="nav-item">
                             <a href="/my-shared-art" class="nav-link">My Shared Art</a>
