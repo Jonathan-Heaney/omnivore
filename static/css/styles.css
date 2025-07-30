@@ -301,6 +301,10 @@ a {
   background-color: #eef6ff;
 }
 
+.notification-item.unread:hover {
+  background-color: #cce2f2;
+}
+
 .notification-link {
   text-decoration: none;
   color: inherit;

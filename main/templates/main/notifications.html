@@ -12,7 +12,7 @@
 
 <ul class="notification-list">
   {% for notification in notifications %}
-    <li class="notification-item {% if not notification.read %}unread{% endif %}">
+    <li class="notification-item {% if not notification.is_read %}unread{% endif %}">
       <a href="{% url 'notification_redirect' notification.id %}" class="notification-link">
         {{ notification.message }}
         <span class="notification-timestamp">{{ notification.timestamp|naturaltime }}</span>
