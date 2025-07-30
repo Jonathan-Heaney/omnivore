@@ -14,6 +14,7 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from django.utils import timezone
+from datetime import timedelta
 from django.views.decorators.http import require_POST
 from .models import ArtPiece, SentArtPiece, CustomUser, Comment, Like, Notification
 
@@ -211,10 +212,12 @@ def toggle_like(request, art_piece_id):
 @login_required
 def notifications_view(request):
     user = request.user
+    now = timezone.now()
+    two_weeks_ago = now - timedelta(days=14)
     unread_notifications = Notification.objects.filter(
         recipient=user, is_read=False).order_by('-timestamp')
     read_notifications = Notification.objects.filter(
-        recipient=user, is_read=True).order_by('-timestamp')
+        recipient=request.user, is_read=True, timestamp__gte=two_weeks_ago)
 
     return render(request, 'main/notifications.html', {
         'unread_notifications': unread_notifications,
