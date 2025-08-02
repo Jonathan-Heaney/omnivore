@@ -13,6 +13,7 @@ if ENVIRONMENT == "local":
     load_dotenv(".env.local")
 elif ENVIRONMENT == "staging":
     DATABASES = {
+        'ENGINE': 'django.db.backends.postgresql',
         'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
     }
 else:
