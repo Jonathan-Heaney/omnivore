@@ -13,11 +13,22 @@ if ENVIRONMENT == "local":
     load_dotenv(".env.local")
 elif ENVIRONMENT == "staging":
     DATABASES = {
-        'ENGINE': 'django.db.backends.postgresql',
-        'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
+        'default': dj_database_url.config(
+            default=os.getenv("DATABASE_URL")
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
 else:
     load_dotenv(".env.production")
+
+
+# Print the raw DATABASE_URL from the environment
+print("DATABASE_URL from environment:", os.getenv("DATABASE_URL"))
+
+# Print what dj_database_url.config() returns
+print("Parsed DATABASES config:", dj_database_url.config(
+    default=os.getenv("DATABASE_URL")))
 
 if ENVIRONMENT != "staging":
     DB_NAME = os.environ.get('DB_NAME')
