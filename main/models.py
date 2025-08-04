@@ -11,6 +11,10 @@ class CustomUser(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
+    email_on_art_shared = models.BooleanField(default=True)
+    email_on_comment = models.BooleanField(default=True)
+    email_on_like = models.BooleanField(default=False)
+
     groups = models.ManyToManyField(
         'auth.Group',
         related_name='customuser_set',
