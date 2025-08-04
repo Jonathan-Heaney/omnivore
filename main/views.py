@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import RegisterForm, ArtPieceForm, CommentForm, AccountInfoForm, EmailPreferencesForm
-from django.contrib.auth.forms import PasswordChangeForm
+from .forms import RegisterForm, ArtPieceForm, CommentForm, AccountInfoForm, EmailPreferencesForm, CustomPasswordChangeForm
 from django.contrib import messages
 from django.contrib.auth import login, logout, update_session_auth_hash, authenticate, views as auth_views
 from django.contrib.auth.decorators import login_required
@@ -355,7 +354,7 @@ def account_info_settings(request):
         form = AccountInfoForm(instance=request.user)
 
     email_form = EmailPreferencesForm(instance=request.user)
-    password_form = PasswordChangeForm(user=request.user)
+    password_form = CustomPasswordChangeForm(user=request.user)
 
     return render(request, 'main/account_settings.html', {
         'account_form': form,
@@ -377,7 +376,7 @@ def email_pref_settings(request):
         form = EmailPreferencesForm(instance=request.user)
 
     account_form = AccountInfoForm(instance=request.user)
-    password_form = PasswordChangeForm(user=request.user)
+    password_form = CustomPasswordChangeForm(user=request.user)
 
     return render(request, 'main/account_settings.html', {
         'account_form': account_form,
@@ -389,7 +388,7 @@ def email_pref_settings(request):
 @login_required
 def password_settings(request):
     if request.method == 'POST':
-        form = PasswordChangeForm(user=request.user, data=request.POST)
+        form = CustomPasswordChangeForm(user=request.user, data=request.POST)
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)  # Prevents logout
@@ -397,7 +396,7 @@ def password_settings(request):
                 request, "Password successfully updated.", extra_tags="password")
             return redirect(reverse('password_settings') + '#password')
     else:
-        form = PasswordChangeForm(user=request.user)
+        form = CustomPasswordChangeForm(user=request.user)
 
     account_form = AccountInfoForm(instance=request.user)
     email_form = EmailPreferencesForm(instance=request.user)

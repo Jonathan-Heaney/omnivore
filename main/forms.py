@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from .models import ArtPiece, CustomUser, Comment
 from django.core.exceptions import ValidationError
 
@@ -54,6 +54,13 @@ class EmailPreferencesForm(forms.ModelForm):
             'email_on_comment': 'Email me when someone comments on my art',
             'email_on_like': 'Email me when someone likes my art',
         }
+
+
+class CustomPasswordChangeForm(PasswordChangeForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'old_password' in self.fields:
+            self.fields['old_password'].widget.attrs.pop('autofocus', None)
 
 
 class ArtPieceForm(forms.ModelForm):

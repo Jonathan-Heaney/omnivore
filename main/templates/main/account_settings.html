@@ -70,7 +70,7 @@
         <ul class="messages">
         {% for message in messages %}
             {% if 'password' in message.tags %}
-                <li class="alert alert-success messages">{{ message }}</li>
+                <li class="alert alert-success">{{ message }}</li>
             {% endif %}
         {% endfor %}
         </ul>
