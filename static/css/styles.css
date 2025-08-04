@@ -380,6 +380,13 @@ a {
   background-color: #e0e0e0;
 }
 
+/* Account settings success message */
+.messages {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
 /* Additional media queries for fine-tuning responsiveness */
 @media (max-width: 767.98px) {
   .header {

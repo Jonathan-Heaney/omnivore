@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import RegisterForm, ArtPieceForm, CommentForm, AccountInfoForm
+from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate, views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.utils.html import strip_tags
@@ -351,6 +352,7 @@ def account_settings(request):
         account_form = AccountInfoForm(request.POST, instance=user)
         if account_form.is_valid():
             account_form.save()
+            messages.success(request, "Your changes have been saved.")
             return redirect('account_settings')
     else:
         account_form = AccountInfoForm(instance=user)
