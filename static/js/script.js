@@ -141,3 +141,4 @@ function toggleHeartIcon(event) {
   // Let HTMX handle the form submission in the background
   event.target.submit();
 }
+
