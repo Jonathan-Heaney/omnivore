@@ -6,6 +6,7 @@ from django.contrib.auth import login, logout, update_session_auth_hash, authent
 from django.contrib.auth.decorators import login_required
 from django.utils.html import strip_tags
 from django.core.mail import send_mail
+from django.urls import reverse
 import random
 from collections import defaultdict
 from django.core.mail import EmailMultiAlternatives
@@ -342,47 +343,67 @@ class CustomPasswordResetView(auth_views.PasswordResetView):
 
 
 @login_required
-def account_settings(request):
-    user = request.user
-
+def account_info_settings(request):
     if request.method == 'POST':
-        if 'save_info' in request.POST:
-            info_form = AccountInfoForm(request.POST, instance=user)
-            email_form = EmailPreferencesForm(instance=user)
-            password_form = PasswordChangeForm(user=user)
-            if info_form.is_valid():
-                info_form.save()
-                messages.success(request, "Account information updated.")
-                return redirect('account_settings')
-
-        elif 'save_email_prefs' in request.POST:
-            info_form = AccountInfoForm(instance=user)
-            email_form = EmailPreferencesForm(request.POST, instance=user)
-            password_form = PasswordChangeForm(user=user)
-            if email_form.is_valid():
-                email_form.save()
-                messages.success(request, "Email preferences updated.")
-                return redirect('account_settings')
-
-        elif 'change_password' in request.POST:
-            info_form = AccountInfoForm(instance=user)
-            email_form = EmailPreferencesForm(instance=user)
-            password_form = PasswordChangeForm(user=user, data=request.POST)
-            if password_form.is_valid():
-                user = password_form.save()
-                update_session_auth_hash(request, user)
-                messages.success(
-                    request, "Your password was successfully updated.")
-                return redirect('account_settings')
-            else:
-                messages.error(request, "Please correct the errors below.")
+        form = AccountInfoForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request, "Account information updated.", extra_tags="account")
+            return redirect(reverse('account_info_settings') + '#account-info')
     else:
-        info_form = AccountInfoForm(instance=user)
-        email_form = EmailPreferencesForm(instance=user)
-        password_form = PasswordChangeForm(user=user)
+        form = AccountInfoForm(instance=request.user)
+
+    email_form = EmailPreferencesForm(instance=request.user)
+    password_form = PasswordChangeForm(user=request.user)
 
     return render(request, 'main/account_settings.html', {
-        'info_form': info_form,
+        'account_form': form,
         'email_form': email_form,
-        'password_form': password_form,
+        'password_form': password_form
+    })
+
+
+@login_required
+def email_pref_settings(request):
+    if request.method == 'POST':
+        form = EmailPreferencesForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request, "Email preferences updated.", extra_tags="email")
+            return redirect(reverse('email_pref_settings') + '#email-prefs')
+    else:
+        form = EmailPreferencesForm(instance=request.user)
+
+    account_form = AccountInfoForm(instance=request.user)
+    password_form = PasswordChangeForm(user=request.user)
+
+    return render(request, 'main/account_settings.html', {
+        'account_form': account_form,
+        'email_form': form,
+        'password_form': password_form
+    })
+
+
+@login_required
+def password_settings(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Prevents logout
+            messages.success(
+                request, "Password successfully updated.", extra_tags="password")
+            return redirect(reverse('password_settings') + '#password')
+    else:
+        form = PasswordChangeForm(user=request.user)
+
+    account_form = AccountInfoForm(instance=request.user)
+    email_form = EmailPreferencesForm(instance=request.user)
+
+    return render(request, 'main/account_settings.html', {
+        'account_form': account_form,
+        'email_form': email_form,
+        'password_form': form
     })

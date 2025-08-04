@@ -28,5 +28,11 @@ urlpatterns = [
          name="password_reset_confirm"),
     path('reset/done/',
          auth_views.PasswordResetCompleteView.as_view(template_name='registration/password_reset_complete.html'), name="password_reset_complete"),
-    path('settings/', views.account_settings, name='account_settings'),
+
+    path('settings/', views.account_info_settings,
+         name='account_info_settings'),
+    path('settings/email/', views.email_pref_settings,
+         name='email_pref_settings'),
+    path('settings/password/',
+         views.password_settings, name='password_settings'),
 ]

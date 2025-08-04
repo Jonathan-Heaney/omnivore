@@ -12,38 +12,77 @@
 <div class="container mt-4">
   <h1 class="header">Account Settings</h1>
 
- <!-- Account Info Form -->
-  <form method="post">
+<!-- Account Info -->
+<div id="account-info">
+  <h2>Account Information</h2>
+  <form method="post" action="{% url 'account_info_settings' %}#account-info">
     {% csrf_token %}
-    <fieldset>
-      <legend>Account Info</legend>
-      {{ info_form|crispy }}
-    </fieldset>
-    <button type="submit" name="save_info" class="btn btn-primary">Save Account Info</button>
+    {{ account_form|crispy }}
+
+    {% if messages %}
+        <ul class="messages">
+        {% for message in messages %}
+            {% if 'account' in message.tags %}
+                <li class="alert alert-success">{{ message }}</li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+    {% endif %}
+
+    <button type="submit" class="btn btn-primary">Save Account Info</button>
   </form>
 
-  <!-- Email Preferences Form -->
-  <form method="post" class="mt-5">
-    {% csrf_token %}
-    <fieldset>
-      <legend>Email Notification Preferences</legend>
-      {{ email_form|crispy }}
-    </fieldset>
-    <button type="submit" name="save_email_prefs" class="btn btn-primary">Save Email Preferences</button>
-  </form>
+</div>
 
-  <!-- Password Change Form -->
-<form method="post" class="mt-5">
-  {% csrf_token %}
-  <fieldset>
-    <legend>Change Password</legend>
+<hr>
+
+<!-- Email Preferences -->
+<div id="email-prefs">
+  <h2>Email Notification Preferences</h2>
+  <form method="post" action="{% url 'email_pref_settings' %}#email-prefs">
+    {% csrf_token %}
+    {{ email_form|crispy }}
+
+    {% if messages %}
+        <ul class="messages">
+        {% for message in messages %}
+            {% if 'email' in message.tags %}
+                <li class="alert alert-success">{{ message }}</li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+    {% endif %}
+
+    <button type="submit" class="btn btn-primary">Save Email Preferences</button>
+  </form>
+</div>
+
+<hr>
+
+<!-- Password Change -->
+<div id="password">
+  <h2>Change Password</h2>
+  <form method="post" action="{% url 'password_settings' %}#password">
+    {% csrf_token %}
     {{ password_form|crispy }}
-  </fieldset>
-  <button type="submit" name="change_password" class="btn btn-primary">Change Password</button>
-</form>
+
+    {% if messages %}
+        <ul class="messages">
+        {% for message in messages %}
+            {% if 'password' in message.tags %}
+                <li class="alert alert-success messages">{{ message }}</li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+    {% endif %}
+
+    <button type="submit" class="btn btn-primary">Change Password</button>
+  </form>
+</div>
 
 </div>
 {% endblock %}
+
 
 {% block scripts %}
     <script>
