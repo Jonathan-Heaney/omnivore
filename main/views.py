@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import RegisterForm, ArtPieceForm, CommentForm, AccountInfoForm
+from .forms import RegisterForm, ArtPieceForm, CommentForm, AccountInfoForm, EmailPreferencesForm
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate, views as auth_views
 from django.contrib.auth.decorators import login_required
@@ -349,14 +349,27 @@ def account_settings(request):
     user = request.user
 
     if request.method == 'POST':
-        account_form = AccountInfoForm(request.POST, instance=user)
-        if account_form.is_valid():
-            account_form.save()
-            messages.success(request, "Your changes have been saved.")
-            return redirect('account_settings')
+        if 'save_info' in request.POST:
+            info_form = AccountInfoForm(request.POST, instance=user)
+            email_form = EmailPreferencesForm(instance=user)
+            if info_form.is_valid():
+                info_form.save()
+                messages.success(request, "Account information updated.")
+                return redirect('account_settings')
+
+        elif 'save_email_prefs' in request.POST:
+            info_form = AccountInfoForm(instance=user)
+            email_form = EmailPreferencesForm(request.POST, instance=user)
+            if email_form.is_valid():
+                email_form.save()
+                messages.success(
+                    request, "Email notification preferences updated.")
+                return redirect('account_settings')
     else:
-        account_form = AccountInfoForm(instance=user)
+        info_form = AccountInfoForm(instance=user)
+        email_form = EmailPreferencesForm(instance=user)
 
     return render(request, 'main/account_settings.html', {
-        'account_form': account_form,
+        'info_form': info_form,
+        'email_form': email_form,
     })

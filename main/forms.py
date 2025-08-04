@@ -45,6 +45,17 @@ class AccountInfoForm(forms.ModelForm):
         }
 
 
+class EmailPreferencesForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ['email_on_art_shared', 'email_on_comment', 'email_on_like']
+        labels = {
+            'email_on_art_shared': 'Email me when someone shares art with me',
+            'email_on_comment': 'Email me when someone comments on my art',
+            'email_on_like': 'Email me when someone likes my art',
+        }
+
+
 class ArtPieceForm(forms.ModelForm):
     class Meta:
         model = ArtPiece
