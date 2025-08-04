@@ -1,19 +1,16 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import RegisterForm, ArtPieceForm, CommentForm, AccountInfoForm, EmailPreferencesForm
+from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib import messages
-from django.contrib.auth import login, logout, authenticate, views as auth_views
+from django.contrib.auth import login, logout, update_session_auth_hash, authenticate, views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.utils.html import strip_tags
 from django.core.mail import send_mail
-import os
 import random
-import logging
-import pprint
 from collections import defaultdict
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
-from django.http import HttpResponse, JsonResponse
-from django.conf import settings
+from django.http import HttpResponse
 from django.utils import timezone
 from datetime import timedelta
 from django.views.decorators.http import require_POST
@@ -352,6 +349,7 @@ def account_settings(request):
         if 'save_info' in request.POST:
             info_form = AccountInfoForm(request.POST, instance=user)
             email_form = EmailPreferencesForm(instance=user)
+            password_form = PasswordChangeForm(user=user)
             if info_form.is_valid():
                 info_form.save()
                 messages.success(request, "Account information updated.")
@@ -360,16 +358,31 @@ def account_settings(request):
         elif 'save_email_prefs' in request.POST:
             info_form = AccountInfoForm(instance=user)
             email_form = EmailPreferencesForm(request.POST, instance=user)
+            password_form = PasswordChangeForm(user=user)
             if email_form.is_valid():
                 email_form.save()
-                messages.success(
-                    request, "Email notification preferences updated.")
+                messages.success(request, "Email preferences updated.")
                 return redirect('account_settings')
+
+        elif 'change_password' in request.POST:
+            info_form = AccountInfoForm(instance=user)
+            email_form = EmailPreferencesForm(instance=user)
+            password_form = PasswordChangeForm(user=user, data=request.POST)
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)
+                messages.success(
+                    request, "Your password was successfully updated.")
+                return redirect('account_settings')
+            else:
+                messages.error(request, "Please correct the errors below.")
     else:
         info_form = AccountInfoForm(instance=user)
         email_form = EmailPreferencesForm(instance=user)
+        password_form = PasswordChangeForm(user=user)
 
     return render(request, 'main/account_settings.html', {
         'info_form': info_form,
         'email_form': email_form,
+        'password_form': password_form,
     })
