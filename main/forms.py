@@ -33,6 +33,18 @@ class RegisterForm(UserCreationForm):
         return user
 
 
+class AccountInfoForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ['first_name', 'last_name', 'email', 'username']
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+
 class ArtPieceForm(forms.ModelForm):
     class Meta:
         model = ArtPiece

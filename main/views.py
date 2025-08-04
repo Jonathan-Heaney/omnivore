@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import RegisterForm, ArtPieceForm, CommentForm
+from .forms import RegisterForm, ArtPieceForm, CommentForm, AccountInfoForm
 from django.contrib.auth import login, logout, authenticate, views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.utils.html import strip_tags
@@ -341,3 +341,20 @@ class CustomPasswordResetView(auth_views.PasswordResetView):
         }
         form.save(**opts)
         return super(auth_views.PasswordResetView, self).form_valid(form)
+
+
+@login_required
+def account_settings(request):
+    user = request.user
+
+    if request.method == 'POST':
+        account_form = AccountInfoForm(request.POST, instance=user)
+        if account_form.is_valid():
+            account_form.save()
+            return redirect('account_settings')
+    else:
+        account_form = AccountInfoForm(instance=user)
+
+    return render(request, 'main/account_settings.html', {
+        'account_form': account_form,
+    })
