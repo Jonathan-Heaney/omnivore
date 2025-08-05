@@ -15,22 +15,24 @@
 <!-- Account Info -->
 <div id="account-info">
   <h2>Account Information</h2>
-  <form method="post" id="account-info-form" action="{% url 'account_info_settings' %}#account-info">
-    {% csrf_token %}
-    {{ account_form|crispy }}
+  <form method="post" id="account-info-form" action="{% url 'account_info_settings' %}">
+  {% csrf_token %}
+  {{ account_form|crispy }}
 
+  <div id="account-info-message-container">
     {% if messages %}
-        <ul class="messages">
-        {% for message in messages %}
-            {% if 'account' in message.tags %}
-                <li class="alert alert-success">{{ message }}</li>
-            {% endif %}
-        {% endfor %}
-        </ul>
+      <ul class="messages">
+      {% for message in messages %}
+        {% if 'account' in message.tags %}
+          <li class="alert alert-success">{{ message }}</li>
+        {% endif %}
+      {% endfor %}
+      </ul>
     {% endif %}
+  </div>
 
-    <button type="submit" class="btn btn-primary" id="save-account-info" disabled>Save Account Info</button>
-  </form>
+  <button type="submit" class="btn btn-primary" id="save-account-info" disabled>Save Account Info</button>
+</form>
 
 </div>
 
@@ -85,44 +87,66 @@
 
 
 {% block scripts %}
-    <script>
+<script>
 document.addEventListener("DOMContentLoaded", () => {
   // === ACCOUNT INFO FORM ===
   const accountForm = document.getElementById("account-info-form");
   const accountInputs = accountForm.querySelectorAll("input");
   const accountButton = document.getElementById("save-account-info");
+  const messageContainer = document.getElementById("account-info-message-container");
 
   const originalAccountValues = Array.from(accountInputs).map(input => input.value);
-  accountForm.addEventListener("input", () => {
-    const changed = Array.from(accountInputs).some((input, i) => input.value !== originalAccountValues[i]);
-    accountButton.disabled = !changed;
-  });
 
-  // === EMAIL PREFERENCES FORM ===
-  const emailForm = document.getElementById("email-pref-form");
-  const emailInputs = emailForm.querySelectorAll("input[type=checkbox]");
-  const emailButton = document.getElementById("save-email-prefs");
-
-  const originalEmailValues = Array.from(emailInputs).map(cb => cb.checked);
-  emailForm.addEventListener("change", () => {
-    const changed = Array.from(emailInputs).some((cb, i) => cb.checked !== originalEmailValues[i]);
-    emailButton.disabled = !changed;
-  });
-
-  // === PASSWORD FORM ===
-  const passwordForm = document.getElementById("password-form");
-  const oldPassword = passwordForm.querySelector("input[name=old_password]");
-  const newPassword1 = passwordForm.querySelector("input[name=new_password1]");
-  const newPassword2 = passwordForm.querySelector("input[name=new_password2]");
-  const passwordButton = document.getElementById("save-password");
-
-  function validatePasswordForm() {
-    const allFilled = oldPassword.value && newPassword1.value && newPassword2.value;
-    const passwordsMatch = newPassword1.value === newPassword2.value;
-    passwordButton.disabled = !(allFilled && passwordsMatch);
+  function hasChanges() {
+    return Array.from(accountInputs).some((input, i) => input.value !== originalAccountValues[i]);
   }
 
-  passwordForm.addEventListener("input", validatePasswordForm);
+  function resetButtonAndMessage() {
+    accountButton.disabled = true;
+    const ul = document.createElement("ul");
+    ul.classList.add("messages");
+    const li = document.createElement("li");
+    li.classList.add("alert", "alert-success");
+    li.textContent = "Account information updated.";
+    ul.appendChild(li);
+    messageContainer.innerHTML = "";
+    messageContainer.appendChild(ul);
+  }
+
+    accountForm.addEventListener("input", () => {
+    const changed = hasChanges();
+    accountButton.disabled = !changed;
+    if (changed) {
+      messageContainer.innerHTML = ""; // Remove message only when making a real change
+    }
+  });
+
+  accountForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const formData = new FormData(accountForm);
+    accountButton.disabled = true;
+
+    const response = await fetch(accountForm.action, {
+      method: "POST",
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+      body: formData,
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      resetButtonAndMessage();
+      // Update baseline values so next edit cycle works
+      for (let i = 0; i < accountInputs.length; i++) {
+        originalAccountValues[i] = accountInputs[i].value;
+      }
+    } else {
+      accountButton.disabled = false;
+      alert("Something went wrong. Please try again.");
+    }
+  });
+
 });
 </script>
 {% endblock %}

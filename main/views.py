@@ -10,7 +10,7 @@ import random
 from collections import defaultdict
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
 from datetime import timedelta
 from django.views.decorators.http import require_POST
@@ -347,6 +347,8 @@ def account_info_settings(request):
         form = AccountInfoForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'message': 'Account information updated.'})
             messages.success(
                 request, "Account information updated.", extra_tags="account")
             return redirect(reverse('account_info_settings') + '#account-info')
