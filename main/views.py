@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import RegisterForm, ArtPieceForm, CommentForm, AccountInfoForm, EmailPreferencesForm, CustomPasswordChangeForm
 from django.contrib import messages
@@ -397,17 +398,21 @@ def password_settings(request):
         form = CustomPasswordChangeForm(user=request.user, data=request.POST)
         if form.is_valid():
             user = form.save()
-            update_session_auth_hash(request, user)  # Prevent logout
+            update_session_auth_hash(request, user)
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return JsonResponse({"message": "Password successfully updated."})
+            else:
+                messages.success(
+                    request, "Password successfully updated.", extra_tags="password")
+                return redirect(reverse('password_settings') + '#password')
+        else:
             if request.headers.get("X-Requested-With") == "XMLHttpRequest":
                 return JsonResponse({
-                    "message": "Password successfully updated."
-                })
-            messages.success(
-                request, "Password successfully updated.", extra_tags="password")
-            return redirect(reverse('password_settings') + '#password')
-    else:
-        form = CustomPasswordChangeForm(user=request.user)
+                    "errors": form.errors.as_json()
+                }, status=400)
 
+    # fallback for GET or non-AJAX
+    form = CustomPasswordChangeForm(user=request.user)
     account_form = AccountInfoForm(instance=request.user)
     email_form = EmailPreferencesForm(instance=request.user)
 

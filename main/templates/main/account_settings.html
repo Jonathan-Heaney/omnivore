@@ -190,7 +190,7 @@ const newPassword2 = passwordForm.querySelector("input[name=new_password2]");
 const passwordButton = document.getElementById("save-password");
 const passwordMessageContainer = document.getElementById("password-message-container");
 
-// Form validation logic
+// Helper: Check if form is filled and passwords match
 function validatePasswordForm() {
   const oldFilled = oldPassword.value.trim() !== "";
   const new1Filled = newPassword1.value.trim() !== "";
@@ -199,11 +199,20 @@ function validatePasswordForm() {
   return oldFilled && new1Filled && new2Filled && passwordsMatch;
 }
 
-// Re-check on input change
+// Helper: Reset form after success
+function resetPasswordForm() {
+  oldPassword.value = "";
+  newPassword1.value = "";
+  newPassword2.value = "";
+  passwordButton.disabled = true;
+}
+
+// Update button state and clear messages on input
 passwordForm.addEventListener("input", () => {
-  const valid = validatePasswordForm();
-  passwordButton.disabled = !valid;
-  if (valid) {
+  const isValid = validatePasswordForm();
+  passwordButton.disabled = !isValid;
+
+  if (isValid) {
     passwordMessageContainer.innerHTML = "";
   }
 });
@@ -213,25 +222,39 @@ passwordForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const formData = new FormData(passwordForm);
-  const response = await fetch(passwordForm.action, {
-    method: "POST",
-    headers: {
-      "X-Requested-With": "XMLHttpRequest",
-    },
-    body: formData,
-  });
 
-  if (response.ok) {
-    const data = await response.json();
-    passwordMessageContainer.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
-    passwordButton.disabled = true;
+  try {
+    const response = await fetch(passwordForm.action, {
+      method: "POST",
+      headers: {
+        "X-Requested-With": "XMLHttpRequest",
+      },
+      body: formData,
+    });
 
-    // Clear password fields
-    oldPassword.value = "";
-    newPassword1.value = "";
-    newPassword2.value = "";
-  } else {
-    passwordMessageContainer.innerHTML = `<div class="alert alert-danger">There was a problem changing your password.</div>`;
+    if (response.ok) {
+      const data = await response.json();
+      passwordMessageContainer.innerHTML = `
+        <div class="alert alert-success">${data.message}</div>
+      `;
+      resetPasswordForm();
+    } else {
+      const errorData = await response.json();
+      const errors = JSON.parse(errorData.errors);
+
+      const errorList = Object.values(errors)
+        .flatMap(fieldErrors =>
+          fieldErrors.map(err => `<li class="alert alert-danger">${err.message}</li>`)
+        )
+        .join("");
+
+      passwordMessageContainer.innerHTML = `<ul class="messages">${errorList}</ul>`;
+    }
+  } catch (err) {
+    console.error("Unexpected error during password change:", err);
+    passwordMessageContainer.innerHTML = `
+      <div class="alert alert-danger">Something went wrong. Please try again.</div>
+    `;
   }
 });
 </script>
