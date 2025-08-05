@@ -15,7 +15,7 @@
 <!-- Account Info -->
 <div id="account-info">
   <h2>Account Information</h2>
-  <form method="post" action="{% url 'account_info_settings' %}#account-info">
+  <form method="post" id="account-info-form" action="{% url 'account_info_settings' %}#account-info">
     {% csrf_token %}
     {{ account_form|crispy }}
 
@@ -29,7 +29,7 @@
         </ul>
     {% endif %}
 
-    <button type="submit" class="btn btn-primary">Save Account Info</button>
+    <button type="submit" class="btn btn-primary" id="save-account-info" disabled>Save Account Info</button>
   </form>
 
 </div>
@@ -39,7 +39,7 @@
 <!-- Email Preferences -->
 <div id="email-prefs">
   <h2>Email Notification Preferences</h2>
-  <form method="post" action="{% url 'email_pref_settings' %}#email-prefs">
+  <form method="post" id="email-pref-form" action="{% url 'email_pref_settings' %}#email-prefs">
     {% csrf_token %}
     {{ email_form|crispy }}
 
@@ -53,7 +53,7 @@
         </ul>
     {% endif %}
 
-    <button type="submit" class="btn btn-primary">Save Email Preferences</button>
+    <button type="submit" class="btn btn-primary" id="save-email-prefs" disabled>Save Email Preferences</button>
   </form>
 </div>
 
@@ -62,7 +62,7 @@
 <!-- Password Change -->
 <div id="password">
   <h2>Change Password</h2>
-  <form method="post" action="{% url 'password_settings' %}#password">
+  <form method="post" id="password-form" action="{% url 'password_settings' %}#password">
     {% csrf_token %}
     {{ password_form|crispy }}
 
@@ -76,7 +76,7 @@
         </ul>
     {% endif %}
 
-    <button type="submit" class="btn btn-primary">Change Password</button>
+    <button type="submit" class="btn btn-primary" id="save-password" disabled>Change Password</button>
   </form>
 </div>
 
@@ -86,25 +86,43 @@
 
 {% block scripts %}
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const form = document.getElementById('account-info-form');
-        const saveButton = document.getElementById('save-button');
+document.addEventListener("DOMContentLoaded", () => {
+  // === ACCOUNT INFO FORM ===
+  const accountForm = document.getElementById("account-info-form");
+  const accountInputs = accountForm.querySelectorAll("input");
+  const accountButton = document.getElementById("save-account-info");
 
-        const initialData = new FormData(form);
+  const originalAccountValues = Array.from(accountInputs).map(input => input.value);
+  accountForm.addEventListener("input", () => {
+    const changed = Array.from(accountInputs).some((input, i) => input.value !== originalAccountValues[i]);
+    accountButton.disabled = !changed;
+  });
 
-        form.addEventListener('input', function () {
-        const currentData = new FormData(form);
-        let changed = false;
+  // === EMAIL PREFERENCES FORM ===
+  const emailForm = document.getElementById("email-pref-form");
+  const emailInputs = emailForm.querySelectorAll("input[type=checkbox]");
+  const emailButton = document.getElementById("save-email-prefs");
 
-        for (const [key, value] of currentData.entries()) {
-            if (value !== initialData.get(key)) {
-            changed = true;
-            break;
-            }
-        }
+  const originalEmailValues = Array.from(emailInputs).map(cb => cb.checked);
+  emailForm.addEventListener("change", () => {
+    const changed = Array.from(emailInputs).some((cb, i) => cb.checked !== originalEmailValues[i]);
+    emailButton.disabled = !changed;
+  });
 
-        saveButton.disabled = !changed;
-        });
-    });
-    </script>
+  // === PASSWORD FORM ===
+  const passwordForm = document.getElementById("password-form");
+  const oldPassword = passwordForm.querySelector("input[name=old_password]");
+  const newPassword1 = passwordForm.querySelector("input[name=new_password1]");
+  const newPassword2 = passwordForm.querySelector("input[name=new_password2]");
+  const passwordButton = document.getElementById("save-password");
+
+  function validatePasswordForm() {
+    const allFilled = oldPassword.value && newPassword1.value && newPassword2.value;
+    const passwordsMatch = newPassword1.value === newPassword2.value;
+    passwordButton.disabled = !(allFilled && passwordsMatch);
+  }
+
+  passwordForm.addEventListener("input", validatePasswordForm);
+});
+</script>
 {% endblock %}
