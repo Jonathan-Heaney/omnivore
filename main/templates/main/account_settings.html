@@ -39,26 +39,18 @@
 <hr>
 
 <!-- Email Preferences -->
+<!-- Email Preferences -->
 <div id="email-prefs">
   <h2>Email Notification Preferences</h2>
   <form method="post" id="email-pref-form" action="{% url 'email_pref_settings' %}#email-prefs">
     {% csrf_token %}
     {{ email_form|crispy }}
 
-    {% if messages %}
-        <ul class="messages">
-        {% for message in messages %}
-            {% if 'email' in message.tags %}
-                <li class="alert alert-success">{{ message }}</li>
-            {% endif %}
-        {% endfor %}
-        </ul>
-    {% endif %}
+    <div id="email-message-container"></div>
 
     <button type="submit" class="btn btn-primary" id="save-email-prefs" disabled>Save Email Preferences</button>
   </form>
 </div>
-
 <hr>
 
 <!-- Password Change -->
@@ -147,6 +139,55 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+});
+
+// === EMAIL PREFERENCES FORM ===
+const emailForm = document.getElementById("email-pref-form");
+const emailInputs = emailForm.querySelectorAll("input[type=checkbox]");
+const emailButton = document.getElementById("save-email-prefs");
+const emailMessageContainer = document.getElementById("email-message-container");
+
+// Store original state
+const originalEmailValues = Array.from(emailInputs).map(cb => cb.checked);
+
+// Utility to check for changes
+function emailFormHasChanges() {
+  return Array.from(emailInputs).some((cb, i) => cb.checked !== originalEmailValues[i]);
+}
+
+// Enable/disable button based on form state
+emailForm.addEventListener("change", () => {
+  const changed = emailFormHasChanges();
+  emailButton.disabled = !changed;
+  if (changed) {
+    emailMessageContainer.innerHTML = ""; // Clear old message
+  }
+});
+
+// Handle submit via Fetch
+emailForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const formData = new FormData(emailForm);
+  const response = await fetch(emailForm.action, {
+    method: "POST",
+    headers: {
+      "X-Requested-With": "XMLHttpRequest",
+    },
+    body: formData,
+  });
+
+  if (response.ok) {
+    const data = await response.json();
+    emailMessageContainer.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+    emailButton.disabled = true;
+
+    // Update the original values to match the now-saved state
+    emailInputs.forEach((cb, i) => {
+      originalEmailValues[i] = cb.checked;
+    });
+  } else {
+    emailMessageContainer.innerHTML = `<div class="alert alert-danger">There was a problem saving your preferences.</div>`;
+  }
 });
 </script>
 {% endblock %}

@@ -371,6 +371,10 @@ def email_pref_settings(request):
         form = EmailPreferencesForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return JsonResponse({
+                    "message": "Email preferences updated."
+                })
             messages.success(
                 request, "Email preferences updated.", extra_tags="email")
             return redirect(reverse('email_pref_settings') + '#email-prefs')
