@@ -397,7 +397,11 @@ def password_settings(request):
         form = CustomPasswordChangeForm(user=request.user, data=request.POST)
         if form.is_valid():
             user = form.save()
-            update_session_auth_hash(request, user)  # Prevents logout
+            update_session_auth_hash(request, user)  # Prevent logout
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return JsonResponse({
+                    "message": "Password successfully updated."
+                })
             messages.success(
                 request, "Password successfully updated.", extra_tags="password")
             return redirect(reverse('password_settings') + '#password')

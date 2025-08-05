@@ -60,15 +60,7 @@
     {% csrf_token %}
     {{ password_form|crispy }}
 
-    {% if messages %}
-        <ul class="messages">
-        {% for message in messages %}
-            {% if 'password' in message.tags %}
-                <li class="alert alert-success">{{ message }}</li>
-            {% endif %}
-        {% endfor %}
-        </ul>
-    {% endif %}
+    <div id="password-message-container"></div>
 
     <button type="submit" class="btn btn-primary" id="save-password" disabled>Change Password</button>
   </form>
@@ -187,6 +179,59 @@ emailForm.addEventListener("submit", async (e) => {
     });
   } else {
     emailMessageContainer.innerHTML = `<div class="alert alert-danger">There was a problem saving your preferences.</div>`;
+  }
+});
+
+// === PASSWORD FORM ===
+const passwordForm = document.getElementById("password-form");
+const oldPassword = passwordForm.querySelector("input[name=old_password]");
+const newPassword1 = passwordForm.querySelector("input[name=new_password1]");
+const newPassword2 = passwordForm.querySelector("input[name=new_password2]");
+const passwordButton = document.getElementById("save-password");
+const passwordMessageContainer = document.getElementById("password-message-container");
+
+// Form validation logic
+function validatePasswordForm() {
+  const oldFilled = oldPassword.value.trim() !== "";
+  const new1Filled = newPassword1.value.trim() !== "";
+  const new2Filled = newPassword2.value.trim() !== "";
+  const passwordsMatch = newPassword1.value === newPassword2.value;
+  return oldFilled && new1Filled && new2Filled && passwordsMatch;
+}
+
+// Re-check on input change
+passwordForm.addEventListener("input", () => {
+  const valid = validatePasswordForm();
+  passwordButton.disabled = !valid;
+  if (valid) {
+    passwordMessageContainer.innerHTML = "";
+  }
+});
+
+// Handle submit via Fetch
+passwordForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const formData = new FormData(passwordForm);
+  const response = await fetch(passwordForm.action, {
+    method: "POST",
+    headers: {
+      "X-Requested-With": "XMLHttpRequest",
+    },
+    body: formData,
+  });
+
+  if (response.ok) {
+    const data = await response.json();
+    passwordMessageContainer.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+    passwordButton.disabled = true;
+
+    // Clear password fields
+    oldPassword.value = "";
+    newPassword1.value = "";
+    newPassword2.value = "";
+  } else {
+    passwordMessageContainer.innerHTML = `<div class="alert alert-danger">There was a problem changing your password.</div>`;
   }
 });
 </script>
