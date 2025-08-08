@@ -387,6 +387,46 @@ a {
   margin: 0;
 }
 
+/* Account settings page - password eye */
+/* Wrap so we can position the eye inside the input */
+.pw-wrap {
+  position: relative;
+}
+
+/* Make space for the eye on the right */
+.pw-wrap input[type='password'],
+.pw-wrap input[type='text'].pw-visible {
+  padding-right: 2.25rem;
+}
+
+/* The eye button */
+.pw-toggle {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Size + subtle state */
+.pw-toggle svg {
+  width: 20px;
+  height: 20px;
+  opacity: 0.65;
+}
+.pw-toggle:hover svg {
+  opacity: 0.9;
+}
+.pw-toggle[aria-pressed='true'] svg {
+  opacity: 1;
+}
+
 /* Additional media queries for fine-tuning responsiveness */
 @media (max-width: 767.98px) {
   .header {
