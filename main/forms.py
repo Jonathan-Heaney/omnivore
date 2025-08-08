@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
+from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm, AuthenticationForm
 from .models import ArtPiece, CustomUser, Comment
 from django.core.exceptions import ValidationError
 
@@ -19,6 +19,14 @@ class RegisterForm(UserCreationForm):
         validators=[validate_username],
         help_text="Please choose a unique username. Do not use your email address."
     )
+    password1 = forms.CharField(
+        label="Password",
+        widget=forms.PasswordInput(attrs={'class': 'js-password'})
+    )
+    password2 = forms.CharField(
+        label="Confirm Password",
+        widget=forms.PasswordInput(attrs={'class': 'js-password'})
+    )
 
     class Meta:
         model = CustomUser
@@ -31,6 +39,12 @@ class RegisterForm(UserCreationForm):
         if commit:
             user.save()
         return user
+
+
+class CustomAuthenticationForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['password'].widget.attrs.update({'class': 'js-password'})
 
 
 class AccountInfoForm(forms.ModelForm):
