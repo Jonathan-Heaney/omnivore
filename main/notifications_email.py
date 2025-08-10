@@ -1,8 +1,5 @@
-# main/notifications_email.py
 from django.conf import settings
 from django.urls import reverse
-from django.core.mail import EmailMultiAlternatives
-from django.template.loader import render_to_string
 from main.utils.email_unsub import make_unsub_token
 from .mail import send_templated_email
 
@@ -52,7 +49,7 @@ def send_like_email(*, recipient, liker, art_piece):
     # Unsubscribe link for 'like'
     token = make_unsub_token(recipient.id, "like")
     unsub_path = reverse("email_unsubscribe", args=[token])
-    unsubscribe_url = _abs_url(unsub_path)
+    unsubscribe_url = _abs_url(settings.SITE_URL, unsub_path)
 
     context = {
         "recipient": recipient,
@@ -61,7 +58,10 @@ def send_like_email(*, recipient, liker, art_piece):
         "unsubscribe_url": unsubscribe_url,
         # Deep-link back to the relevant page/section
         # (owner sees likes on My Shared Art)
-        "cta_url": _abs_url("/my-shared-art#likes-{id}".format(id=art_piece.id)),
+        "cta_url": _abs_url(
+            settings.SITE_URL,
+            f"/my-shared-art#likes-{art_piece.id}"
+        ),
     }
 
     subject = f"{liker.get_full_name()} loved a piece you shared!"
