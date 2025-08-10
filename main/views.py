@@ -94,6 +94,12 @@ def my_shared_art(request):
     user = request.user
     my_pieces = ArtPiece.objects.filter(user=user).order_by('-created_at')
 
+    n_id = request.GET.get("n")
+    if n_id:
+        Notification.objects.filter(
+            id=n_id, recipient=request.user, is_read=False
+        ).update(is_read=True)
+
     # Dictionary to hold conversations by art piece
     conversations = defaultdict(lambda: defaultdict(list))
     likes_dict = {}
@@ -154,6 +160,12 @@ def my_received_art(request):
     user = request.user
     received_pieces = SentArtPiece.objects.filter(
         user=user).select_related('art_piece__user').order_by('-sent_time')
+
+    n_id = request.GET.get("n")
+    if n_id:
+        Notification.objects.filter(
+            id=n_id, recipient=request.user, is_read=False
+        ).update(is_read=True)
 
     pieces = [received_piece.art_piece for received_piece in received_pieces]
     comments = Comment.objects.filter(art_piece__in=pieces, sender=user) | Comment.objects.filter(

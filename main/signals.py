@@ -16,7 +16,7 @@ def create_like_notification(sender, instance, created, **kwargs):
     if sender_user == recipient_user:
         return
 
-    Notification.objects.create(
+    n = Notification.objects.create(
         recipient=recipient_user,
         sender=sender_user,
         notification_type='like',
@@ -25,7 +25,7 @@ def create_like_notification(sender, instance, created, **kwargs):
     )
 
     send_like_email(recipient=recipient_user,
-                    liker=sender_user, art_piece=instance.art_piece)
+                    liker=sender_user, art_piece=instance.art_piece, notification_id=n.id)
 
 
 @receiver(post_save, sender=Comment)
@@ -40,7 +40,7 @@ def create_comment_notification(sender, instance, created, **kwargs):
     if sender_user == recipient_user:
         return
 
-    Notification.objects.create(
+    n = Notification.objects.create(
         recipient=recipient_user,
         sender=sender_user,
         notification_type='comment',
@@ -48,7 +48,8 @@ def create_comment_notification(sender, instance, created, **kwargs):
         art_piece=instance.art_piece
     )
 
-    send_comment_email(recipient_user, instance)
+    send_comment_email(recipient=recipient_user,
+                       comment=instance, notification_id=n.id)
 
 
 @receiver(post_save, sender=SentArtPiece)

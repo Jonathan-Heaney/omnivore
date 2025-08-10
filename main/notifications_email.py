@@ -9,21 +9,27 @@ def _abs_url(base, path):
     return base.rstrip("/") + path
 
 
-def send_comment_email(recipient, comment):
-    # Respect user preference
+def send_comment_email(*, recipient, comment, notification_id=None):
     if not getattr(recipient, "email_on_comment", False):
         return
 
-    # Build unsubscribe link
     token = make_unsub_token(recipient.id, "comment")
-    unsub_path = reverse("email_unsubscribe", args=[token])
-    unsubscribe_url = _abs_url(settings.SITE_URL, unsub_path)
+    unsubscribe_url = _abs_url(settings.SITE_URL,
+                               reverse("email_unsubscribe", args=[token]))
 
-    # (Optional) deep link to the relevant page/anchor
-    # If the comment is on recipient's *shared* piece, link to my_shared_art
-    # else if it's on a piece they *received*, link to my_received_art.
-    # Keep it simple for now:
-    target_url = _abs_url(settings.SITE_URL, "/my-shared-art/")
+    # Decide page + anchor based on who’s being notified
+    if comment.art_piece.user_id == recipient.id:
+        # Recipient is the owner (they're on My Shared Art).
+        # Conversations are keyed by the *other person* — the commenter (sender).
+        base_path = "/my-shared-art"
+        anchor = f"#comments-{comment.art_piece.id}-{comment.sender.id}-container"
+    else:
+        # Recipient received the piece (they're on My Received Art).
+        base_path = "/my-received-art"
+        anchor = f"#comments-{comment.art_piece.id}-container"
+
+    q = f"?n={notification_id}" if notification_id else ""
+    target_url = _abs_url(settings.SITE_URL, f"{base_path}{q}{anchor}")
 
     subject = f"{comment.sender.first_name} sent you a message!"
     context = {
@@ -36,32 +42,34 @@ def send_comment_email(recipient, comment):
     send_templated_email(recipient, subject, "emails/comment", context)
 
 
-def send_like_email(*, recipient, liker, art_piece):
+def send_like_email(*, recipient, liker, art_piece, notification_id=None):
     """
     Email the owner of an art piece when someone likes it.
-    recipient: CustomUser who shared the piece (art_piece.user)
-    liker: CustomUser who clicked like
+    recipient: the owner (art_piece.user)
+    liker: the user who clicked like
     art_piece: ArtPiece instance
+    notification_id: optional int, used to mark-as-read on click
     """
     if not getattr(recipient, "email_on_like", False):
         return
 
-    # Unsubscribe link for 'like'
+    # Unsubscribe link
     token = make_unsub_token(recipient.id, "like")
-    unsub_path = reverse("email_unsubscribe", args=[token])
-    unsubscribe_url = _abs_url(settings.SITE_URL, unsub_path)
+    unsubscribe_url = _abs_url(settings.SITE_URL,
+                               reverse("email_unsubscribe", args=[token]))
+
+    # CTA: add ?n=<notification_id> if we have one
+    path = f"/my-shared-art"
+    if notification_id:
+        path += f"?n={notification_id}"
+    path += f"#likes-{art_piece.id}"
 
     context = {
         "recipient": recipient,
         "liker": liker,
         "art_piece": art_piece,
         "unsubscribe_url": unsubscribe_url,
-        # Deep-link back to the relevant page/section
-        # (owner sees likes on My Shared Art)
-        "cta_url": _abs_url(
-            settings.SITE_URL,
-            f"/my-shared-art#likes-{art_piece.id}"
-        ),
+        "cta_url": _abs_url(settings.SITE_URL, path),
     }
 
     subject = f"{liker.get_full_name()} loved a piece you shared!"
