@@ -17,7 +17,7 @@ from django.utils import timezone
 from datetime import timedelta
 from django.views.decorators.http import require_POST
 from .models import ArtPiece, SentArtPiece, CustomUser, Comment, Like, Notification
-from utils.email_unsub import load_unsub_token
+from main.utils.email_unsub import load_unsub_token
 
 
 def home(request):

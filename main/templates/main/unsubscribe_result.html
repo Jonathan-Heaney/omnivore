@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css_files %}
+  <link rel="stylesheet" href="{% static "css/styles.css" %}">
+{% endblock %}
+
+{% block content %}
+  <div class="container mt-4">
+    {% if ok %}
+      <div class="alert alert-success">
+        You’ve been unsubscribed from {{ category_label }}. 
+        You can manage your preferences anytime on your 
+        <a href="{% url 'account_info_settings' %}#email-prefs">Settings</a> page.
+      </div>
+    {% else %}
+      <div class="alert alert-danger">
+        {{ error }}
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

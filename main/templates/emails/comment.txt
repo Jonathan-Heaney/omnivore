@@ -1,0 +1,11 @@
+Hi {{ recipient.first_name }},
+
+{{ sender.first_name }} sent you a message:
+
+"{{ comment.text }}"
+
+View it: {{ target_url }}
+
+—
+Too many emails? Unsubscribe from comment emails:
+{{ unsubscribe_url }}

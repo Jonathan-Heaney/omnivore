@@ -1,7 +1,7 @@
 # main/notifications_email.py
 from django.conf import settings
 from django.urls import reverse
-from utils.email_unsub import make_unsub_token
+from main.utils.email_unsub import make_unsub_token
 from .mail import send_templated_email
 
 
