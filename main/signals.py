@@ -1,7 +1,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import Like, Notification, Comment, SentArtPiece
-from .notifications_email import send_comment_email
+from .notifications_email import send_comment_email, send_like_email
 
 
 @receiver(post_save, sender=Like)
@@ -23,6 +23,9 @@ def create_like_notification(sender, instance, created, **kwargs):
         message=f"{sender_user} loved a piece of art you shared!",
         art_piece=instance.art_piece
     )
+
+    send_like_email(recipient=recipient_user,
+                    liker=sender_user, art_piece=instance.art_piece)
 
 
 @receiver(post_save, sender=Comment)
