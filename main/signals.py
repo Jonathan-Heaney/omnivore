@@ -1,6 +1,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import Like, Notification, Comment, SentArtPiece
+from .notifications_email import send_comment_email
 
 
 @receiver(post_save, sender=Like)
@@ -43,6 +44,8 @@ def create_comment_notification(sender, instance, created, **kwargs):
         message=f"{sender_user} sent you a message!",
         art_piece=instance.art_piece
     )
+
+    send_comment_email(recipient_user, instance)
 
 
 @receiver(post_save, sender=SentArtPiece)

@@ -11,11 +11,13 @@ import random
 from collections import defaultdict
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
+from django.core.signing import BadSignature, SignatureExpired
 from django.utils import timezone
 from datetime import timedelta
 from django.views.decorators.http import require_POST
 from .models import ArtPiece, SentArtPiece, CustomUser, Comment, Like, Notification
+from utils.email_unsub import load_unsub_token
 
 
 def home(request):
@@ -421,3 +423,63 @@ def password_settings(request):
         'email_form': email_form,
         'password_form': form
     })
+
+
+# map token kinds -> CustomUser boolean fields
+KIND_TO_FIELD = {
+    "art": "email_on_art_shared",
+    "comment": "email_on_comment",
+    "like": "email_on_like",
+}
+
+KIND_LABELS = {
+    "art": "new art shared",
+    "comment": "comments & replies",
+    "like": "likes",
+}
+
+
+def unsubscribe_email(request, token: str):
+    try:
+        # raises SignatureExpired/BadSignature as needed
+        payload = load_unsub_token(token)
+    except SignatureExpired:
+        return render(
+            request,
+            "main/unsubscribe_result.html",
+            {"ok": False, "error": "This unsubscribe link has expired."},
+            status=400,
+        )
+    except BadSignature:
+        return render(
+            request,
+            "main/unsubscribe_result.html",
+            {"ok": False, "error": "Invalid unsubscribe link."},
+            status=400,
+        )
+
+    uid = payload.get("uid")
+    kind = payload.get("kind")
+    field_name = KIND_TO_FIELD.get(kind)
+
+    if not uid or not field_name:
+        return HttpResponseBadRequest("Invalid unsubscribe data.")
+
+    try:
+        user = CustomUser.objects.get(pk=uid)
+    except CustomUser.DoesNotExist:
+        return render(
+            request,
+            "main/unsubscribe_result.html",
+            {"ok": False, "error": "User not found."},
+            status=404,
+        )
+
+    setattr(user, field_name, False)
+    user.save(update_fields=[field_name])
+
+    return render(
+        request,
+        "main/unsubscribe_result.html",
+        {"ok": True, "category_label": KIND_LABELS.get(kind, "these emails")},
+    )
