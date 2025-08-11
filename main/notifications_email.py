@@ -74,3 +74,38 @@ def send_like_email(*, recipient, liker, art_piece, notification_id=None):
 
     subject = f"{liker.get_full_name()} loved a piece you shared!"
     send_templated_email(recipient, subject, "emails/like", context)
+
+
+def send_shared_art_email(*, recipient, sender, art_piece, notification_id=None):
+    """
+    Email a user when they receive a piece of art.
+    recipient: user who received the art (SentArtPiece.user)
+    sender:    user who shared the art (art_piece.user)
+    """
+    # Respect user preference
+    if not getattr(recipient, "email_on_art_shared", False):
+        return
+
+    # Unsubscribe for this category
+    # kinds: "comment", "like", "art"
+    token = make_unsub_token(recipient.id, "art")
+    unsubscribe_url = _abs_url(
+        settings.SITE_URL, reverse("email_unsubscribe", args=[token])
+    )
+
+    # Link them to My Received Art, scrolled to that piece’s block
+    path = "/my-received-art"
+    if notification_id:
+        path += f"?n={notification_id}"
+    path += f"#art-{art_piece.id}"   # matches your template IDs
+
+    context = {
+        "recipient": recipient,
+        "sender": sender,
+        "art_piece": art_piece,
+        "cta_url": _abs_url(settings.SITE_URL, path),
+        "unsubscribe_url": unsubscribe_url,
+    }
+
+    subject = f"{sender.get_full_name()} shared some art with you!"
+    send_templated_email(recipient, subject, "emails/shared_art", context)
