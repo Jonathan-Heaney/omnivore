@@ -62,7 +62,7 @@ def send_like_email(*, recipient, liker, art_piece, notification_id=None):
     path = f"/my-shared-art"
     if notification_id:
         path += f"?n={notification_id}"
-    path += f"#likes-{art_piece.id}"
+    path += f"#art-{art_piece.id}"
 
     context = {
         "recipient": recipient,

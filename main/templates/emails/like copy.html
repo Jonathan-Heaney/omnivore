@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+  <body style="font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;">
+    <p>Hi {{ recipient.first_name }},</p>
+
+    <p><strong>{{ liker.get_full_name }}</strong> loved your piece
+      <em>{{ art_piece.piece_name }}</em>!</p>
+
+    <p><a href="{{ cta_url }}">See who loved it →</a></p>
+
+    <hr>
+    <p style="font-size:12px;color:#666;">
+      Don’t want these emails? <a href="{{ unsubscribe_url }}">Unsubscribe</a>.
+    </p>
+  </body>
+</html>
