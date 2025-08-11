@@ -17,27 +17,38 @@ def send_comment_email(*, recipient, comment, notification_id=None):
     unsubscribe_url = _abs_url(settings.SITE_URL,
                                reverse("email_unsubscribe", args=[token]))
 
-    # Decide page + anchor based on who’s being notified
-    if comment.art_piece.user_id == recipient.id:
-        # Recipient is the owner (they're on My Shared Art).
-        # Conversations are keyed by the *other person* — the commenter (sender).
-        base_path = "/my-shared-art"
-        anchor = f"#comments-{comment.art_piece.id}-{comment.sender.id}-container"
-    else:
-        # Recipient received the piece (they're on My Received Art).
-        base_path = "/my-received-art"
-        anchor = f"#comments-{comment.art_piece.id}-container"
+    art_piece = comment.art_piece
+    sender = comment.sender
+    sender_full_name = sender.get_full_name()
 
+    # Destination + anchor
+    if art_piece.user_id == recipient.id:
+        # Recipient owns the piece → My Shared Art, conversation keyed by commenter (sender)
+        base_path = "/my-shared-art"
+        anchor = f"#comments-{art_piece.id}-{sender.id}-container"
+        body_text = (
+            f"{sender_full_name} sent you a message about a piece of art you shared: "
+        )
+    else:
+        # Recipient received the piece → My Received Art, single thread per piece
+        base_path = "/my-received-art"
+        anchor = f"#comments-{art_piece.id}-container"
+        body_text = (
+            f"{sender_full_name} sent you a message about their piece of art: "
+        )
     q = f"?n={notification_id}" if notification_id else ""
     target_url = _abs_url(settings.SITE_URL, f"{base_path}{q}{anchor}")
 
-    subject = f"{comment.sender.first_name} sent you a message!"
+    subject = f"{sender_full_name} sent you a message!"
+
     context = {
         "recipient": recipient,
-        "sender": comment.sender,
+        "sender": sender,
+        "art_piece": art_piece,
         "comment": comment,
         "target_url": target_url,
         "unsubscribe_url": unsubscribe_url,
+        "body_text": body_text,
     }
     send_templated_email(recipient, subject, "emails/comment", context)
 
