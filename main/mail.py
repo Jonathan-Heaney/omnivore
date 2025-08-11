@@ -42,7 +42,7 @@ def send_templated_email(
         subject=subject,
         body=text_body,  # plain text body first
         from_email=getattr(settings, "DEFAULT_FROM_EMAIL",
-                           "no-reply@omnivorearts.com"),
+                           "oliver@omnivorearts.com"),
         to=[to_email],
         bcc=bcc,
         reply_to=reply_to,
