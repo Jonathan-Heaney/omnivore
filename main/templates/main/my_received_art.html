@@ -11,6 +11,19 @@
 
 <h1 class="header">My Received Art</h1>
 
+{% if request.user.is_authenticated and request.user.receive_art_paused %}
+  <div class="alert alert-warning d-flex align-items-center justify-content-between" role="alert">
+    <div>
+      <strong>New art delivery is paused.</strong>
+      You won’t receive new pieces while paused. Go to
+      <a class="alert-link fw-bold text-decoration-underline" href="{% url 'account_info_settings' %}?section=art-delivery#art-delivery">
+        Settings → Art Delivery
+      </a>
+      to resume.
+    </div>
+  </div>
+{% endif %}
+
 {% for piece in pieces %}
   <div id="art-{{ piece.id }}" class="card mt-2 art-piece">
     <div class="card-header"><strong>
