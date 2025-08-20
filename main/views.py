@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import RegisterForm, ArtPieceForm, CommentForm, AccountInfoForm, EmailPreferencesForm, CustomPasswordChangeForm
+from .forms import RegisterForm, ArtPieceForm, CommentForm, AccountInfoForm, ArtDeliveryForm, EmailPreferencesForm, CustomPasswordChangeForm
 from django.contrib import messages
 from django.contrib.auth import login, logout, update_session_auth_hash, authenticate, views as auth_views
 from django.contrib.auth.decorators import login_required
@@ -352,13 +352,48 @@ def account_info_settings(request):
     else:
         form = AccountInfoForm(instance=request.user)
 
+    art_delivery_form = ArtDeliveryForm(instance=request.user)
     email_form = EmailPreferencesForm(instance=request.user)
     password_form = CustomPasswordChangeForm(user=request.user)
 
     return render(request, 'main/account_settings.html', {
         'account_form': form,
+        'art_delivery_form': art_delivery_form,
         'email_form': email_form,
         'password_form': password_form
+    })
+
+
+@login_required
+def art_delivery_settings(request):
+    """
+    Handles the single toggle 'receive_art_paused' with the same AJAX pattern:
+    - On AJAX: return JSON { message: ... }
+    - On non-AJAX: use messages framework and redirect to #art-delivery
+    """
+    if request.method == 'POST':
+        form = ArtDeliveryForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                paused = form.cleaned_data.get("receive_art_paused")
+                msg = "Art delivery paused." if paused else "Art delivery resumed."
+                return JsonResponse({"message": msg, "paused": paused})
+            messages.success(
+                request, "Art delivery preference updated.", extra_tags="artdelivery")
+            return redirect(reverse('art_delivery_settings') + '#art-delivery')
+
+    # GET or invalid POST (non-AJAX): render full page with all sections
+    account_form = AccountInfoForm(instance=request.user)
+    art_delivery_form = ArtDeliveryForm(instance=request.user)
+    email_form = EmailPreferencesForm(instance=request.user)
+    password_form = CustomPasswordChangeForm(user=request.user)
+
+    return render(request, 'main/account_settings.html', {
+        'account_form': account_form,
+        'email_form': email_form,
+        'password_form': password_form,
+        'art_delivery_form': art_delivery_form,
     })
 
 
@@ -379,10 +414,12 @@ def email_pref_settings(request):
         form = EmailPreferencesForm(instance=request.user)
 
     account_form = AccountInfoForm(instance=request.user)
+    art_delivery_form = ArtDeliveryForm(instance=request.user)
     password_form = CustomPasswordChangeForm(user=request.user)
 
     return render(request, 'main/account_settings.html', {
         'account_form': account_form,
+        'art_delivery_form': art_delivery_form,
         'email_form': form,
         'password_form': password_form
     })
@@ -410,10 +447,12 @@ def password_settings(request):
     # fallback for GET or non-AJAX
     form = CustomPasswordChangeForm(user=request.user)
     account_form = AccountInfoForm(instance=request.user)
+    art_delivery_form = ArtDeliveryForm(instance=request.user)
     email_form = EmailPreferencesForm(instance=request.user)
 
     return render(request, 'main/account_settings.html', {
         'account_form': account_form,
+        'art_delivery_form': art_delivery_form,
         'email_form': email_form,
         'password_form': form
     })

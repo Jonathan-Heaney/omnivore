@@ -33,12 +33,27 @@
 
   <button type="submit" class="btn btn-primary" id="save-account-info" disabled>Save Account Info</button>
 </form>
-
 </div>
 
 <hr>
 
-<!-- Email Preferences -->
+<!-- Art Delivery -->
+<div id="art-delivery">
+  <h2>Art Delivery</h2>
+  <form method="post" id="art-delivery-form" action="{% url 'art_delivery_settings' %}#art-delivery">
+    {% csrf_token %}
+    {{ art_delivery_form|crispy }}
+
+    <div id="art-delivery-message-container"></div>
+
+    <button type="submit" class="btn btn-primary" id="save-art-delivery" disabled>
+      Save Art Delivery Preference
+    </button>
+  </form>
+</div>
+
+<hr>
+
 <!-- Email Preferences -->
 <div id="email-prefs">
   <h2>Email Notification Preferences</h2>
@@ -132,6 +147,56 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
 });
+
+
+// === ART DELIVERY FORM ===
+const artForm = document.getElementById("art-delivery-form");
+const artCheckbox = artForm.querySelector('input[name="receive_art_paused"]');
+const artButton = document.getElementById("save-art-delivery");
+const artMsg = document.getElementById("art-delivery-message-container");
+
+let originalArtPaused = artCheckbox.checked;
+
+function artFormHasChanges() {
+  return artCheckbox.checked !== originalArtPaused;
+}
+
+artForm.addEventListener("change", () => {
+  const changed = artFormHasChanges();
+  artButton.disabled = !changed;
+  if (changed) {
+    artMsg.innerHTML = ""; // clear prior success on new edits
+  }
+});
+
+artForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const formData = new FormData(artForm);
+
+  try {
+    const response = await fetch(artForm.action, {
+      method: "POST",
+      headers: {
+        "X-Requested-With": "XMLHttpRequest",
+      },
+      body: formData,
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      artMsg.innerHTML = `<div class="alert alert-success">${data.message || "Art delivery preference updated."}</div>`;
+      artButton.disabled = true;
+      // update baseline to new saved value
+      originalArtPaused = artCheckbox.checked;
+    } else {
+      artMsg.innerHTML = `<div class="alert alert-danger">There was a problem saving your preference.</div>`;
+    }
+  } catch (err) {
+    console.error("Unexpected error saving art delivery preference:", err);
+    artMsg.innerHTML = `<div class="alert alert-danger">Something went wrong. Please try again.</div>`;
+  }
+});
+
 
 // === EMAIL PREFERENCES FORM ===
 const emailForm = document.getElementById("email-pref-form");

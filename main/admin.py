@@ -12,7 +12,7 @@ class CustomUserAdmin(admin.ModelAdmin):
     list_filter = ("date_joined", "last_login", "is_active", "is_staff")
 
     list_display = ("username", "first_name",
-                    "last_name", "email", "email_on_art_shared", "email_on_comment", "email_on_like", "date_joined", "last_login", "is_active")
+                    "last_name", "email", "receive_art_paused", "email_on_art_shared", "email_on_comment", "email_on_like", "date_joined", "last_login", "is_active")
 
     fieldsets = (
         (None, {'fields': ('username', 'password')}),

@@ -59,6 +59,25 @@ class AccountInfoForm(forms.ModelForm):
         }
 
 
+class ArtDeliveryForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ["receive_art_paused"]
+        labels = {
+            "receive_art_paused": "Pause receiving new art",
+        }
+        help_texts = {
+            "receive_art_paused": (
+                "When paused, you won’t receive new art. "
+                "You can still view previously received art. "
+                "You’ll continue to receive comments/likes emails based on your preferences."
+            ),
+        }
+        widgets = {
+            "receive_art_paused": forms.CheckboxInput(attrs={"class": "form-check-input"})
+        }
+
+
 class EmailPreferencesForm(forms.ModelForm):
     class Meta:
         model = CustomUser
