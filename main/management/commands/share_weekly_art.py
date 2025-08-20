@@ -25,7 +25,7 @@ class Command(BaseCommand):
             if dry_run:
                 if result:
                     self.stdout.write(
-                        f"[DRY RUN] {user.get_full_name()} would receive '{result.piece_name}' by {result.artist_name}."
+                        f"[DRY RUN] {user.get_full_name()} would receive '{result.piece_name}' (shared by {result.user})"
                     )
                 else:
                     self.stdout.write(
