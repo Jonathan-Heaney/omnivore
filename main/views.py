@@ -285,36 +285,18 @@ def mark_art_piece_as_sent(user, art_piece):
         user=user, art_piece=art_piece)
 
 
-def send_art_piece_email(user):
+def share_art_piece(user: CustomUser, dry_run=False):
+    if user.receive_art_paused:
+        return None
+
     art_piece = choose_art_piece(user)
-
     if not art_piece:
-        return
+        return None
 
-    # Mark the art piece as sent
-    mark_art_piece_as_sent(user, art_piece)
+    if not dry_run:
+        mark_art_piece_as_sent(user, art_piece)
 
-    sender = f'{art_piece.user.first_name} {art_piece.user.last_name}'
-
-    art_page_link = 'https://omnivorearts.com/my-received-art'
-
-    # Define the context to be used in the template
-    context = {
-        'username': user.first_name,
-        'sender': sender,
-        'link': art_page_link
-    }
-
-    # Render the HTML content with the context
-    html_content = render_to_string('emails/plain_email.html', context)
-
-    subject = f"You have new art from {sender}!"
-    from_email = 'Omnivore Arts <oliver@omnivorearts.com>'
-    to = [user.email]
-
-    msg = EmailMultiAlternatives(subject, '', from_email, to)
-    msg.attach_alternative(html_content, "text/html")
-    msg.send()
+    return art_piece
 
 
 def custom_404(request, exception):

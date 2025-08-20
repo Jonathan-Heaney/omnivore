@@ -15,6 +15,12 @@ class CustomUser(AbstractUser):
     email_on_comment = models.BooleanField(default=True)
     email_on_like = models.BooleanField(default=False)
 
+    # User can pause actually receiving new art (in-app + email)
+    receive_art_paused = models.BooleanField(default=False)
+
+    # So you don't have to query SentArtPiece each time
+    last_art_sent_at = models.DateTimeField(null=True, blank=True)
+
     groups = models.ManyToManyField(
         'auth.Group',
         related_name='customuser_set',
