@@ -113,7 +113,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'main.context_processors.has_submitted_art_this_month',
                 'main.context_processors.notifications_context',
             ],
         },
