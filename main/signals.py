@@ -57,27 +57,28 @@ def create_sent_art_notification(sender, instance, created, **kwargs):
     if not created:
         return
 
-    if created:
-        recipient = instance.user
-        sender_user = instance.art_piece.user
-        art_piece = instance.art_piece
+    # Skip notifications for welcome and reciprocal art sharing
+    if instance.source in {"welcome", "reciprocal"}:
+        return
 
-        # Don’t send a notification if the user received their own art
-        if recipient == sender_user:
-            return
+    recipient = instance.user
+    sender_user = instance.art_piece.user
+    art_piece = instance.art_piece
 
-        n = Notification.objects.create(
-            recipient=recipient,
-            sender=sender_user,
-            notification_type='shared_art',
-            art_piece=art_piece,
-            message=f"{sender_user.first_name} {sender_user.last_name} shared some art with you!"
-        )
+    if recipient == sender_user:
+        return
 
-        # fire the email (respects recipient.email_on_art_shared)
-        send_shared_art_email(
-            recipient=recipient,
-            sender=sender_user,
-            art_piece=art_piece,
-            notification_id=n.id
-        )
+    n = Notification.objects.create(
+        recipient=recipient,
+        sender=sender_user,
+        notification_type='shared_art',
+        art_piece=art_piece,
+        message=f"{sender_user.first_name} {sender_user.last_name} shared some art with you!"
+    )
+
+    send_shared_art_email(
+        recipient=recipient,
+        sender=sender_user,
+        art_piece=art_piece,
+        notification_id=n.id
+    )

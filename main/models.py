@@ -67,6 +67,16 @@ class SentArtPiece(models.Model):
     art_piece = models.ForeignKey(ArtPiece, on_delete=models.CASCADE)
     sent_time = models.DateTimeField(auto_now_add=True)
 
+    SOURCE_CHOICES = [
+        ("weekly", "Weekly"),
+        ("welcome", "Welcome"),
+        ("reciprocal", "Reciprocal"),
+        ("manual", "Manual"),
+    ]
+
+    source = models.CharField(
+        max_length=20, choices=SOURCE_CHOICES, default="weekly")
+
     class Meta:
         unique_together = ('user', 'art_piece')
 

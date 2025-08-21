@@ -39,25 +39,36 @@ def sign_up(request):
 
 @login_required(login_url="/login")
 def share_art(request):
-    today = timezone.now().date()
-    first_day_of_month = timezone.make_aware(
-        timezone.datetime(today.year, today.month, 1))
     user = request.user
-    already_submitted = ArtPiece.objects.filter(
-        user=user).filter(created_at__gte=first_day_of_month)
-
-    if already_submitted:
-        return render(request, 'main/already_submitted.html')
 
     if request.method == 'POST':
         form = ArtPieceForm(request.POST)
         if form.is_valid():
+            # Save the user's new submission
             art_piece = form.save(commit=False)
-            art_piece.user = request.user
+            art_piece.user = user
             art_piece.save()
+
+            # If the user paused delivery, skip reciprocal gift
+            if getattr(user, "receive_art_paused", False):
+                return render(request, 'main/thanks_for_sharing.html', {
+                    "reciprocal_piece": None,
+                    "paused": True,
+                })
+
+            # Pick a reciprocal gift (never their own, never repeats)
             piece_to_share = choose_art_piece(user)
-            mark_art_piece_as_sent(user, piece_to_share)
-            return render(request, 'main/thanks_for_sharing.html')
+
+            if piece_to_share:
+                # Add silently; signal will NOT notify/email due to source='reciprocal'
+                mark_art_piece_as_sent(
+                    user, piece_to_share, source="reciprocal")
+
+            # Render Thank You page and show the piece (or fallback)
+            return render(request, 'main/thanks_for_sharing.html', {
+                "reciprocal_piece": piece_to_share,
+                "paused": False,
+            })
     else:
         form = ArtPieceForm()
 
@@ -279,10 +290,9 @@ def choose_art_piece(user):
         return None
 
 
-def mark_art_piece_as_sent(user, art_piece):
+def mark_art_piece_as_sent(user, art_piece, *, source="weekly"):
     # Create a record in the SentArtPiece model
-    SentArtPiece.objects.create(
-        user=user, art_piece=art_piece)
+    return SentArtPiece.objects.create(user=user, art_piece=art_piece, source=source)
 
 
 def share_art_piece(user: CustomUser, dry_run=False):
@@ -294,7 +304,7 @@ def share_art_piece(user: CustomUser, dry_run=False):
         return None
 
     if not dry_run:
-        mark_art_piece_as_sent(user, art_piece)
+        mark_art_piece_as_sent(user, art_piece, source="weekly")
 
     return art_piece
 
