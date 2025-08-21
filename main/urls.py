@@ -8,6 +8,7 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('home/', views.home, name='home'),
     path('sign-up/', views.sign_up, name='sign_up'),
+    path("welcome/", views.welcome_page, name="welcome_page"),
     path('login/', LoginView.as_view(
         authentication_form=CustomAuthenticationForm,
         template_name='registration/login.html'  # or keep default

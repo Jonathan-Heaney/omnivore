@@ -54,6 +54,8 @@ class ArtPiece(models.Model):
     piece_description = models.TextField()
     link = models.URLField(blank=True, null=True)
     approved_status = models.BooleanField(default=True)
+    welcome_eligible = models.BooleanField(default=False)
+    welcome_weight = models.PositiveSmallIntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -106,6 +108,26 @@ class ReciprocalGrant(models.Model):
 
     class Meta:
         indexes = [models.Index(fields=["user", "created_at"])]
+
+
+class WelcomeGrant(models.Model):
+    """
+    Records the single welcome gift given to a user.
+    Ensures we only grant once per user (idempotent by schema).
+    """
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="welcome_grant")
+    sent_art_piece = models.ForeignKey(
+        "ArtPiece",
+        on_delete=models.SET_NULL,   # piece might be removed later
+        null=True,
+        blank=True,
+        related_name="welcome_granted_to",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [models.Index(fields=["created_at"])]
 
 
 class Comment(models.Model):

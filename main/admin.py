@@ -3,9 +3,25 @@ from .models import ArtPiece, SentArtPiece, CustomUser, Comment, Like, Notificat
 
 
 class ArtPieceAdmin(admin.ModelAdmin):
-    list_filter = ("user", "approved_status")
+    list_filter = ("user", "approved_status", "welcome_eligible")
     list_display = ("piece_name", "artist_name", "link", "user",
-                    "approved_status", "created_at")
+                    "approved_status", "welcome_eligible", "welcome_weight", "created_at")
+    search_fields = ("piece_name", "artist_name",
+                     "user__first_name", "user__last_name")
+
+    actions = ["mark_as_welcome_eligible", "unmark_as_welcome_eligible"]
+
+    def mark_as_welcome_eligible(self, request, queryset):
+        updated = queryset.update(welcome_eligible=True)
+        self.message_user(
+            request, f"{updated} piece(s) marked as welcome-eligible.")
+    mark_as_welcome_eligible.short_description = "Mark selected as welcome-eligible"
+
+    def unmark_as_welcome_eligible(self, request, queryset):
+        updated = queryset.update(welcome_eligible=False)
+        self.message_user(
+            request, f"{updated} piece(s) unmarked as welcome-eligible.")
+    unmark_as_welcome_eligible.short_description = "Unmark selected as welcome-eligible"
 
 
 class CustomUserAdmin(admin.ModelAdmin):

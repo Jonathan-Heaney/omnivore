@@ -17,7 +17,7 @@ from django.core.signing import BadSignature, SignatureExpired
 from django.utils import timezone
 from datetime import timedelta
 from django.views.decorators.http import require_POST
-from .models import ArtPiece, SentArtPiece, CustomUser, Comment, Like, Notification, ReciprocalGrant
+from .models import ArtPiece, SentArtPiece, CustomUser, Comment, Like, Notification, ReciprocalGrant, WelcomeGrant
 from main.utils.email_unsub import load_unsub_token
 
 
@@ -31,11 +31,80 @@ def sign_up(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect('/home')
+            return redirect(reverse('welcome_page'))
     else:
         form = RegisterForm()
 
     return render(request, 'registration/sign_up.html', {"form": form})
+
+
+@login_required
+def welcome_page(request):
+    """
+    GET-only: ensure the user has exactly one welcome gift (idempotent),
+    then show it. Safe to refresh; OneToOne + select_for_update prevents duplicates.
+    """
+    user = request.user
+
+    # Give (or fetch existing) welcome piece; None if no eligible piece
+    welcome_piece = ensure_welcome_gift(user)
+
+    # Optional: banner if the user has paused delivery (copy-only; we still give the welcome)
+    paused = getattr(user, "receive_art_paused", False)
+
+    return render(request, "main/welcome.html", {
+        "welcome_piece": welcome_piece,
+        "paused": paused,
+    })
+
+
+def choose_welcome_piece_weighted(user):
+    qs = ArtPiece.objects.filter(
+        approved_status=True,
+        welcome_eligible=True,
+    ).exclude(
+        user=user
+    ).exclude(
+        id__in=SentArtPiece.objects.filter(
+            user=user).values_list('art_piece_id', flat=True)
+    ).values('id', 'welcome_weight')
+
+    items = list(qs)
+    if not items:
+        return None
+
+    # Build a weighted bag (small pools of 5–10 keep this trivial)
+    weighted = []
+    for it in items:
+        weighted.extend([it['id']] * max(1, it['welcome_weight']))
+
+    chosen_id = random.choice(weighted)
+    return ArtPiece.objects.select_related('user').get(pk=chosen_id)
+
+
+def ensure_welcome_gift(user):
+    """
+    Give exactly one welcome piece (idempotent via WelcomeGrant).
+    """
+    with transaction.atomic():
+        grant, created = WelcomeGrant.objects.select_for_update().get_or_create(
+            user=user,
+            defaults={},
+        )
+
+        if grant.sent_art_piece:
+            return grant.sent_art_piece
+
+        piece = choose_welcome_piece_weighted(user)  # <-- curated pool
+        if not piece:
+            return None
+
+        grant.sent_art_piece = piece
+        grant.save(update_fields=["sent_art_piece"])
+
+        # silent add; your signal skips notifications for source='welcome'
+        mark_art_piece_as_sent(user, piece, source="welcome")
+        return piece
 
 
 @login_required(login_url="/login")
