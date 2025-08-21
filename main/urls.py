@@ -14,6 +14,7 @@ urlpatterns = [
     ), name='login'),
     path("logout/", views.LogOut, name="logout"),
     path("share-art/", views.share_art, name="share_art"),
+    path("share/thanks/", views.thanks_for_sharing, name="thanks_for_sharing"),
     path("my-shared-art/", views.my_shared_art, name="my_shared_art"),
     path("my-received-art/", views.my_received_art, name="my_received_art"),
     path('edit-art-piece/<int:pk>', views.edit_art_piece, name='edit_art_piece'),

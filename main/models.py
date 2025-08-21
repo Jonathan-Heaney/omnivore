@@ -89,6 +89,25 @@ class SentArtPiece(models.Model):
     art_piece_submitter.short_description = 'Submitted By'
 
 
+class ReciprocalGrant(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE)
+    trigger_art_piece = models.OneToOneField(
+        "ArtPiece", on_delete=models.CASCADE, related_name="reciprocal_grant"
+    )
+    sent_art_piece = models.ForeignKey(
+        "ArtPiece",
+        on_delete=models.SET_NULL,   # so we can null it if the piece disappears
+        null=True,                   # <-- make nullable
+        blank=True,                  # <-- allow blank in forms/admin
+        related_name="reciprocal_granted_to",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [models.Index(fields=["user", "created_at"])]
+
+
 class Comment(models.Model):
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='sent_comments')

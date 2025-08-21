@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import RegisterForm, ArtPieceForm, CommentForm, AccountInfoForm, ArtDeliveryForm, EmailPreferencesForm, CustomPasswordChangeForm
 from django.contrib import messages
@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.html import strip_tags
 from django.core.mail import send_mail
 from django.urls import reverse
+from django.db import transaction
 import random
 from collections import defaultdict
 from django.core.mail import EmailMultiAlternatives
@@ -16,7 +17,7 @@ from django.core.signing import BadSignature, SignatureExpired
 from django.utils import timezone
 from datetime import timedelta
 from django.views.decorators.http import require_POST
-from .models import ArtPiece, SentArtPiece, CustomUser, Comment, Like, Notification
+from .models import ArtPiece, SentArtPiece, CustomUser, Comment, Like, Notification, ReciprocalGrant
 from main.utils.email_unsub import load_unsub_token
 
 
@@ -43,36 +44,73 @@ def share_art(request):
 
     if request.method == 'POST':
         form = ArtPieceForm(request.POST)
-        if form.is_valid():
-            # Save the user's new submission
-            art_piece = form.save(commit=False)
-            art_piece.user = user
-            art_piece.save()
+        if not form.is_valid():
+            return render(request, 'main/share_art.html', {"form": form})
 
-            # If the user paused delivery, skip reciprocal gift
-            if getattr(user, "receive_art_paused", False):
-                return render(request, 'main/thanks_for_sharing.html', {
-                    "reciprocal_piece": None,
-                    "paused": True,
-                })
+        # 1) Save the submitted art
+        new_piece = form.save(commit=False)
+        new_piece.user = user
+        new_piece.save()
 
-            # Pick a reciprocal gift (never their own, never repeats)
-            piece_to_share = choose_art_piece(user)
+        # 2) If paused, skip reciprocal and redirect to Thank You (no gift)
+        if getattr(user, "receive_art_paused", False):
+            return redirect(reverse("thanks_for_sharing") + "?paused=1")
 
-            if piece_to_share:
-                # Add silently; signal will NOT notify/email due to source='reciprocal'
-                mark_art_piece_as_sent(
-                    user, piece_to_share, source="reciprocal")
+        # 3) Idempotent grant: only create once per submitted piece
+        with transaction.atomic():
+            grant, created = ReciprocalGrant.objects.select_for_update().get_or_create(
+                trigger_art_piece=new_piece,
+                defaults={"user": user},  # <-- no sent_art_piece here
+            )
 
-            # Render Thank You page and show the piece (or fallback)
-            return render(request, 'main/thanks_for_sharing.html', {
-                "reciprocal_piece": piece_to_share,
-                "paused": False,
-            })
-    else:
-        form = ArtPieceForm()
+            if created:
+                reciprocal = choose_art_piece(user)
+                if reciprocal:
+                    grant.sent_art_piece = reciprocal
+                    grant.save(update_fields=["sent_art_piece"])
 
+                    # Add to My Received Art silently
+                    mark_art_piece_as_sent(
+                        user, reciprocal, source="reciprocal")
+                else:
+                    # Leave sent_art_piece as NULL; still save the grant (already saved by create)
+                    reciprocal = None
+            else:
+                reciprocal = grant.sent_art_piece  # reuse if it exists
+
+        # 4) Redirect (PRG). Pass piece id (if any) to Thank-You GET view
+        if reciprocal:
+            return redirect(reverse("thanks_for_sharing") + f"?p={reciprocal.id}")
+        else:
+            return redirect(reverse("thanks_for_sharing"))
+
+    # GET -> render form
+    form = ArtPieceForm()
     return render(request, 'main/share_art.html', {"form": form})
+
+
+@login_required
+def thanks_for_sharing(request):
+    user = request.user
+    paused = request.GET.get("paused") == "1"
+    piece_id = request.GET.get("p")
+
+    reciprocal_piece = None
+    if piece_id:
+        # Security: ensure the piece was actually sent to THIS user as reciprocal
+        sent = SentArtPiece.objects.filter(
+            user=user, art_piece_id=piece_id, source="reciprocal"
+        ).select_related("art_piece", "art_piece__user").first()
+        if sent:
+            reciprocal_piece = sent.art_piece
+        else:
+            # fall through silently (no gift), rather than 404ing user
+            reciprocal_piece = None
+
+    return render(request, "main/thanks_for_sharing.html", {
+        "reciprocal_piece": reciprocal_piece,
+        "paused": paused,
+    })
 
 
 @login_required(login_url="/login")
