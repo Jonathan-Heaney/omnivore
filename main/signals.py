@@ -1,31 +1,40 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.db import transaction
+from .tasks import send_like_email_task  # Celery task
 from .models import Like, Notification, Comment, SentArtPiece
 from .notifications_email import send_comment_email, send_like_email, send_shared_art_email
 
 
 @receiver(post_save, sender=Like)
-def create_like_notification(sender, instance, created, **kwargs):
+def on_like_created(sender, instance, created, **kwargs):
     if not created:
         return
 
-    sender_user = instance.user
-    recipient_user = instance.art_piece.user  # The person who shared the piece
+    liker = instance.user
+    recipient = instance.art_piece.user
+    art_piece = instance.art_piece
 
     # Avoid self-notification
-    if sender_user == recipient_user:
+    if liker == recipient:
         return
 
+    # Create in-app notification (same as before, but message a bit cleaner)
     n = Notification.objects.create(
-        recipient=recipient_user,
-        sender=sender_user,
-        notification_type='like',
-        message=f"{sender_user} loved a piece of art you shared!",
-        art_piece=instance.art_piece
+        recipient=recipient,
+        sender=liker,
+        notification_type="like",
+        art_piece=art_piece,
+        message=f"{liker.first_name} {liker.last_name} loved a piece you shared."
     )
 
-    send_like_email(recipient=recipient_user,
-                    liker=sender_user, art_piece=instance.art_piece, notification_id=n.id)
+    # Enqueue the email AFTER the transaction commits successfully
+    transaction.on_commit(lambda: send_like_email_task.delay(
+        recipient_id=recipient.id,
+        liker_id=liker.id,
+        art_piece_id=art_piece.id,
+        notification_id=n.id,
+    ))
 
 
 @receiver(post_save, sender=Comment)

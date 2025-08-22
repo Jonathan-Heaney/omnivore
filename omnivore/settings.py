@@ -42,6 +42,23 @@ DEFAULT_FROM_EMAIL = os.environ.get(
     'DEFAULT_FROM_EMAIL', 'Omnivore Arts <oliver@omnivorearts.com>')
 SITE_URL = os.getenv("SITE_URL", "http://localhost:8000")
 
+# Celery configuration
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = os.getenv(
+    "CELERY_RESULT_BACKEND", "redis://localhost:6379/1")
+
+# Good defaults
+CELERY_TASK_ACKS_LATE = True
+CELERY_TASK_TIME_LIMIT = 30
+CELERY_TASK_SOFT_TIME_LIMIT = 25
+CELERY_TASK_ROUTES = {
+    "main.tasks.send_like_email_task": {"queue": "emails"},
+}
+
+# During first local test you can force inline execution:
+# CELERY_TASK_ALWAYS_EAGER = True
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
