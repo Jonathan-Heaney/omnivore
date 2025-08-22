@@ -321,22 +321,29 @@ def my_received_art(request):
     return render(request, 'main/my_received_art.html', context)
 
 
+@login_required
 @require_POST
-def toggle_like(request, art_piece_id):
+def toggle_like_api(request, art_piece_id):
     art_piece = get_object_or_404(ArtPiece, id=art_piece_id)
     user = request.user
 
+    # toggle
     like, created = Like.objects.get_or_create(user=user, art_piece=art_piece)
     if not created:
         like.delete()
         liked = False
     else:
         liked = True
+        # If you create Notification/email via a Like signal (see below),
+        # do nothing else here. The request returns immediately.
 
-    heart_html = render_to_string(
-        'main/heart_button.html', {'piece': art_piece, 'liked': liked}, request=request)
+    # Optional: return current like count (if you show it in UI)
+    likes_count = Like.objects.filter(art_piece=art_piece).count()
 
-    return HttpResponse(heart_html)
+    # Ensure any on_commit hooks run after the DB write, but we still return ASAP
+    transaction.on_commit(lambda: None)
+
+    return JsonResponse({"ok": True, "liked": liked, "likes_count": likes_count})
 
 
 # Notifications

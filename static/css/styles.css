@@ -204,6 +204,14 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: transform 0.05s ease;
+}
+
+.like-button:active {
+  transform: scale(0.98);
+}
+.like-button.liked .like-text {
+  font-weight: 600;
 }
 
 .like-button:hover {

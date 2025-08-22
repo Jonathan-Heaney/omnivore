@@ -1,12 +1,8 @@
-<form method="post" action="{% url 'toggle_like' piece.id %}" class="heart-form" hx-post="{% url 'toggle_like' piece.id %}" hx-swap="innerHTML" hx-target="#heart-{{ piece.id }}-container" hx-trigger="click" onsubmit="toggleHeartIcon(event)">
-    {% csrf_token %}
-    {% if liked or piece.id in liked_pieces %}
-        <button type="submit" id="heart-{{ piece.id }}" class="like-button liked">
-            <span class="heart-icon">❤️</span> Loved
-        </button>
-    {% else %}
-        <button type="submit" id="heart-{{ piece.id }}" class="like-button">
-            <span class="heart-icon">♡</span> <span class=unliked-text>Love</span>
-        </button>
-    {% endif %}
-</form>
+<button type="button"
+        class="like-button {% if liked or piece.id in liked_pieces %}liked{% endif %}"
+        data-piece-id="{{ piece.id }}"
+        aria-pressed="{% if liked or piece.id in liked_pieces %}true{% else %}false{% endif %}">
+  <span class="heart-icon">{% if liked or piece.id in liked_pieces %}❤️{% else %}♡{% endif %}</span>
+  <span class="like-text">{% if liked or piece.id in liked_pieces %}Loved{% else %}Love{% endif %}</span>
+</button>
+
