@@ -11,7 +11,7 @@
 <div class="container">
     <div class="row home-container">
         <div class="col-md-6 text-center oliver-container">
-            <img class="oliver img-fluid" src="{% static 'images/oliver.png' %}" alt="Oliver the Omnivore">
+            <img class="oliver img-fluid" src="{% static 'images/oliver-no-bg.png' %}" alt="Oliver the Omnivore">
             <p class="oliver-caption">Oliver the Omnivore</p>
         </div>
         <div class="col-md-6 text-center">
@@ -20,14 +20,10 @@
     </div>
     <div class="row cta-container">
         <div class="col-12 text-center">
-            {% if user.is_authenticated and not has_submitted_art_this_month %}
-            <h4>Share a piece of art <a href="/share-art">here</a>!</h4>
-            {% elif user.is_authenticated and has_submitted_art_this_month %}
-            <h4>Thank you for sharing a piece of art! You will receive art every Tuesday and Friday starting December 6th.</h4>
             {% if user.is_authenticated %}
             <h4>Our first round is open for submissions - share a piece of art <a href="/share-art">here</a>!</h4>
             {% else %}
-            <h4>Sign up <a href="/sign-up">here</a>!</h4>
+            <h4>Our first round is open - <a href="/sign-up">join us</a>!</h4>
             {% endif %}
         </div>
     </div>
