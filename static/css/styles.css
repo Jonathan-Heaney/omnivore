@@ -101,6 +101,340 @@ a {
   margin-top: 20px;
 }
 
+/* .comments-section {
+  padding: 12px;
+} */
+
+.comment-form {
+  display: flex;
+  align-items: center;
+}
+
+.conversation {
+  padding: 12px;
+}
+
+.input-group {
+  display: flex;
+  width: 100%;
+}
+
+.form-control {
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 10px;
+  resize: none;
+  flex-grow: 1;
+}
+
+.reply-form {
+  margin-bottom: 0.5rem;
+}
+
+.divider {
+  color: black;
+}
+
+.replyTextarea {
+  width: 100%;
+  box-sizing: border-box; /* Ensure padding and border are included in the width */
+  min-height: 40px; /* Set a minimum height */
+  max-height: 200px; /* Set a maximum height */
+  overflow-y: auto; /* Allow scrolling if the content exceeds the max height */
+  resize: none; /* Prevent manual resizing by the user */
+  /* padding-left: 20px; Add some padding for aesthetics */
+}
+
+.sendButton {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding-left: 10px;
+  margin-right: -10px;
+}
+
+.sendButton svg {
+  width: 24px;
+  height: 24px;
+}
+
+.sendButton:disabled {
+  cursor: not-allowed;
+}
+
+/* Disabled state */
+.sendButton:disabled svg {
+  color: gray;
+}
+
+/* Active state (enabled but not hovered) */
+.sendButton:not(:disabled) svg {
+  color: #007bff;
+}
+
+/* Hover state */
+.sendButton:not(:disabled):hover {
+  cursor: pointer;
+}
+
+.sendButton:not(:disabled):hover svg {
+  color: #0056b3;
+}
+
+.received-comments-section {
+  padding: 12px;
+}
+
+.conversation-header {
+  padding: 10px;
+  background-color: #efe;
+}
+
+.likes-container {
+  padding: 5px;
+  background-color: #fee;
+}
+
+.like-button {
+  border: none;
+  border-radius: 10px;
+  background: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.05s ease;
+}
+
+.like-button:active {
+  transform: scale(0.98);
+}
+.like-button.liked .like-text {
+  font-weight: 600;
+}
+
+.like-button:hover {
+  background-color: #eee;
+}
+
+.heart-icon {
+  margin-right: 6px;
+}
+
+.unliked-text {
+  color: #777;
+  font-weight: 400;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 15px;
+  border: 1px solid #888;
+  width: 80%;
+  position: relative;
+}
+
+.modal-content ul {
+  list-style: none;
+  margin-top: 2.5rem;
+  padding: 0;
+}
+
+.modal ul li {
+  position: relative; /* For positioning the heart icon */
+  padding-left: 1.75em; /* Add space for the heart icon */
+}
+
+.modal ul li::before {
+  content: '❤️'; /* Add the heart emoji */
+  position: absolute;
+  left: 0; /* Position the heart icon to the left of the list item */
+  top: 0;
+}
+
+.close {
+  color: #aaa;
+  position: absolute; /* Position the close button absolutely */
+  left: 10px; /* Position it to the right */
+  top: 10px; /* Position it to the top */
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer; /* Change cursor to indicate it's clickable */
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Notifications */
+
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-5deg);
+  }
+  75% {
+    transform: rotate(5deg);
+  }
+}
+
+#notification-link.has-unread {
+  color: #dc3545;
+  transition: color 0.2s ease;
+}
+
+#notification-link.has-unread:hover {
+  color: #bb2124;
+  animation: wiggle 0.3s ease;
+}
+
+.notification-section-heading {
+  /* margin-top: 2rem; */
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.notification-list {
+  list-style: none;
+  padding: 0;
+}
+
+.notification-item {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: #fefefe;
+  transition: background-color 0.3s ease;
+}
+
+.notification-item.unread {
+  font-weight: bold;
+  background-color: #eef6ff;
+}
+
+.notification-item.read {
+  font-weight: normal;
+  background-color: #f7f7f7;
+}
+
+.notification-item.read:hover {
+  background-color: #f0f0f0;
+}
+
+.notification-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.notification-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notification-timestamp {
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.blue-dot {
+  margin-right: 8px;
+  font-size: 0.8em;
+  vertical-align: middle;
+}
+
+.notification-item.unread:hover {
+  background-color: #cce2f2;
+}
+
+.unread-container {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.mark-read-btn {
+  padding: 5px 10px;
+  border: 1px solid #888;
+  background-color: #f5f5f5;
+  color: #333;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.mark-read-btn:hover {
+  background-color: #e0e0e0;
+}
+
+/* Account settings success message */
+.messages {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Account settings page - password eye */
+/* Wrap so we can position the eye inside the input */
+.pw-wrap {
+  position: relative;
+}
+
+/* Make space for the eye on the right */
+.pw-wrap input[type='password'],
+.pw-wrap input[type='text'].pw-visible {
+  padding-right: 2.25rem;
+}
+
+/* The eye button */
+.pw-toggle {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Size + subtle state */
+.pw-toggle svg {
+  width: 20px;
+  height: 20px;
+  opacity: 0.65;
+}
+.pw-toggle:hover svg {
+  opacity: 0.9;
+}
+.pw-toggle[aria-pressed='true'] svg {
+  opacity: 1;
+}
+
 /* Additional media queries for fine-tuning responsiveness */
 @media (max-width: 767.98px) {
   .header {

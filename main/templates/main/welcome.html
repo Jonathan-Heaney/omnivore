@@ -1,0 +1,53 @@
+{# templates/main/welcome.html #}
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Welcome {% endblock %}
+
+{% block css_files %}
+  <link rel="stylesheet" href="{% static "css/styles.css" %}">
+{% endblock %}
+
+{% block content %}
+<h1 class="header">Welcome to Omnivore</h1>
+
+{% if welcome_piece %}
+  <p>As a gift from the community, here’s something to start your journey:</p>
+
+  <div id="art-{{ welcome_piece.id }}" class="card mt-2 art-piece">
+    <div class="card-header"><strong>
+      {% if welcome_piece.link %}
+        <a href="{{ welcome_piece.link }}" target="_blank">
+          <span class="card-title">{{ welcome_piece.piece_name }}</span>
+        </a>
+      {% else %}
+        <span class="card-title">{{ welcome_piece.piece_name }}</span>
+      {% endif %}
+    </strong> ({{ welcome_piece.artist_name }})</div>
+
+    <div class="card-body d-flex flex-row justify-content-between">
+      <div>
+        <p>{{ welcome_piece.piece_description|linebreaksbr }}</p>
+      </div>
+    </div>
+
+    <div class="card-footer text-muted">
+      Shared by <strong>{{ welcome_piece.user.first_name }} {{ welcome_piece.user.last_name }}</strong>
+    </div>
+  </div>
+
+  <div class="mt-3">
+    <small class="text-muted">
+      This gift has also been added to your
+      <a href="{% url 'my_received_art' %}#art-{{ welcome_piece.id }}">My Received Art</a>
+      so you can find it later.
+    </small>
+  </div>
+
+{% else %}
+  <div class="alert alert-info">
+    Welcome! We couldn’t find a piece to share with you right now.
+    Check back on your <a href="{% url 'my_received_art' %}">My Received Art</a> page soon.
+  </div>
+{% endif %}
+
+{% endblock %}

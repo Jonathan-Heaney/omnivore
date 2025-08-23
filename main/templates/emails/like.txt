@@ -1,0 +1,8 @@
+Hi {{ recipient.first_name }},
+
+{{ liker.get_full_name }} loved your piece "{{ art_piece.piece_name }}".
+
+See who loved it: {{ cta_url }}
+
+—
+Don’t want these emails? Unsubscribe: {{ unsubscribe_url }}

@@ -1,18 +1,34 @@
 from django.contrib import admin
-from .models import ArtPiece, SentArtPiece, CustomUser
+from .models import ArtPiece, SentArtPiece, CustomUser, Comment, Like, Notification
 
 
 class ArtPieceAdmin(admin.ModelAdmin):
-    list_filter = ("user", "approved_status")
+    list_filter = ("user", "approved_status", "welcome_eligible")
     list_display = ("piece_name", "artist_name", "link", "user",
-                    "approved_status", "created_at")
+                    "approved_status", "welcome_eligible", "welcome_weight", "created_at")
+    search_fields = ("piece_name", "artist_name",
+                     "user__first_name", "user__last_name")
+
+    actions = ["mark_as_welcome_eligible", "unmark_as_welcome_eligible"]
+
+    def mark_as_welcome_eligible(self, request, queryset):
+        updated = queryset.update(welcome_eligible=True)
+        self.message_user(
+            request, f"{updated} piece(s) marked as welcome-eligible.")
+    mark_as_welcome_eligible.short_description = "Mark selected as welcome-eligible"
+
+    def unmark_as_welcome_eligible(self, request, queryset):
+        updated = queryset.update(welcome_eligible=False)
+        self.message_user(
+            request, f"{updated} piece(s) unmarked as welcome-eligible.")
+    unmark_as_welcome_eligible.short_description = "Unmark selected as welcome-eligible"
 
 
 class CustomUserAdmin(admin.ModelAdmin):
     list_filter = ("date_joined", "last_login", "is_active", "is_staff")
 
     list_display = ("username", "first_name",
-                    "last_name", "email", "date_joined", "last_login", "is_active")
+                    "last_name", "email", "receive_art_paused", "email_on_art_shared", "email_on_comment", "email_on_like", "date_joined", "last_login", "is_active")
 
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
@@ -35,6 +51,28 @@ class SentArtPieceAdmin(admin.ModelAdmin):
                     "art_piece_submitter", "sent_time")
 
 
+class CommentAdmin(admin.ModelAdmin):
+    list_filter = ("sender", "recipient", "art_piece",
+                   "text", "parent_comment")
+    list_display = ("sender", "recipient", "art_piece",
+                    "text", "parent_comment", "created_at")
+
+
+class LikeAdmin(admin.ModelAdmin):
+    list_filter = ("user", "art_piece", "created_at")
+    list_display = ("user", "art_piece", "created_at")
+
+
+class NotificationAdmin(admin.ModelAdmin):
+    list_filter = ("sender", "recipient", "notification_type",
+                   "art_piece", "is_read", "timestamp", "message")
+    list_display = ("sender", "recipient", "notification_type",
+                    "art_piece", "is_read", "timestamp", "message")
+
+
 admin.site.register(ArtPiece, ArtPieceAdmin)
 admin.site.register(SentArtPiece, SentArtPieceAdmin)
 admin.site.register(CustomUser, CustomUserAdmin)
+admin.site.register(Comment, CommentAdmin)
+admin.site.register(Like, LikeAdmin)
+admin.site.register(Notification, NotificationAdmin)

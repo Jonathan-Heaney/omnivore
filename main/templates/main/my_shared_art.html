@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load custom_filters %}
+
 
 {% block title %} My Shared Art {% endblock %}
 {% block css_files %}
@@ -11,7 +13,7 @@
 <h1 class="header">My Shared Art</h1>
 
 {% for piece in pieces %}
-<div class="card mt-2 art-piece">
+<div id="art-{{ piece.id }}" class="card mt-2 art-piece">
     <div class="card-header"><strong>
       {% if piece.link %}
         <a href="{{piece.link}}" target="_blank"><span class="card-title">{{piece.piece_name}}</span></a> 
@@ -32,14 +34,46 @@
       </div>
     </div>
     <div class="card-footer text-muted">Shared {{piece.created_at|date:"F j, Y" }}</div>
-  </div>
+
+    {% with users=likes_dict|dict_get:piece %}
+        {% if users %}
+          <div class="likes-container" id="likes-{{ piece.id }}-container">
+            {% include 'main/likes_display.html' with piece=piece likes_dict=likes_dict %}
+          </div>
+        {% endif %}
+    {% endwith %}
+
+
+    {% with piece_conversations=conversations|dict_get:piece %}
+      {% if piece_conversations %}     
+        <div class="comments-section">
+          {% for recipient, conversation in piece_conversations.items %}
+              <div class='conversation-header'>
+                <button class='toggle-comment-btn' id="toggle-button-{{ piece.id}}-{{recipient.id}}" onclick="toggleComments({{ piece.id}}, {{recipient.id }})"><i class="fa-solid fa-minus"></i></button>
+                Conversation with <strong>{{ recipient.first_name }} {{ recipient.last_name }}</strong>
+              </div>
+              <div class="conversation">
+                <div id="comments-{{ piece.id }}-{{ recipient.id }}-container">
+                  {% for comment in conversation %}
+                      {% include 'main/comment_text.html' with comment=comment %}
+                  {% endfor %}
+                </div>
+                <div class="reply-form">
+                  {% include 'main/reply_form.html' with reply_recipient=recipient.first_name top_level_comment=conversation.0 %}
+                </div>
+                {% comment %} {% if not forloop.last %}
+                  <hr class='divider'>
+                {% endif %} {% endcomment %}
+              </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+  
+    
+</div>
+
   {% empty %}
   <p>Nothing shared yet - share something <a href="/share-art">here</a>!</p>
 {% endfor %}
-
-<script>
-  function confirmDelete() {
-      return confirm('Are you sure you want to delete this post? This cannot be undone.');
-  }
-  </script>
 {% endblock %}

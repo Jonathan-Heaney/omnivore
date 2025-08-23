@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load custom_filters %}
 
 {% block title %} My Received Art {% endblock %}
 {% block css_files %}
@@ -10,8 +11,21 @@
 
 <h1 class="header">My Received Art</h1>
 
+{% if request.user.is_authenticated and request.user.receive_art_paused %}
+  <div class="alert alert-warning d-flex align-items-center justify-content-between" role="alert">
+    <div>
+      <strong>New art delivery is paused.</strong>
+      You won’t receive new pieces while paused. Go to
+      <a class="alert-link fw-bold text-decoration-underline" href="{% url 'account_info_settings' %}?section=art-delivery#art-delivery">
+        Settings → Art Delivery
+      </a>
+      to resume.
+    </div>
+  </div>
+{% endif %}
+
 {% for piece in pieces %}
-<div class="card mt-2 art-piece">
+  <div id="art-{{ piece.id }}" class="card mt-2 art-piece">
     <div class="card-header"><strong>
         {% if piece.link %}
         <a href="{{piece.link}}" target="_blank"><span class="card-title">{{piece.piece_name}}</span></a>
@@ -24,8 +38,26 @@
         <p>{{piece.piece_description|linebreaksbr}}</p>
       </div>
     </div>
-    <div class="card-footer text-muted">Shared by <strong>{{piece.user.first_name}} {{piece.user.last_name}}</strong></div>
+    <div class="card-footer text-muted">Shared by <strong>{{piece.user.first_name}} {{piece.user.last_name}}</strong>
+    </div>
+
+    <div class="likes-container" id="heart-{{ piece.id }}-container">
+      {% include 'main/heart_button.html' with piece=piece %}
+    </div>
+
+    <div class="received-comments-section">
+      <div id="comments-{{ piece.id }}-container">
+        {% for comment in comments %}
+          {% if comment.art_piece == piece %}
+            {% include 'main/comment_text.html' %}
+          {% endif %}
+        {% endfor %}
+      </div>
+      {% include 'main/comment_form.html' with reply_recipient=piece.user.first_name %}
+    </div>
+
   </div>
+
   {% empty %}
   <p>You haven't received anything yet - make sure to <a href="/share-art">share something</a> so that don't miss out on getting any art!</p>
 {% endfor %}

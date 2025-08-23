@@ -5,14 +5,17 @@ from dotenv import load_dotenv
 import warnings
 
 # Figure out which environment we're in
-current_environment = os.getenv("ENVIRONMENT", "production")
+ENVIRONMENT = os.getenv("ENVIRONMENT", "local")
+
+ENVIRONMENT = "production"
 
 # Load the appropriate .env file based on the environment
-if current_environment == "staging":
+if ENVIRONMENT == "local":
+    load_dotenv(".env.local")
+elif ENVIRONMENT == "staging":
     load_dotenv(".env.staging")
 else:
     load_dotenv(".env.production")
-
 
 DB_NAME = os.environ.get('DB_NAME')
 DB_USERNAME = os.environ.get('DB_USERNAME')
@@ -37,10 +40,31 @@ AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
 AWS_SES_REGION_NAME = os.environ.get('AWS_SES_REGION_NAME')
 AWS_SES_REGION_ENDPOINT = os.environ.get('AWS_SES_REGION_ENDPOINT')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
+DEFAULT_FROM_EMAIL = os.environ.get(
+    'DEFAULT_FROM_EMAIL', 'Omnivore Arts <oliver@omnivorearts.com>')
+SITE_URL = os.getenv("SITE_URL", "http://localhost:8000")
+
+# Celery configuration
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = os.getenv(
+    "CELERY_RESULT_BACKEND", "redis://localhost:6379/1")
+
+# Good defaults
+CELERY_TASK_ACKS_LATE = True
+CELERY_TASK_TIME_LIMIT = 30
+CELERY_TASK_SOFT_TIME_LIMIT = 25
+CELERY_TASK_ROUTES = {
+    "main.tasks.send_like_email_task": {"queue": "emails"},
+}
+
+# During first local test you can force inline execution:
+# CELERY_TASK_ALWAYS_EAGER = True
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+DEBUG = os.environ.get('DEBUG')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get("SECRET_KEY")
@@ -76,6 +100,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -110,14 +135,13 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'main.context_processors.has_submitted_art_this_month',
+                'main.context_processors.notifications_context',
             ],
         },
     },
 ]
 
 WSGI_APPLICATION = 'omnivore.wsgi.application'
-
 
 STORAGES = {
     # ...
@@ -177,6 +201,7 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = '/home'
 LOGOUT_REDIRECT_URL = '/login'
 
@@ -191,3 +216,18 @@ CSRF_TRUSTED_ORIGINS = [
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 handler404 = 'main.views.custom_404'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
+}

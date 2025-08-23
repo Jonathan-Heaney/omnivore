@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css_files %}
+  <link rel="stylesheet" href="{% static "css/styles.css" %}">
+{% endblock %}
+
+{% block content %}
+  <div class="container mt-4">
+    {% url 'account_info_settings' as settings_url %}
+    {% if ok %}
+      <div class="alert alert-success">
+        You’ve been unsubscribed from {{ category_label }}.
+        {% if user.is_authenticated %}
+          You can manage your preferences anytime on your
+          <a href="{{ settings_url }}#email-prefs">Settings</a> page.
+        {% else %}
+          You can manage your preferences anytime on your
+          {# Send them to login, then bounce back to Settings → Email Preferences #}
+          {% with next_target=settings_url|add:'?section=email-prefs' %}
+            <a href="{% url 'login' %}?next={{ next_target|urlencode }}">Settings</a> page.
+          {% endwith %}
+        {% endif %}
+      </div>
+    {% else %}
+      <div class="alert alert-danger">
+        {{ error }}
+        {% if not user.is_authenticated %}
+          {# Offer a login link anyway, for convenience #}
+          {% with next_target=settings_url|add:'?section=email-prefs' %}
+            <div class="mt-2">
+              <a href="{% url 'login' %}?next={{ next_target|urlencode }}">Log in</a> to manage your email preferences.
+            </div>
+          {% endwith %}
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

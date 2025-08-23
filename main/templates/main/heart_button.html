@@ -1,0 +1,8 @@
+<button type="button"
+        class="like-button {% if liked or piece.id in liked_pieces %}liked{% endif %}"
+        data-piece-id="{{ piece.id }}"
+        aria-pressed="{% if liked or piece.id in liked_pieces %}true{% else %}false{% endif %}">
+  <span class="heart-icon">{% if liked or piece.id in liked_pieces %}❤️{% else %}♡{% endif %}</span>
+  <span class="like-text">{% if liked or piece.id in liked_pieces %}Loved{% else %}Love{% endif %}</span>
+</button>
+
