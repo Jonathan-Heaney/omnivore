@@ -9,6 +9,12 @@ class ArtPieceAdmin(admin.ModelAdmin):
     search_fields = ("piece_name", "artist_name",
                      "user__first_name", "user__last_name")
 
+    list_editable = (
+        "approved_status",
+        "welcome_eligible",
+        "welcome_weight",
+    )
+
     actions = ["mark_as_welcome_eligible", "unmark_as_welcome_eligible"]
 
     def mark_as_welcome_eligible(self, request, queryset):
@@ -42,6 +48,13 @@ class CustomUserAdmin(admin.ModelAdmin):
             'classes': ('wide',),
             'fields': ('username', 'password1', 'password2', 'email', 'first_name', 'last_name'),
         }),
+    )
+
+    list_editable = (
+        "email_on_art_shared",
+        "email_on_comment",
+        "email_on_like",
+        "receive_art_paused",
     )
 
 
