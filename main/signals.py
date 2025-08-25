@@ -32,7 +32,7 @@ def on_like_created(sender, instance, created, **kwargs):
     transaction.on_commit(lambda: send_like_email_task.delay(
         recipient_id=recipient.id,
         liker_id=liker.id,
-        art_piece_id=art_piece.public_id,
+        art_piece_id=art_piece.id,
         notification_id=n.id,
     ))
 
