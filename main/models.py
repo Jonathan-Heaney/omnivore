@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
 from django.urls import reverse
+import uuid
 
 
 class CustomUser(AbstractUser):
@@ -58,6 +59,16 @@ class ArtPiece(models.Model):
     welcome_weight = models.PositiveSmallIntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    public_id = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        editable=False,
+        db_index=True,
+    )
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse("edit_art_piece", args=[self.public_id])
 
     def __str__(self):
         return self.piece_name
@@ -200,18 +211,35 @@ class Notification(models.Model):
         ordering = ['-timestamp']
 
     def get_redirect_url(self):
-        if self.notification_type == 'like':
-            return reverse('my_shared_art') + f"#art-{self.art_piece.id}"
-        elif self.notification_type == 'shared_art':
-            return reverse('my_received_art') + f"#art-{self.art_piece.id}"
-        elif self.notification_type == 'comment':
-            # Choose logic based on sender/recipient relationship
-            if self.recipient == self.art_piece.user:
-                return reverse('my_shared_art') + f"#art-{self.art_piece.id}"
+        # Default fallback
+        base = reverse("notifications")
+        fragment = ""
+
+        # If there's no art_piece (shouldn’t happen for like/comment/shared_art),
+        # just go to notifications list.
+        if not self.art_piece_id:
+            return base
+
+        # Decide destination page
+        if self.notification_type == "like":
+            base = reverse("my_shared_art")
+            fragment = f"#art-{self.art_piece.public_id}"
+        elif self.notification_type == "shared_art":
+            base = reverse("my_received_art")
+            fragment = f"#art-{self.art_piece.public_id}"
+        elif self.notification_type == "comment":
+            # If the recipient is the original sharer, take them to My Shared Art;
+            # otherwise to My Received Art.
+            if self.recipient_id == self.art_piece.user_id:
+                base = reverse("my_shared_art")
             else:
-                return reverse('my_received_art') + f"#art-{self.art_piece.id}"
+                base = reverse("my_received_art")
+            fragment = f"#art-{self.art_piece.public_id}"
         else:
-            return reverse('notifications')  # fallback if something's wrong
+            return base
+
+        # Include ?n=<id> so the landing view marks it read
+        return f"{base}?n={self.id}{fragment}"
 
     def __str__(self):
         return f'{self.sender} -> {self.recipient} ({self.notification_type})'

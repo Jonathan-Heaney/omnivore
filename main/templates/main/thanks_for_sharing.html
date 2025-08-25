@@ -9,6 +9,8 @@
 
 {% block content %}
 
+<h1>Thanks for sharing!</h1>
+
 {% if paused %}
   <div class="alert alert-warning">
     You currently have new art delivery paused. You can resume it anytime in
@@ -48,7 +50,7 @@
     <div class="mt-3">
       <small class="text-muted">
         This gift has also been added to your
-        <a href="{% url 'my_received_art' %}#art-{{ reciprocal_piece.id }}">My Received Art</a>
+        <a href="{% url 'my_received_art' %}#art-{{ reciprocal_piece.public_id }}">My Received Art</a>
         so you can find it later.
       </small>
     </div>

@@ -73,7 +73,7 @@ def send_like_email(*, recipient, liker, art_piece, notification_id=None):
     path = f"/my-shared-art"
     if notification_id:
         path += f"?n={notification_id}"
-    path += f"#art-{art_piece.id}"
+    path += f"#art-{art_piece.public_id}"
 
     context = {
         "recipient": recipient,
@@ -108,7 +108,7 @@ def send_shared_art_email(*, recipient, sender, art_piece, notification_id=None)
     path = "/my-received-art"
     if notification_id:
         path += f"?n={notification_id}"
-    path += f"#art-{art_piece.id}"   # matches your template IDs
+    path += f"#art-{art_piece.public_id}"   # matches your template IDs
 
     context = {
         "recipient": recipient,
