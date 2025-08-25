@@ -25,7 +25,7 @@
 {% endif %}
 
 {% for piece in pieces %}
-  <div id="art-{{ piece.id }}" class="card mt-2 art-piece">
+  <div id="art-{{ piece.public_id }}" class="card mt-2 art-piece">
     <div class="card-header"><strong>
         {% if piece.link %}
         <a href="{{piece.link}}" target="_blank"><span class="card-title">{{piece.piece_name}}</span></a>
