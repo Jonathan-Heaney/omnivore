@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
 from django.urls import reverse
+import uuid
 
 
 class CustomUser(AbstractUser):
@@ -58,6 +59,16 @@ class ArtPiece(models.Model):
     welcome_weight = models.PositiveSmallIntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    public_id = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        editable=False,
+        db_index=True,
+    )
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse("edit_art_piece", args=[self.public_id])
 
     def __str__(self):
         return self.piece_name

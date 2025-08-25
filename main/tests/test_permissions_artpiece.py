@@ -6,7 +6,7 @@ from main.forms import ArtPieceForm
 @pytest.mark.django_db
 def test_owner_can_get_edit_form(client, user_a, art_by_a):
     client.force_login(user_a)
-    url = reverse("edit_art_piece", args=[art_by_a.pk])
+    url = reverse("edit_art_piece", args=[art_by_a.public_id])
     resp = client.get(url)
     assert resp.status_code == 200
     assert b"edit" in resp.content.lower()  # weak smoke check
@@ -15,7 +15,7 @@ def test_owner_can_get_edit_form(client, user_a, art_by_a):
 @pytest.mark.django_db
 def test_non_owner_gets_404_on_edit(client, user_a, art_by_b):
     client.force_login(user_a)
-    url = reverse("edit_art_piece", args=[art_by_b.pk])
+    url = reverse("edit_art_piece", args=[art_by_b.public_id])
     resp = client.get(url)
     assert resp.status_code == 404
 
@@ -23,7 +23,7 @@ def test_non_owner_gets_404_on_edit(client, user_a, art_by_b):
 @pytest.mark.django_db
 def test_owner_can_post_edit_and_changes_persist(client, user_a, art_by_a):
     client.force_login(user_a)
-    url = reverse("edit_art_piece", args=[art_by_a.pk])
+    url = reverse("edit_art_piece", args=[art_by_a.public_id])
 
     # Build a valid payload straight from the form’s expected fields
     form = ArtPieceForm(instance=art_by_a)
@@ -53,7 +53,7 @@ def test_owner_can_post_edit_and_changes_persist(client, user_a, art_by_a):
 @pytest.mark.django_db
 def test_non_owner_post_edit_is_404(client, user_a, art_by_b):
     client.force_login(user_a)
-    url = reverse("edit_art_piece", args=[art_by_b.pk])
+    url = reverse("edit_art_piece", args=[art_by_b.public_id])
     data = {"piece_name": "Hacker change",
             "piece_description": "Oops", "approved_status": True}
     resp = client.post(url, data)
@@ -63,18 +63,18 @@ def test_non_owner_post_edit_is_404(client, user_a, art_by_b):
 @pytest.mark.django_db
 def test_owner_can_delete_via_post(client, user_a, art_by_a):
     client.force_login(user_a)
-    url = reverse("delete_art_piece", args=[art_by_a.pk])
+    url = reverse("delete_art_piece", args=[art_by_a.public_id])
     resp = client.post(url)
     assert resp.status_code in (302, 303)
     # object should be gone
     from main.models import ArtPiece
-    assert not ArtPiece.objects.filter(pk=art_by_a.pk).exists()
+    assert not ArtPiece.objects.filter(pk=art_by_a.public_id).exists()
 
 
 @pytest.mark.django_db
 def test_non_owner_delete_is_404(client, user_a, art_by_b):
     client.force_login(user_a)
-    url = reverse("delete_art_piece", args=[art_by_b.pk])
+    url = reverse("delete_art_piece", args=[art_by_b.public_id])
     resp = client.post(url)
     assert resp.status_code == 404
 
@@ -82,7 +82,19 @@ def test_non_owner_delete_is_404(client, user_a, art_by_b):
 @pytest.mark.django_db
 def test_delete_requires_post(client, user_a, art_by_a):
     client.force_login(user_a)
-    url = reverse("delete_art_piece", args=[art_by_a.pk])
+    url = reverse("delete_art_piece", args=[art_by_a.public_id])
     resp = client.get(url)
     # @require_POST should emit 405 Method Not Allowed
     assert resp.status_code == 405
+
+
+@pytest.mark.django_db
+def test_edit_and_delete_use_uuid_urls(client, user_a, art_by_a):
+    client.force_login(user_a)
+    url = reverse("edit_art_piece", args=[art_by_a.public_id])
+    resp = client.get(url)
+    assert resp.status_code == 200
+
+    del_url = reverse("delete_art_piece", args=[art_by_a.public_id])
+    resp = client.post(del_url)
+    assert resp.status_code in (302, 303)
