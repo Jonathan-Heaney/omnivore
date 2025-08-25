@@ -26,8 +26,8 @@
         <p>{{piece.piece_description|linebreaksbr}}</p>
       </div>
       <div class="art-buttons">
-        <a href="{% url 'edit_art_piece' piece.id %}" class="btn btn-primary edit-btn" id="edit-btn">Edit</a>
-        <form method="post" action="{% url 'delete_art_piece' piece.id %}" onsubmit="return confirmDelete();">
+        <a href="{% url 'edit_art_piece' piece.public_id %}" class="btn btn-primary edit-btn" id="edit-btn">Edit</a>
+        <form method="post" action="{% url 'delete_art_piece' piece.public_id %}" onsubmit="return confirmDelete();">
           {% csrf_token %}
           <button type="submit" class="btn btn-danger">Delete</button>
       </form>
