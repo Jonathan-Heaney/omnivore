@@ -183,28 +183,33 @@ def thanks_for_sharing(request):
 
 
 @login_required(login_url="/login")
-def edit_art_piece(request, pk):
-    art_piece = get_object_or_404(ArtPiece, pk=pk)
+def edit_art_piece(request, pk: int):
+    """
+    Only the owner (art_piece.user) can edit.
+    If not owner or not found -> 404 (don’t leak existence).
+    """
+    art_piece = get_object_or_404(ArtPiece, pk=pk, user=request.user)
 
-    if request.method == 'POST':
+    if request.method == "POST":
         form = ArtPieceForm(request.POST, instance=art_piece)
         if form.is_valid():
             form.save()
-            return redirect("/my-shared-art")
+            return redirect("my_shared_art")
     else:
         form = ArtPieceForm(instance=art_piece)
 
-    return render(request, 'main/edit_art_piece.html', {'form': form})
+    return render(request, "main/edit_art_piece.html", {"form": form, "piece": art_piece})
 
 
 @login_required(login_url="/login")
-def delete_art_piece(request, pk):
-    art_piece = get_object_or_404(ArtPiece, pk=pk)
-    if request.method == 'POST':
-        art_piece.delete()
-        return redirect('my_shared_art')
-
-    return redirect('my_shared_art')
+@require_POST
+def delete_art_piece(request, pk: int):
+    """
+    Only the owner can delete. Enforce POST to avoid accidental deletes.
+    """
+    art_piece = get_object_or_404(ArtPiece, pk=pk, user=request.user)
+    art_piece.delete()
+    return redirect("my_shared_art")
 
 
 @login_required(login_url="/login")
