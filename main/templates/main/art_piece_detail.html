@@ -75,7 +75,7 @@
 
                 {# reply form targets this page and appends into this thread #}
                 {% if conversation|length %}
-                {% include "main/reply_form.html" with reply_recipient=recipient.first_name top_level_comment=conversation.0 piece=piece recipient=recipient post_url=request.path target_id=tgt_id only %}
+                {% include "main/reply_form.html" with reply_recipient=recipient.first_name top_level_comment=conversation.0 piece=piece recipient=recipient post_url=request.path target_id=tgt_id %}
                 {% endif %}
                 {% endwith %}
             {% endwith %}
@@ -96,7 +96,7 @@
           {% endfor %}
         </div>
 
-        {% include "main/comment_form.html" with reply_recipient=piece.user.first_name piece=piece post_url=request.path target_id=tgt_id only %}
+        {% include "main/comment_form.html" with reply_recipient=piece.user.first_name piece=piece post_url=request.path target_id=tgt_id %}
       {% endwith %}
     {% endwith %}
   </div>

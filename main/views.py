@@ -326,32 +326,84 @@ def my_received_art(request):
     return render(request, 'main/my_received_art.html', context)
 
 
-# views.py
-
 @login_required(login_url="/login")
 def art_piece_detail(request, public_id):
     piece = get_object_or_404(ArtPiece, public_id=public_id)
     user = request.user
 
-    # Viewer must be the owner OR someone who actually received this piece.
     is_owner = (piece.user_id == user.id)
     has_received = SentArtPiece.objects.filter(
         user=user, art_piece=piece).exists()
-
     if not (is_owner or has_received):
-        # 404 so people can't probe others' art
-        from django.http import Http404
         raise Http404("Not found")
 
-    if is_owner:
-        # OWNER MODE: group all messages by the *other participant*
-        qs = (Comment.objects
-              .filter(art_piece=piece)
-              .filter(Q(sender=user) | Q(recipient=user))
-              .select_related("sender", "recipient")
-              .order_by("created_at"))
+    # --- HTMX POST handling (both modes) ---
+    is_htmx = request.headers.get(
+        "HX-Request") == "true" or "hx-request" in request.headers
+    if request.method == "POST" and is_htmx:
+        # OWNER replying in a specific 1:1 thread (reply_form posts comment_id)
+        if is_owner and "comment_id" in request.POST:
+            comment_id = request.POST.get("comment_id")
+            current_comment = get_object_or_404(
+                Comment.objects.select_related(
+                    "sender", "recipient", "art_piece"),
+                id=comment_id,
+                art_piece=piece,
+            )
+            # Walk up to top-level thread starter
+            while current_comment.parent_comment:
+                current_comment = current_comment.parent_comment
+            top = current_comment
 
-        # key = other_user, value = [comments...]
+            form = CommentForm(request.POST)
+            if form.is_valid():
+                reply = form.save(commit=False)
+                reply.sender = user
+                # reply goes to the *other* participant of that thread
+                reply.recipient = top.sender if top.sender_id != user.id else top.recipient
+                reply.art_piece = piece
+                reply.parent_comment = top
+                reply.save()
+
+                html = render_to_string(
+                    "main/comment_text.html", {"comment": reply}, request=request)
+                return HttpResponse(html)
+
+            return JsonResponse({"ok": False, "errors": form.errors}, status=400)
+
+        # RECIPIENT sending a new message to the sharer (comment_form posts art_piece_id)
+        if not is_owner and "add_comment" in request.POST:
+            # extra guard: ensure the viewer is part of this 1:1 with the sharer
+            if not has_received:
+                return JsonResponse({"ok": False, "error": "Not allowed"}, status=403)
+
+            form = CommentForm(request.POST)
+            if form.is_valid():
+                new_comment = form.save(commit=False)
+                new_comment.sender = user
+                new_comment.recipient = piece.user
+                new_comment.art_piece = piece
+                new_comment.save()
+
+                html = render_to_string(
+                    "main/comment_text.html", {"comment": new_comment}, request=request)
+                return HttpResponse(html)
+
+            return JsonResponse({"ok": False, "errors": form.errors}, status=400)
+
+        # If we got here, the POST shape didn't match what we expect
+        return JsonResponse({"ok": False, "error": "Unsupported operation"}, status=400)
+
+    # --- GET rendering ---
+    if is_owner:
+        qs = (
+            Comment.objects
+            .filter(art_piece=piece)
+            .filter(Q(sender=user) | Q(recipient=user))
+            .select_related("sender", "recipient")
+            .order_by("created_at")
+        )
+        # Group by the other participant
         conversations = defaultdict(list)
         for c in qs:
             other = c.recipient if c.sender_id == user.id else c.sender
@@ -360,22 +412,18 @@ def art_piece_detail(request, public_id):
         context = {
             "piece": piece,
             "mode": "owner",
-            # dict(other_user -> list[Comment])
             "conversations": dict(conversations),
         }
         return render(request, "main/art_piece_detail.html", context)
 
     else:
-        # RECIPIENT MODE: only the 1:1 thread between viewer and the sharer
-        qs = (Comment.objects
-              .filter(art_piece=piece)
-              .filter(
-                  Q(sender=user, recipient=piece.user) |
-                  Q(sender=piece.user, recipient=user)
-              )
-              .select_related("sender", "recipient")
-              .order_by("created_at"))
-
+        qs = (
+            Comment.objects
+            .filter(art_piece=piece)
+            .filter(Q(sender=user, recipient=piece.user) | Q(sender=piece.user, recipient=user))
+            .select_related("sender", "recipient")
+            .order_by("created_at")
+        )
         context = {
             "piece": piece,
             "mode": "recipient",
