@@ -27,17 +27,18 @@
 {% for piece in pieces %}
   <div id="art-{{ piece.public_id }}" class="card mt-2 art-piece">
     <div class="card-header"><strong>
-        {% if piece.link %}
-        <a href="{{piece.link}}" target="_blank"><span class="card-title">{{piece.piece_name}}</span></a>
-        {% else %}
-        <span class="card-title">{{piece.piece_name}}</span>
-        {% endif %}
+        <a href="{% url 'art_detail' piece.public_id %}">
+          <span class="card-title">{{ piece.piece_name }}</span>
+        </a>
         </strong>({{ piece.artist_name }})</div>
     <div class="card-body d-flex flex-row justify-content-between">
       <div>
         <p>{{piece.piece_description|linebreaksbr}}</p>
       </div>
     </div>
+    {% if piece.link %}
+      <a class="btn btn-sm btn-outline-secondary ms-2" href="{{ piece.link }}" target="_blank" rel="noopener">Source</a>
+    {% endif %}
     <div class="card-footer text-muted">Shared by <strong>{{piece.user.first_name}} {{piece.user.last_name}}</strong>
     </div>
 

@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}{{ piece.piece_name }} — Omnivore{% endblock %}
+{% block css_files %}
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+  <h1 class="header">{{ piece.piece_name }}</h1>
+
+  <div class="card mt-2 art-piece" id="art-{{ piece.public_id }}">
+    <div class="card-header">
+      <strong class="card-title">{{ piece.piece_name }}</strong>
+      <span>({{ piece.artist_name }})</span>
+      {% if piece.link %}
+        <a class="btn btn-sm btn-outline-secondary ms-2" href="{{ piece.link }}" target="_blank" rel="noopener">
+          Open source link
+        </a>
+      {% endif %}
+    </div>
+
+    <div class="card-body">
+      <p>{{ piece.piece_description|linebreaksbr }}</p>
+    </div>
+
+    <div class="card-footer text-muted">
+      Shared by <strong>{{ piece.user.first_name }} {{ piece.user.last_name }}</strong>
+      on {{ piece.created_at|date:"F j, Y" }}
+    </div>
+
+    <div class="likes-container" id="heart-{{ piece.id }}-container">
+      {% include 'main/heart_button.html' with piece=piece %}
+    </div>
+
+    <div class="comments-section mt-3">
+      <h3 class="h5">Conversation</h3>
+      <div id="comments-{{ piece.id }}-container">
+        {% for comment in comments %}
+          {% include 'main/comment_text.html' with comment=comment %}
+        {% empty %}
+          <p class="text-muted">No comments yet.</p>
+        {% endfor %}
+      </div>
+
+      {# Reuse your existing form include (will work with the HTMX branch above) #}
+      {% include 'main/comment_form.html' with reply_recipient=piece.user.first_name %}
+    </div>
+  </div>
+{% endblock %}
