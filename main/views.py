@@ -1,3 +1,5 @@
+from .models import ArtPiece, Comment, SentArtPiece
+from django.shortcuts import get_object_or_404, render
 from django.db.models import Q
 from django.http import Http404
 from django.http import JsonResponse, Http404
@@ -326,77 +328,60 @@ def my_received_art(request):
 
 # views.py
 
-
 @login_required(login_url="/login")
 def art_piece_detail(request, public_id):
     piece = get_object_or_404(ArtPiece, public_id=public_id)
     user = request.user
 
-    # Permission: owner OR recipient
-    is_owner = piece.user_id == user.id
-    is_recipient = SentArtPiece.objects.filter(
+    # Viewer must be the owner OR someone who actually received this piece.
+    is_owner = (piece.user_id == user.id)
+    has_received = SentArtPiece.objects.filter(
         user=user, art_piece=piece).exists()
-    if not (is_owner or is_recipient):
+
+    if not (is_owner or has_received):
+        # 404 so people can't probe others' art
+        from django.http import Http404
         raise Http404("Not found")
 
-    # Mark notification read (if coming from a notification link)
-    n_id = request.GET.get("n")
-    if n_id:
-        Notification.objects.filter(
-            id=n_id, recipient=user, is_read=False
-        ).update(is_read=True)
+    if is_owner:
+        # OWNER MODE: group all messages by the *other participant*
+        qs = (Comment.objects
+              .filter(art_piece=piece)
+              .filter(Q(sender=user) | Q(recipient=user))
+              .select_related("sender", "recipient")
+              .order_by("created_at"))
 
-    # Comments for this piece (oldest first for conversation flow)
-    comments = (
-        Comment.objects
-        .filter(art_piece=piece)
-        .select_related("sender", "recipient")
-        .order_by("created_at")
-    )
+        # key = other_user, value = [comments...]
+        conversations = defaultdict(list)
+        for c in qs:
+            other = c.recipient if c.sender_id == user.id else c.sender
+            conversations[other].append(c)
 
-    # Like state for the current user
-    liked_pieces = set()
-    if Like.objects.filter(user=user, art_piece=piece).exists():
-        liked_pieces.add(piece.id)  # likes.js expects numeric id here
-
-    # Support your existing HTMX comment post flow (optional)
-    if "hx-request" in request.headers:
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            new_comment = form.save(commit=False)
-            new_comment.sender = user
-
-            # You were previously passing art_piece_id in the POST — keep that working:
-            art_piece_id = request.POST.get("art_piece_id")
-            new_comment.art_piece = piece if not art_piece_id else get_object_or_404(
-                ArtPiece, id=art_piece_id)
-
-            # Recipient logic: if the commenter is the owner, send to the other party in thread;
-            # fallback to the piece owner otherwise.
-            if comments.exists():
-                top = comments.first()
-                # Route replies like your list views do: reply to the other person in the thread
-                if top.sender_id == user.id and top.recipient_id:
-                    new_comment.recipient = top.recipient
-                else:
-                    new_comment.recipient = top.sender if top.sender_id != user.id else piece.user
-            else:
-                new_comment.recipient = piece.user if user.id != piece.user_id else None
-
-            new_comment.save()
-            html = render_to_string(
-                "main/comment_text.html", {"comment": new_comment}, request=request)
-            return HttpResponse(html)
-
-    return render(
-        request,
-        "main/art_piece_detail.html",
-        {
+        context = {
             "piece": piece,
-            "comments": comments,
-            "liked_pieces": liked_pieces,
-        },
-    )
+            "mode": "owner",
+            # dict(other_user -> list[Comment])
+            "conversations": dict(conversations),
+        }
+        return render(request, "main/art_piece_detail.html", context)
+
+    else:
+        # RECIPIENT MODE: only the 1:1 thread between viewer and the sharer
+        qs = (Comment.objects
+              .filter(art_piece=piece)
+              .filter(
+                  Q(sender=user, recipient=piece.user) |
+                  Q(sender=piece.user, recipient=user)
+              )
+              .select_related("sender", "recipient")
+              .order_by("created_at"))
+
+        context = {
+            "piece": piece,
+            "mode": "recipient",
+            "thread": list(qs),
+        }
+        return render(request, "main/art_piece_detail.html", context)
 
 
 @login_required
