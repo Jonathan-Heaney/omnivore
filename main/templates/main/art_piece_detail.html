@@ -25,21 +25,40 @@
       </a>
     {% endif %}
 
-    {% if request.user != piece.user %}
-      <div class="mt-3 likes-container" id="heart-{{ piece.id }}-container">
-        {% include 'main/heart_button.html' with piece=piece %}
-      </div>
-    {% endif %}
+
   </div>
 
   <div class="card-footer text-muted">
     Shared by <strong>{{ piece.user.first_name }} {{ piece.user.last_name }}</strong> ·
     {{ piece.created_at|date:"F j, Y" }}
   </div>
+
+  {% if request.user != piece.user %}
+      <div class="likes-container" id="heart-{{ piece.id }}-container">
+        {% include 'main/heart_button.html' with piece=piece %}
+      </div>
+    {% endif %}
+
+  {# --- RECIPIENT VIEW: single 1:1 DM thread with the sharer --- #}
+{% if mode == "recipient" %}
+  <div class="received-comments-section">
+    {% with pid=piece.id|stringformat:"s" %}
+      {% with tgt_id="comments-"|add:pid|add:"-container" %}
+        <div id="{{ tgt_id }}">
+          {% for comment in thread %}
+            {% include 'main/comment_text.html' with comment=comment %}
+          {% endfor %}
+        </div>
+
+        {% include "main/comment_form.html" with reply_recipient=piece.user.first_name piece=piece post_url=request.path target_id=tgt_id %}
+      {% endwith %}
+    {% endwith %}
+  </div>
+
 </div>
 
 {# --- OWNER VIEW: multi-conversation DM threads --- #}
-{% if mode == "owner" %}
+{% elif mode == "owner" %}
   {% if conversations %}
     <div class="comments-section mt-3">
       {% for recipient, conversation in conversations.items %}
@@ -84,22 +103,6 @@
       {% endfor %}
     </div>
   {% endif %}
-
-{# --- RECIPIENT VIEW: single 1:1 DM thread with the sharer --- #}
-{% elif mode == "recipient" %}
-  <div class="received-comments-section mt-3">
-    {% with pid=piece.id|stringformat:"s" %}
-      {% with tgt_id="comments-"|add:pid|add:"-container" %}
-        <div id="{{ tgt_id }}">
-          {% for comment in thread %}
-            {% include 'main/comment_text.html' with comment=comment %}
-          {% endfor %}
-        </div>
-
-        {% include "main/comment_form.html" with reply_recipient=piece.user.first_name piece=piece post_url=request.path target_id=tgt_id %}
-      {% endwith %}
-    {% endwith %}
-  </div>
 {% endif %}
 
 {% endblock %}
