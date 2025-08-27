@@ -26,6 +26,9 @@ from main.utils.email_unsub import load_unsub_token
 
 
 def home(request):
+    if request.user.is_authenticated:
+        return redirect('my_received_art')
+    # Unauthed: show marketing/landing content
     return render(request, 'main/home.html')
 
 
