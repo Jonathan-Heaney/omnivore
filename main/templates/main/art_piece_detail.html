@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}{{ piece.piece_name }} · Omnivore{% endblock %}
+{% block css_files %}
+  <link rel="stylesheet" href="{% static "css/styles.css" %}">
+{% endblock %}
+
+{% block content %}
+
+<h1 class="header">{{ piece.piece_name }}</h1>
+
+<div id="art-{{ piece.public_id }}" class="card mt-2 art-piece">
+  <div class="card-header">
+    <strong>{{ piece.piece_name }}</strong> ({{ piece.artist_name }})
+  </div>
+
+  <div class="card-body">
+    <p>{{ piece.piece_description|linebreaksbr }}</p>
+
+    {% if piece.link %}
+      <a class="btn btn-sm btn-outline-secondary mt-2" href="{{ piece.link }}" target="_blank" rel="noopener">
+        Source
+      </a>
+    {% endif %}
+  </div>
+
+  <div class="card-footer text-muted">
+    Shared by <strong>{{ piece.user.first_name }} {{ piece.user.last_name }}</strong> ·
+    {{ piece.created_at|date:"F j, Y" }}
+  </div>
+
+  {% if request.user != piece.user %}
+      <div class="likes-container" id="heart-{{ piece.id }}-container">
+        {% include 'main/heart_button.html' with piece=piece is_liked=is_liked %}
+      </div>
+    {% endif %}
+
+  {# --- RECIPIENT VIEW: single 1:1 DM thread with the sharer --- #}
+{% if mode == "recipient" %}
+  <div class="received-comments-section">
+    {% with pid=piece.id|stringformat:"s" %}
+      {% with tgt_id="comments-"|add:pid|add:"-container" %}
+        <div id="{{ tgt_id }}">
+          {% for comment in thread %}
+            {% include 'main/comment_text.html' with comment=comment %}
+          {% endfor %}
+        </div>
+
+        {% include "main/comment_form.html" with reply_recipient=piece.user.first_name piece=piece post_url=request.path target_id=tgt_id %}
+      {% endwith %}
+    {% endwith %}
+  </div>
+
+
+{# --- OWNER VIEW: multi-conversation DM threads --- #}
+{% elif mode == "owner" %}
+  {% if conversations %}
+    <div class="comments-section mt-3">
+      {% for recipient, conversation in conversations.items %}
+        <div class="card mt-3">
+          <div class="card-header conversation-header d-flex align-items-center justify-content-between">
+            <div>
+              Conversation with <strong>{{ recipient.first_name }} {{ recipient.last_name }}</strong>
+            </div>
+
+            {# toggle button ids: toggle-button-<piece.id>-<recipient.id> #}
+            {% with pid=piece.id|stringformat:"s" rid=recipient.id|stringformat:"s" %}
+              <button
+                class="toggle-comment-btn"
+                id="toggle-button-{{ pid }}-{{ rid }}"
+                onclick="toggleComments({{ piece.id }}, {{ recipient.id }})"
+                aria-controls="comments-{{ pid }}-{{ rid }}-container"
+                aria-expanded="true"
+              >
+                <i class="fa-solid fa-minus"></i>
+              </button>
+            {% endwith %}
+          </div>
+        
+
+          <div class="conversation">
+            {# comments container id: comments-<piece.id>-<recipient.id>-container #}
+            {% with pid=piece.id|stringformat:"s" rid=recipient.id|stringformat:"s" %}
+              {% with tgt_id="comments-"|add:pid|add:"-"|add:rid|add:"-container" %}
+                <div id="{{ tgt_id }}">
+                  {% for comment in conversation %}
+                    {% include 'main/comment_text.html' with comment=comment %}
+                  {% endfor %}
+                </div>
+
+                {# reply form targets this page and appends into this thread #}
+                {% include "main/reply_form.html" with reply_recipient=recipient.first_name top_level_comment=conversation.0 piece=piece recipient=recipient post_url=request.path target_id=tgt_id %}
+                {% endwith %}
+            {% endwith %}
+          </div>
+        </div>
+      </div>  
+      {% endfor %}
+      {% endif %}
+      {% endif %}
+</div>
+
+{% endblock %}

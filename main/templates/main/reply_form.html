@@ -1,14 +1,24 @@
-<form method="post" action="{% url 'my_shared_art' %}" class="comment-form" hx-post="{% url 'my_shared_art' %}" hx-target="#comments-{{ piece.id }}-{{recipient.id}}-container" hx-swap="beforeend" hx-on::after-request="clearForm(this)">
-    {% csrf_token %}
-    <input type="hidden" name="comment_id" value="{{ top_level_comment.id }}">
-    <div class="input-group">
-        <textarea name="text" rows="1" class="form-control replyTextArea" placeholder="Reply to {{ reply_recipient }}..." required></textarea>
-        <button type="submit" name="reply_comment" class="sendButton" >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" />
-            </svg>
-        </button>
-    </div>
+{% url 'my_shared_art' as fallback_post_url %}
+{% with pid=piece.id|stringformat:"s" rid=recipient.id|stringformat:"s" %}
+  {% with fallback_target_id="comments-"|add:pid|add:"-"|add:rid|add:"-container" %}
+<form method="post"
+      action="{{ post_url|default:fallback_post_url }}"
+      class="comment-form"
+      hx-post="{{ post_url|default:fallback_post_url }}"
+      hx-target="#{{ target_id|default:fallback_target_id }}"
+      hx-swap="beforeend"
+      hx-on::after-request="clearForm(this)">
+  {% csrf_token %}
+  <input type="hidden" name="comment_id" value="{{ top_level_comment.id }}">
+  <div class="input-group">
+      <textarea name="text" rows="1" class="form-control replyTextArea"
+                placeholder="Reply to {{ reply_recipient }}..." required></textarea>
+      <button type="submit" name="reply_comment" class="sendButton">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" />
+          </svg>
+      </button>
+  </div>
 </form>
-
-
+  {% endwith %}
+{% endwith %}
