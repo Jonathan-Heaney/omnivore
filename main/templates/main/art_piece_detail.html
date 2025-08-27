@@ -35,7 +35,16 @@
       <div class="likes-container" id="heart-{{ piece.id }}-container">
         {% include 'main/heart_button.html' with piece=piece is_liked=is_liked %}
       </div>
-    {% endif %}
+
+  {% elif request.user == piece.user %}
+      {% with users=likes_dict|dict_get:piece %}
+        {% if users %}
+          <div class="likes-container" id="likes-{{ piece.id }}-container">
+            {% include 'main/likes_display.html' with piece=piece likes_dict=likes_dict %}
+          </div>
+        {% endif %}
+    {% endwith %}
+  {% endif %}
 
   {# --- RECIPIENT VIEW: single 1:1 DM thread with the sharer --- #}
 {% if mode == "recipient" %}
@@ -57,9 +66,9 @@
 {# --- OWNER VIEW: multi-conversation DM threads --- #}
 {% elif mode == "owner" %}
   {% if conversations %}
-    <div class="comments-section mt-3">
+    <div class="comments-section">
       {% for recipient, conversation in conversations.items %}
-        <div class="card mt-3">
+        <div class="card">
           <div class="card-header conversation-header d-flex align-items-center justify-content-between">
             <div>
               Conversation with <strong>{{ recipient.first_name }} {{ recipient.last_name }}</strong>

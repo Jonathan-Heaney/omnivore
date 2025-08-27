@@ -352,6 +352,12 @@ def art_piece_detail(request, public_id):
             notification_type__in=["like", "comment", "shared_art"],
         ).update(is_read=True)
 
+    # Fetch likes for each piece
+    likes_dict = {}
+    likes = Like.objects.filter(art_piece=piece).select_related('user')
+    users = [like.user for like in likes]
+    likes_dict[piece] = users
+
     # --- HTMX POST handling (both modes) ---
     is_htmx = request.headers.get(
         "HX-Request") == "true" or "hx-request" in request.headers
@@ -428,7 +434,8 @@ def art_piece_detail(request, public_id):
             "piece": piece,
             "mode": "owner",
             "conversations": dict(conversations),
-            "is_liked": False
+            "is_liked": False,
+            'likes_dict': likes_dict
         }
         return render(request, "main/art_piece_detail.html", context)
 
