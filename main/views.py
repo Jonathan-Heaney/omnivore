@@ -343,6 +343,15 @@ def art_piece_detail(request, public_id):
     if not (is_owner or has_received):
         raise Http404("Not found")
 
+    # --- PIECE-LEVEL AUTO-READ ---
+    if request.method == "GET":
+        Notification.objects.filter(
+            recipient=user,
+            art_piece=piece,
+            is_read=False,
+            notification_type__in=["like", "comment", "shared_art"],
+        ).update(is_read=True)
+
     # --- HTMX POST handling (both modes) ---
     is_htmx = request.headers.get(
         "HX-Request") == "true" or "hx-request" in request.headers
