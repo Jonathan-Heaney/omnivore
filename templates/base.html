@@ -60,17 +60,23 @@
                                 <a href="/my-shared-art" class="nav-link">My Shared Art</a>
                             </li>
                             <li class="nav-item">
-                                <a href="/my-received-art" class="nav-link">My Received Art</a>
-                            </li>
-                            <li class="nav-item">
                                  <a href="/share-art" class="nav-link">Share Art</a>
                             </li>
-                            <li class="nav-item">
-                                <a href="/logout" class="nav-link">Logout</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="/settings" class="nav-link">Settings</a>
-                            </li>
+                            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                            </button>
+                            <div class="collapse navbar-collapse" id="navbarNav">
+                                <ul class="navbar-nav me-auto">
+                                    <li class="nav-item dropdown">
+                                        <a   a class="nav-link dropdown-toggle" href="#" id="aboutDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            Account
+                                        </a>
+                                        <ul class="dropdown-menu" aria-labelledby="aboutDropdown">
+                                            <li><a class="dropdown-item" href="/settings">Settings</a></li>
+                                            <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                                        </ul>
+                                    </li>   
+                                </ul>
                         {% else %}
                             <li class="nav-item">
                                 <a href="/login" class="nav-link">Login</a>
