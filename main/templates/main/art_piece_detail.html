@@ -33,7 +33,7 @@
 
   {% if request.user != piece.user %}
       <div class="likes-container" id="heart-{{ piece.id }}-container">
-        {% include 'main/heart_button.html' with piece=piece %}
+        {% include 'main/heart_button.html' with piece=piece is_liked=is_liked %}
       </div>
     {% endif %}
 

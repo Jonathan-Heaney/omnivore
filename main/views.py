@@ -334,6 +334,9 @@ def art_piece_detail(request, public_id):
     is_owner = (piece.user_id == user.id)
     has_received = SentArtPiece.objects.filter(
         user=user, art_piece=piece).exists()
+    is_liked = False
+    if not is_owner:
+        is_liked = Like.objects.filter(user=user, art_piece=piece).exists()
     if not (is_owner or has_received):
         raise Http404("Not found")
 
@@ -413,6 +416,7 @@ def art_piece_detail(request, public_id):
             "piece": piece,
             "mode": "owner",
             "conversations": dict(conversations),
+            "is_liked": False
         }
         return render(request, "main/art_piece_detail.html", context)
 
@@ -428,6 +432,7 @@ def art_piece_detail(request, public_id):
             "piece": piece,
             "mode": "recipient",
             "thread": list(qs),
+            "is_liked": is_liked,
         }
         return render(request, "main/art_piece_detail.html", context)
 
