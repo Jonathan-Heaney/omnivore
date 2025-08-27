@@ -21,23 +21,15 @@ def send_comment_email(*, recipient, comment, notification_id=None):
     sender = comment.sender
     sender_full_name = sender.get_full_name()
 
-    # Destination + anchor
-    if art_piece.user_id == recipient.id:
-        # Recipient owns the piece → My Shared Art, conversation keyed by commenter (sender)
-        base_path = "/my-shared-art"
-        anchor = f"#comments-{art_piece.id}-{sender.id}-container"
-        body_text = (
-            f"{sender_full_name} sent you a message about a piece of art you shared: "
-        )
-    else:
-        # Recipient received the piece → My Received Art, single thread per piece
-        base_path = "/my-received-art"
-        anchor = f"#comments-{art_piece.id}-container"
-        body_text = (
-            f"{sender_full_name} sent you a message about their piece of art: "
-        )
+    # Deep link to art detail, carry ?n=<id> for read tracking
     q = f"?n={notification_id}" if notification_id else ""
-    target_url = _abs_url(settings.SITE_URL, f"{base_path}{q}{anchor}")
+    target_url = _abs_url(settings.SITE_URL, reverse(
+        "art_detail", args=[art_piece.public_id]) + q)
+
+    if art_piece.user_id == recipient.id:
+        body_text = f"{sender_full_name} sent you a message on your piece:"
+    else:
+        body_text = f"{sender_full_name} replied to your message on:"
 
     subject = f"{sender_full_name} sent you a message!"
 
@@ -69,18 +61,16 @@ def send_like_email(*, recipient, liker, art_piece, notification_id=None):
     unsubscribe_url = _abs_url(settings.SITE_URL,
                                reverse("email_unsubscribe", args=[token]))
 
-    # CTA: add ?n=<notification_id> if we have one
-    path = f"/my-shared-art"
-    if notification_id:
-        path += f"?n={notification_id}"
-    path += f"#art-{art_piece.public_id}"
+    q = f"?n={notification_id}" if notification_id else ""
+    cta_url = _abs_url(settings.SITE_URL, reverse(
+        "art_detail", args=[art_piece.public_id]) + q)
 
     context = {
         "recipient": recipient,
         "liker": liker,
         "art_piece": art_piece,
         "unsubscribe_url": unsubscribe_url,
-        "cta_url": _abs_url(settings.SITE_URL, path),
+        "cta_url": cta_url,
     }
 
     subject = f"{liker.get_full_name()} loved a piece you shared!"
@@ -104,17 +94,15 @@ def send_shared_art_email(*, recipient, sender, art_piece, notification_id=None)
         settings.SITE_URL, reverse("email_unsubscribe", args=[token])
     )
 
-    # Link them to My Received Art, scrolled to that piece’s block
-    path = "/my-received-art"
-    if notification_id:
-        path += f"?n={notification_id}"
-    path += f"#art-{art_piece.public_id}"   # matches your template IDs
+    q = f"?n={notification_id}" if notification_id else ""
+    cta_url = _abs_url(settings.SITE_URL, reverse(
+        "art_detail", args=[art_piece.public_id]) + q)
 
     context = {
         "recipient": recipient,
         "sender": sender,
         "art_piece": art_piece,
-        "cta_url": _abs_url(settings.SITE_URL, path),
+        "cta_url": cta_url,
         "unsubscribe_url": unsubscribe_url,
     }
 

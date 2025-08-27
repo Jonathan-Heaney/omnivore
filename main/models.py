@@ -210,36 +210,22 @@ class Notification(models.Model):
     class Meta:
         ordering = ['-timestamp']
 
+    from django.urls import reverse
+
     def get_redirect_url(self):
-        # Default fallback
-        base = reverse("notifications")
-        fragment = ""
-
-        # If there's no art_piece (shouldn’t happen for like/comment/shared_art),
-        # just go to notifications list.
+        """
+        Always deep-link to the art detail page.
+        Include ?n=<id> so the landing view (or redirect view) can mark it read.
+        """
+        # Fallback: notifications list if somehow no piece is attached
         if not self.art_piece_id:
-            return base
+            return reverse("notifications")
 
-        # Decide destination page
-        if self.notification_type == "like":
-            base = reverse("my_shared_art")
-            fragment = f"#art-{self.art_piece.public_id}"
-        elif self.notification_type == "shared_art":
-            base = reverse("my_received_art")
-            fragment = f"#art-{self.art_piece.public_id}"
-        elif self.notification_type == "comment":
-            # If the recipient is the original sharer, take them to My Shared Art;
-            # otherwise to My Received Art.
-            if self.recipient_id == self.art_piece.user_id:
-                base = reverse("my_shared_art")
-            else:
-                base = reverse("my_received_art")
-            fragment = f"#art-{self.art_piece.public_id}"
-        else:
-            return base
+        # Always go to the art detail page (owner/recipient view is handled server-side)
+        url = reverse("art_detail", args=[self.art_piece.public_id])
 
-        # Include ?n=<id> so the landing view marks it read
-        return f"{base}?n={self.id}{fragment}"
+        # Preserve the "n" param so clicks from the notifications page also mark as read
+        return f"{url}?n={self.id}"
 
     def __str__(self):
         return f'{self.sender} -> {self.recipient} ({self.notification_type})'
