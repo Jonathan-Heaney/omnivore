@@ -32,57 +32,80 @@
     <div class="d-flex flex-column min-vh-100">
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container-fluid">
-                <a id='navbar-brand' class="navbar-brand" href="/home"><img src="{% static 'images/oliver.png' %}" alt="Oliver the Omnivore" class="navbar-oliver"> Omnivore Arts</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+                <a id="navbar-brand" class="navbar-brand" href="{% url 'home' %}">
+                <img src="{% static 'images/oliver.png' %}" alt="Oliver the Omnivore" class="navbar-oliver">
+                Omnivore Arts
+                </a>s
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                        aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="aboutDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                About
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="aboutDropdown">
-                                <li><a class="dropdown-item" href="/how-it-works">How It Works</a></li>
-                                <li><a class="dropdown-item" href="/faq">FAQ</a></li>
-                                <li><a class="dropdown-item" href="/submission-guidelines">Submission Guidelines</a></li>
-                            </ul>
-                        </li>
+
+                <div class="collapse navbar-collapse" id="mainNav">
+                <!-- Left side -->
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="aboutDropdown" role="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        About
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="aboutDropdown">
+                        <li><a class="dropdown-item" href="/how-it-works">How It Works</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/faq">FAQ</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/submission-guidelines">Submission Guidelines</a></li>
                     </ul>
-                    <ul class="navbar-nav">
-                        {% if user.is_authenticated %}
-                            <li class="nav-item">
-                                <a href="/notifications" class="nav-link {% if has_unread_notifications %}has-unread{% endif %}" id="notification-link" aria-label="Notifications">
-                                    <i class="{% if has_unread_notifications %}fa-solid{% else %}fa-regular{% endif %} fa-bell"></i>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="/my-shared-art" class="nav-link">My Shared Art</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="/my-received-art" class="nav-link">My Received Art</a>
-                            </li>
-                            <li class="nav-item">
-                                 <a href="/share-art" class="nav-link">Share Art</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="/logout" class="nav-link">Logout</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="/settings" class="nav-link">Settings</a>
-                            </li>
-                        {% else %}
-                            <li class="nav-item">
-                                <a href="/login" class="nav-link">Login</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="/sign-up" class="nav-link">Sign Up</a>
-                            </li>
-                        {% endif %}
-                    </ul>
+                    </li>
+                </ul>
+
+                <!-- Right side -->
+                <ul class="navbar-nav align-items-lg-center">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a href="{% url 'notifications' %}" class="nav-link {% if has_unread_notifications %}has-unread{% endif %}"
+                        id="notification-link" aria-label="Notifications">
+                        <i class="{% if has_unread_notifications %}fa-solid{% else %}fa-regular{% endif %} fa-bell"></i>
+                        </a>
+                    </li>
+
+                    <!-- CTA -->
+                    <li class="nav-item ms-lg-2 my-2 my-lg-0">
+                        <a href="{% url 'share_art' %}" class="btn btn-cta btn-sm px-3 fw-semibold rounded-pill">
+                        Share Art
+                        </a>
+                    </li>
+
+
+                    <li class="nav-item">
+                        <a href="{% url 'my_shared_art' %}" class="nav-link">My Shared Art</a>
+                    </li>
+
+                    
+                    <li class="nav-item dropdown ms-lg-3">
+                        <a class="nav-link dropdown-toggle" href="#" id="acctDropdown" role="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        Account
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="acctDropdown">
+                        <li><a class="dropdown-item" href="{% url 'account_info_settings' %}">Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a href="{% url 'login' %}" class="nav-link">Login</a>
+                    </li>
+                    <li class="nav-item ms-lg-2 my-2 my-lg-0">
+                        <a href="{% url 'sign_up' %}" class="btn btn-cta btn-sm rounded-pill px-3">Sign Up</a>
+                    </li>
+                    {% endif %}
+                </ul>
                 </div>
             </div>
-        </nav>
+            </nav>
         
         <div class="container flex-grow-1">
             {% block content %}

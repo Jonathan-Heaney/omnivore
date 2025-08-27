@@ -17,6 +17,19 @@ a {
   color: #fff;
 }
 
+.btn-cta {
+  background: #108dca;
+  border-color: #108dca;
+  color: #fff;
+  font-weight: 700;
+  border-radius: 999px;
+}
+.btn-cta:hover,
+.btn-cta:focus {
+  filter: brightness(1.06);
+  color: #fff;
+}
+
 .card-body {
   display: flex;
   flex-direction: column;
