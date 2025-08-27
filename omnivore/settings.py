@@ -3,6 +3,7 @@ import os
 from os import getenv
 from dotenv import load_dotenv
 import warnings
+from django.urls import reverse_lazy
 
 # Figure out which environment we're in
 ENVIRONMENT = os.getenv("ENVIRONMENT", "local")
@@ -202,8 +203,8 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = '/home'
-LOGOUT_REDIRECT_URL = '/login'
+LOGIN_REDIRECT_URL = reverse_lazy('home')     # after successful login
+LOGOUT_REDIRECT_URL = reverse_lazy('home')    # optional, nice to have
 
 CSRF_TRUSTED_ORIGINS = [
     'https://web-production-4a6f.up.railway.app',
