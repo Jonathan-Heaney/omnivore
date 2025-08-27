@@ -24,8 +24,6 @@
         Source
       </a>
     {% endif %}
-
-
   </div>
 
   <div class="card-footer text-muted">
@@ -55,7 +53,6 @@
     {% endwith %}
   </div>
 
-</div>
 
 {# --- OWNER VIEW: multi-conversation DM threads --- #}
 {% elif mode == "owner" %}
@@ -81,8 +78,9 @@
               </button>
             {% endwith %}
           </div>
+        
 
-          <div class="card-body conversation">
+          <div class="conversation">
             {# comments container id: comments-<piece.id>-<recipient.id>-container #}
             {% with pid=piece.id|stringformat:"s" rid=recipient.id|stringformat:"s" %}
               {% with tgt_id="comments-"|add:pid|add:"-"|add:rid|add:"-container" %}
@@ -93,16 +91,15 @@
                 </div>
 
                 {# reply form targets this page and appends into this thread #}
-                {% if conversation|length %}
                 {% include "main/reply_form.html" with reply_recipient=recipient.first_name top_level_comment=conversation.0 piece=piece recipient=recipient post_url=request.path target_id=tgt_id %}
-                {% endif %}
                 {% endwith %}
             {% endwith %}
           </div>
         </div>
+      </div>  
       {% endfor %}
-    </div>
-  {% endif %}
-{% endif %}
+      {% endif %}
+      {% endif %}
+</div>
 
 {% endblock %}
