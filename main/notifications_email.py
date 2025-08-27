@@ -26,7 +26,6 @@ def send_comment_email(*, recipient, comment, notification_id=None):
     target_url = _abs_url(settings.SITE_URL, reverse(
         "art_detail", args=[art_piece.public_id]) + q)
 
-    # (Optional) tweak body_text if you want different copy for owner vs recipient:
     if art_piece.user_id == recipient.id:
         body_text = f"{sender_full_name} sent you a message on your piece:"
     else:
