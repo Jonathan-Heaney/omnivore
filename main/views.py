@@ -317,20 +317,33 @@ def my_received_art(request):
     if 'hx-request' in request.headers:
         form = CommentForm(request.POST)
         if form.is_valid():
-            new_comment = form.save(commit=False)
-            new_comment.sender = request.user
             art_piece_id = request.POST.get('art_piece_id')
-            new_comment.art_piece = get_object_or_404(
-                ArtPiece, id=art_piece_id)
-            new_comment.recipient = new_comment.art_piece.user
-            new_comment.save()
+            piece = get_object_or_404(ArtPiece, id=art_piece_id)
 
-            context = {
-                'comment': new_comment,
-            }
+            # Guard: ensure this viewer actually received this piece
+            if not SentArtPiece.objects.filter(user=request.user, art_piece=piece).exists():
+                return JsonResponse({"ok": False, "error": "Not allowed"}, status=403)
+
+            # Coalesce into existing top-level if present
+            top = (Comment.objects
+                   .filter(
+                       art_piece=piece,
+                       sender=request.user,
+                       recipient=piece.user,
+                       parent_comment__isnull=True,
+                   )
+                   .first())
+
+            c = form.save(commit=False)
+            c.sender = request.user
+            c.recipient = piece.user
+            c.art_piece = piece
+            if top:
+                c.parent_comment = top
+            c.save()
 
             html = render_to_string(
-                'main/comment_text.html', context, request=request)
+                'main/comment_text.html', {'comment': c}, request=request)
             return HttpResponse(html)
 
     context = {
@@ -417,16 +430,30 @@ def art_piece_detail(request, public_id):
             if not has_received:
                 return JsonResponse({"ok": False, "error": "Not allowed"}, status=403)
 
+            # If a top-level thread already exists for (piece, sender=user, recipient=owner),
+            # fold this message into that thread as a reply.
+            top = (Comment.objects
+                   .filter(
+                       art_piece=piece,
+                       sender=user,
+                       recipient=piece.user,
+                       parent_comment__isnull=True,
+                   )
+                   .first())
+
             form = CommentForm(request.POST)
             if form.is_valid():
-                new_comment = form.save(commit=False)
-                new_comment.sender = user
-                new_comment.recipient = piece.user
-                new_comment.art_piece = piece
-                new_comment.save()
+                c = form.save(commit=False)
+                c.sender = user
+                c.recipient = piece.user
+                c.art_piece = piece
+                if top:
+                    c.parent_comment = top  # already have a thread → make this a reply
+                c.save()
 
                 html = render_to_string(
-                    "main/comment_text.html", {"comment": new_comment}, request=request)
+                    "main/comment_text.html", {"comment": c}, request=request
+                )
                 return HttpResponse(html)
 
             return JsonResponse({"ok": False, "errors": form.errors}, status=400)

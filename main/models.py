@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
 from django.urls import reverse
+from django.db.models import Q, UniqueConstraint
 import uuid
 
 
@@ -153,6 +154,30 @@ class Comment(models.Model):
         'self', null=True, blank=True, on_delete=models.CASCADE, related_name='replies')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            # one top-level thread per (art_piece, sender, recipient)
+            models.UniqueConstraint(
+                fields=['art_piece', 'sender', 'recipient'],
+                condition=Q(parent_comment__isnull=True),
+                name='uniq_comment_top_thread_piece_sender_recipient',
+            ),
+        ]
+        indexes = [
+            models.Index(
+                fields=['art_piece', 'sender', 'recipient'],
+                name='idx_comment_piece_sender_recip',
+            ),
+            models.Index(
+                fields=['art_piece', 'created_at'],
+                name='idx_comment_piece_created',
+            ),
+            models.Index(
+                fields=['parent_comment'],
+                name='idx_comment_parent',
+            ),
+        ]
 
     def __str__(self):
         return f'{self.sender} on {self.art_piece}: {self.text[:30]}'
