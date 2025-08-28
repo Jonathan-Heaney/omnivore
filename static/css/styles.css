@@ -114,6 +114,110 @@ a {
   margin-top: 20px;
 }
 
+/* "New" badge */
+
+.badge-new {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.775rem;
+  letter-spacing: 0.01em;
+  background: linear-gradient(135deg, #ffd86f, #ff9f6e);
+  color: #1f1f1f;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.badge-new .emoji {
+  line-height: 1;
+}
+
+/* Entry pop (one-time) */
+.badge-new.in-view {
+  animation: badge-pop-in 320ms cubic-bezier(0.22, 1.2, 0.36, 1) both;
+}
+
+/* Optional gentle pulse after it’s visible (2 cycles max) */
+.badge-new.pulse {
+  animation: badge-pulse 1500ms ease-in-out 400ms 2 both;
+}
+
+/* Optional shimmer sheen (only while in view) */
+.badge-new.shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0) 20%,
+    rgba(255, 255, 255, 0.35) 40%,
+    rgba(255, 255, 255, 0) 60%
+  );
+  transform: translateX(-120%);
+  animation: badge-shimmer 1600ms ease-in-out 1;
+  pointer-events: none;
+}
+
+.badge-new {
+  position: relative;
+} /* needed for ::after */
+
+/* Keyframes */
+@keyframes badge-pop-in {
+  0% {
+    transform: scale(0.85);
+    filter: blur(0.5px);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    filter: none;
+    opacity: 1;
+  }
+}
+
+@keyframes badge-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes badge-shimmer {
+  0% {
+    transform: translateX(-120%);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .badge-new,
+  .badge-new.in-view,
+  .badge-new.pulse,
+  .badge-new.shimmer::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
 /* .comments-section {
   padding: 12px;
 } */
