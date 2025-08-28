@@ -247,9 +247,16 @@ def my_shared_art(request):
     conversations_dict = {piece: dict(convo)
                           for piece, convo in conversations.items()}
 
-    if 'hx-request' in request.headers:
+    if request.method == "POST" and 'hx-request' in request.headers:
         comment_id = request.POST.get('comment_id')
-        current_comment = get_object_or_404(Comment, id=comment_id)
+        current_comment = get_object_or_404(
+            Comment.objects.select_related('art_piece', 'sender', 'recipient'),
+            id=comment_id
+        )
+
+        # 🔒 Ensure the current user owns the piece (owner replying)
+        if current_comment.art_piece.user_id != request.user.id:
+            return JsonResponse({"ok": False, "error": "Not allowed"}, status=403)
 
         # Traverse to the top-level parent comment
         while current_comment.parent_comment:
