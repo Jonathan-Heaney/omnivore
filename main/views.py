@@ -21,6 +21,7 @@ from django.core.signing import BadSignature, SignatureExpired
 from django.utils import timezone
 from datetime import timedelta
 from django.views.decorators.http import require_POST
+from django.views.decorators.cache import never_cache
 from .models import ArtPiece, SentArtPiece, CustomUser, Comment, Like, Notification, ReciprocalGrant, WelcomeGrant
 from main.utils.email_unsub import load_unsub_token
 
@@ -281,6 +282,7 @@ def my_shared_art(request):
     return render(request, 'main/my_shared_art.html', context)
 
 
+@never_cache
 @login_required(login_url="/login")
 def my_received_art(request):
     user = request.user
