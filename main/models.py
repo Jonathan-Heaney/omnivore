@@ -79,6 +79,7 @@ class SentArtPiece(models.Model):
                              on_delete=models.CASCADE)
     art_piece = models.ForeignKey(ArtPiece, on_delete=models.CASCADE)
     sent_time = models.DateTimeField(auto_now_add=True)
+    seen_at = models.DateTimeField(null=True, blank=True, db_index=True)
 
     SOURCE_CHOICES = [
         ("weekly", "Weekly"),

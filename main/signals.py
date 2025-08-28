@@ -28,7 +28,7 @@ def on_like_created(sender, instance, created, **kwargs):
         sender=liker,
         notification_type="like",
         art_piece=art_piece,
-        message=f"{liker.first_name} {liker.last_name} loved a piece you shared - {art_piece.piece_name}"
+        message=f"{liker.first_name} {liker.last_name} loved a piece you shared: {art_piece.piece_name}"
     )
 
     # Enqueue the email AFTER the transaction commits successfully

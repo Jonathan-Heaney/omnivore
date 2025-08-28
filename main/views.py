@@ -284,8 +284,12 @@ def my_shared_art(request):
 @login_required(login_url="/login")
 def my_received_art(request):
     user = request.user
-    received_pieces = SentArtPiece.objects.filter(
-        user=user).select_related('art_piece__user').order_by('-sent_time')
+    received_qs = (
+        SentArtPiece.objects
+        .filter(user=user)
+        .select_related('art_piece__user')
+        .order_by('-sent_time')
+    )
 
     n_id = request.GET.get("n")
     if n_id:
@@ -293,7 +297,7 @@ def my_received_art(request):
             id=n_id, recipient=request.user, is_read=False
         ).update(is_read=True)
 
-    pieces = [received_piece.art_piece for received_piece in received_pieces]
+    pieces = [sap.art_piece for sap in received_qs]
     comments = Comment.objects.filter(art_piece__in=pieces, sender=user) | Comment.objects.filter(
         art_piece__in=pieces, recipient=user)
 
@@ -321,7 +325,7 @@ def my_received_art(request):
             return HttpResponse(html)
 
     context = {
-        'pieces': pieces,
+        'received_pieces': received_qs,
         'comments': comments,
         'liked_pieces': liked_pieces
     }
@@ -351,6 +355,12 @@ def art_piece_detail(request, public_id):
             is_read=False,
             notification_type__in=["like", "comment", "shared_art"],
         ).update(is_read=True)
+
+    # Mark the SentArtPiece as seen (only recipients, on GET) ---
+    if request.method == "GET" and has_received and not is_owner:
+        SentArtPiece.objects.filter(
+            user=user, art_piece=piece, seen_at__isnull=True
+        ).update(seen_at=timezone.now())
 
     # Fetch likes for each piece
     likes_dict = {}
