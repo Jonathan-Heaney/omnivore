@@ -1,9 +1,12 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db import transaction
-from .tasks import send_like_email_task  # Celery task
+from .tasks import (
+    send_like_email_task,
+    send_comment_email_task,
+    send_shared_art_email_task,
+)  # Celery tasks
 from .models import Like, Notification, Comment, SentArtPiece
-from .notifications_email import send_comment_email, send_like_email, send_shared_art_email
 
 
 @receiver(post_save, sender=Like)
@@ -25,7 +28,7 @@ def on_like_created(sender, instance, created, **kwargs):
         sender=liker,
         notification_type="like",
         art_piece=art_piece,
-        message=f"{liker.first_name} {liker.last_name} loved a piece you shared - {art_piece.name}"
+        message=f"{liker.first_name} {liker.last_name} loved a piece you shared - {art_piece.piece_name}"
     )
 
     # Enqueue the email AFTER the transaction commits successfully
@@ -64,8 +67,12 @@ def create_comment_notification(sender, instance, created, **kwargs):
         art_piece=art_piece
     )
 
-    send_comment_email(recipient=recipient_user,
-                       comment=instance, notification_id=n.id)
+    # enqueue email after DB commit
+    transaction.on_commit(lambda: send_comment_email_task.delay(
+        recipient_id=recipient_user.id,
+        comment_id=instance.id,
+        notification_id=n.id,
+    ))
 
 
 @receiver(post_save, sender=SentArtPiece)
@@ -92,9 +99,9 @@ def create_sent_art_notification(sender, instance, created, **kwargs):
         message=f"{sender_user.first_name} {sender_user.last_name} shared some art with you!"
     )
 
-    send_shared_art_email(
-        recipient=recipient,
-        sender=sender_user,
-        art_piece=art_piece,
-        notification_id=n.id
-    )
+    transaction.on_commit(lambda: send_shared_art_email_task.delay(
+        recipient_id=recipient.id,
+        sender_id=sender_user.id,
+        art_piece_id=art_piece.id,
+        notification_id=n.id,
+    ))
