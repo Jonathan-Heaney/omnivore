@@ -55,6 +55,8 @@ CELERY_TASK_TIME_LIMIT = 30
 CELERY_TASK_SOFT_TIME_LIMIT = 25
 CELERY_TASK_ROUTES = {
     "main.tasks.send_like_email_task": {"queue": "emails"},
+    "main.tasks.send_comment_email_task": {"queue": "emails"},
+    "main.tasks.send_shared_art_email_task": {"queue": "emails"},
 }
 
 # During first local test you can force inline execution:

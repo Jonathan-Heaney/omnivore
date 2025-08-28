@@ -8,7 +8,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--dry-run',
+            '--dry-run', # Add --dry-run to terminal command
             action='store_true',
             help='Preview which users would receive which art pieces, without sending or writing anything.',
         )
