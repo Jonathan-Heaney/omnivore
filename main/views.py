@@ -1,6 +1,6 @@
 from .models import ArtPiece, Comment, SentArtPiece
 from django.shortcuts import get_object_or_404, render
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.http import Http404
 from django.http import JsonResponse, Http404
 from django.shortcuts import render, redirect, get_object_or_404
@@ -221,71 +221,62 @@ def my_shared_art(request):
     user = request.user
     my_pieces = ArtPiece.objects.filter(user=user).order_by('-created_at')
 
+    # Keep legacy mark-as-read support for links that still point here
     n_id = request.GET.get("n")
     if n_id:
         Notification.objects.filter(
             id=n_id, recipient=request.user, is_read=False
         ).update(is_read=True)
 
-    # Dictionary to hold conversations by art piece
-    conversations = defaultdict(lambda: defaultdict(list))
-    likes_dict = {}
+    # Summaries instead of full threads
+    comments_qs = (Comment.objects
+                   .filter(art_piece__in=my_pieces)
+                   .select_related('sender', 'recipient', 'art_piece')
+                   .order_by('created_at'))
 
+    conv_set_by_piece = defaultdict(set)   # piece_id -> set(other_user_id)
+    last_comment_by_piece = {}             # piece_id -> latest Comment
+
+    for c in comments_qs:
+        other = c.recipient if c.sender_id == user.id else c.sender
+        pid = c.art_piece_id
+        conv_set_by_piece[pid].add(other.id)
+        prev = last_comment_by_piece.get(pid)
+        if prev is None or c.created_at > prev.created_at:
+            last_comment_by_piece[pid] = c
+
+    unread_counts = {
+        row['art_piece_id']: row['cnt']
+        for row in (Notification.objects
+                    .filter(recipient=user,
+                            is_read=False,
+                            notification_type='comment',
+                            art_piece__in=my_pieces)
+                    .values('art_piece_id')
+                    .annotate(cnt=Count('id')))
+    }
+
+    likes_by_piece = defaultdict(list)
+    likes = (Like.objects
+             .filter(art_piece__in=my_pieces)
+             .select_related('user', 'art_piece'))
+    for like in likes:
+        likes_by_piece[like.art_piece].append(like.user)
+
+    summaries = {}
     for piece in my_pieces:
-        comments = Comment.objects.filter(art_piece=piece).select_related(
-            'sender', 'recipient').order_by('created_at')
-        for comment in comments:
-            recipient = comment.recipient if comment.sender == user else comment.sender
-            conversations[piece][recipient].append(comment)
-
-        # Fetch likes for each piece
-        likes = Like.objects.filter(art_piece=piece).select_related('user')
-        users = [like.user for like in likes]
-        likes_dict[piece] = users
-
-    # Convert defaultdict to regular dict for template
-    conversations_dict = {piece: dict(convo)
-                          for piece, convo in conversations.items()}
-
-    if request.method == "POST" and 'hx-request' in request.headers:
-        comment_id = request.POST.get('comment_id')
-        current_comment = get_object_or_404(
-            Comment.objects.select_related('art_piece', 'sender', 'recipient'),
-            id=comment_id
-        )
-
-        # 🔒 Ensure the current user owns the piece (owner replying)
-        if current_comment.art_piece.user_id != request.user.id:
-            return JsonResponse({"ok": False, "error": "Not allowed"}, status=403)
-
-        # Traverse to the top-level parent comment
-        while current_comment.parent_comment:
-            current_comment = current_comment.parent_comment
-        top_level_comment = current_comment
-
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            reply = form.save(commit=False)
-            reply.sender = request.user
-            reply.recipient = top_level_comment.sender
-            reply.art_piece = top_level_comment.art_piece
-            reply.parent_comment = top_level_comment
-            reply.save()
-
-            context = {
-                'comment': reply,
-            }
-
-            html = render_to_string(
-                'main/comment_text.html', context, request=request)
-            return HttpResponse(html)
+        pid = piece.id
+        summaries[pid] = {
+            'conv_count': len(conv_set_by_piece.get(pid, set())),
+            'unread_count': unread_counts.get(pid, 0),
+            'last': last_comment_by_piece.get(pid),  # may be None
+        }
 
     context = {
         'pieces': my_pieces,
-        'conversations': conversations_dict,
-        'likes_dict': likes_dict
+        'summaries': summaries,
+        'likes_dict': dict(likes_by_piece),
     }
-
     return render(request, 'main/my_shared_art.html', context)
 
 
