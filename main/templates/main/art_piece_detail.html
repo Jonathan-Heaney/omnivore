@@ -57,7 +57,9 @@
           {% endfor %}
         </div>
 
-        {% include "main/comment_form.html" with reply_recipient=piece.user.first_name piece=piece post_url=request.path target_id=tgt_id %}
+        <div id="reply">
+          {% include "main/comment_form.html" with reply_recipient=piece.user.first_name piece=piece post_url=request.path target_id=tgt_id autofocus=1 %}
+        </div>
       {% endwith %}
     {% endwith %}
   </div>
@@ -67,14 +69,13 @@
 {% elif mode == "owner" %}
   {% if conversations %}
     <div class="comments-section">
-      {% for recipient, conversation in conversations.items %}
+      {# conversations is now a list of (recipient, conversation) tuples, ordered by latest activity #}
+      {% for recipient, conversation in conversations %}
         <div class="card">
           <div class="card-header conversation-header d-flex align-items-center justify-content-between">
             <div>
               Conversation with <strong>{{ recipient.first_name }} {{ recipient.last_name }}</strong>
             </div>
-
-            {# toggle button ids: toggle-button-<piece.id>-<recipient.id> #}
             {% with pid=piece.id|stringformat:"s" rid=recipient.id|stringformat:"s" %}
               <button
                 class="toggle-comment-btn"
@@ -87,10 +88,8 @@
               </button>
             {% endwith %}
           </div>
-        
 
           <div class="conversation">
-            {# comments container id: comments-<piece.id>-<recipient.id>-container #}
             {% with pid=piece.id|stringformat:"s" rid=recipient.id|stringformat:"s" %}
               {% with tgt_id="comments-"|add:pid|add:"-"|add:rid|add:"-container" %}
                 <div id="{{ tgt_id }}">
@@ -99,16 +98,15 @@
                   {% endfor %}
                 </div>
 
-                {# reply form targets this page and appends into this thread #}
                 {% include "main/reply_form.html" with reply_recipient=recipient.first_name top_level_comment=conversation.0 piece=piece recipient=recipient post_url=request.path target_id=tgt_id %}
-                {% endwith %}
+              {% endwith %}
             {% endwith %}
           </div>
         </div>
-      </div>  
       {% endfor %}
-      {% endif %}
-      {% endif %}
+    </div>
+  {% endif %}
+{% endif %}
 </div>
 
 {% endblock %}

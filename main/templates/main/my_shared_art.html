@@ -13,7 +13,7 @@
 <h1 class="header">My Shared Art</h1>
 
 {% for piece in pieces %}
-<div id="art-{{ piece.public_id }}" class="card mt-2 art-piece">
+<div id="art-{{ piece.public_id }}" class="card art-piece mb-4">
     <div class="card-header"><strong>
       <a href="{% url 'art_detail' piece.public_id %}">
         <span class="card-title">{{ piece.piece_name }}</span>
@@ -45,30 +45,43 @@
     {% endwith %}
 
 
-    {% with piece_conversations=conversations|dict_get:piece %}
-      {% if piece_conversations %}     
-        <div class="comments-section">
-          {% for recipient, conversation in piece_conversations.items %}
-              <div class='conversation-header'>
-                <button class='toggle-comment-btn' id="toggle-button-{{ piece.id}}-{{recipient.id}}" onclick="toggleComments({{ piece.id}}, {{recipient.id }})"><i class="fa-solid fa-minus"></i></button>
-                Conversation with <strong>{{ recipient.first_name }} {{ recipient.last_name }}</strong>
+    {# --- conversation summary (clean layout + clear CTA) --- #}
+    {% with s=summaries|dict_get:piece.id %}
+      <div class="piece-summary">
+        <div class="row align-items-center gy-2">
+          <div class="col-12 col-md">
+            <div class="summary-line">
+              <span class="summary-label">Conversations</span>
+              <span class="summary-value">{{ s.conv_count }}</span>
+
+              {% if s.unread_count %}
+                <span class="badge summary-badge" aria-label="{{ s.unread_count }} new conversations">
+                  {{ s.unread_count }} new
+                </span>
+              {% endif %}
+            </div>
+
+            {% if s.last %}
+              <div class="last-message text-muted">
+                <span class="last-label">Last message</span>
+                <span class="last-text">
+                  <strong>{{ s.last.sender.first_name }} {{ s.last.sender.last_name }}</strong> —
+                  {{ s.last.text|truncatechars:120 }}
+                </span>
               </div>
-              <div class="conversation">
-                <div id="comments-{{ piece.id }}-{{ recipient.id }}-container">
-                  {% for comment in conversation %}
-                      {% include 'main/comment_text.html' with comment=comment %}
-                  {% endfor %}
-                </div>
-                <div class="reply-form">
-                  {% include 'main/reply_form.html' with reply_recipient=recipient.first_name top_level_comment=conversation.0 %}
-                </div>
-                {% comment %} {% if not forloop.last %}
-                  <hr class='divider'>
-                {% endif %} {% endcomment %}
-              </div>
-          {% endfor %}
+            {% endif %}
+          </div>
+
+          <div class="col-12 col-md-auto">
+            <a href="{% url 'art_detail' piece.public_id %}"
+              class="btn btn-cta btn-sm"
+              aria-label="View conversations for {{ piece.piece_name }}">
+              <i class="fa-regular fa-comments me-1"></i>
+              View conversations
+            </a>
+          </div>
         </div>
-      {% endif %}
+      </div>
     {% endwith %}
   
     

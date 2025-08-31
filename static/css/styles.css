@@ -207,6 +207,89 @@ a {
   }
 }
 
+/* My Shared Art changes */
+/* Card polish */
+.art-piece.card {
+  border: 1px solid #e9ecef;
+  border-radius: 14px;
+  overflow: hidden; /* keep rounded corners crisp */
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+}
+
+.art-piece .card-header {
+  padding: 0.85rem 1rem;
+  background: #f8f9fa;
+}
+
+/* Conversation summary strip */
+.piece-summary {
+  border-top: 1px solid #eef0f2;
+  background: #fbfcfd;
+  padding: 0.9rem 1rem;
+}
+
+.summary-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.summary-label {
+  color: #6c757d;
+}
+
+.summary-value {
+  font-weight: 600;
+}
+
+.summary-badge {
+  background: #fff3cd; /* soft warning */
+  color: #7a5a00;
+  border: 1px solid #ffe69c;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.last-message {
+  margin-top: 0.35rem;
+  font-size: 0.92rem;
+}
+
+.last-label {
+  color: #6c757d;
+  margin-right: 0.35rem;
+}
+
+/* CTA button: high contrast, subtle elevation */
+.btn-cta {
+  background: #0d6efd; /* Bootstrap primary */
+  color: #fff !important;
+  border: 1px solid #0b5ed7;
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  box-shadow: 0 4px 10px rgba(13, 110, 253, 0.15);
+}
+
+.btn-cta:hover,
+.btn-cta:focus {
+  background: #0b5ed7;
+  border-color: #0a58ca;
+  transform: translateY(-1px);
+}
+
+.btn-cta:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(13, 110, 253, 0.2);
+}
+
+/* Tighten card body spacing a bit for compact stacks */
+.art-piece .card-body {
+  padding: 1rem;
+}
+
 /* Respect users who prefer reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .badge-new,
