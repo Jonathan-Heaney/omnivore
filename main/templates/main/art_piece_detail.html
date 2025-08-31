@@ -57,7 +57,9 @@
           {% endfor %}
         </div>
 
-        {% include "main/comment_form.html" with reply_recipient=piece.user.first_name piece=piece post_url=request.path target_id=tgt_id %}
+        <div id="reply">
+          {% include "main/comment_form.html" with reply_recipient=piece.user.first_name piece=piece post_url=request.path target_id=tgt_id autofocus=1 %}
+        </div>
       {% endwith %}
     {% endwith %}
   </div>
@@ -95,12 +97,12 @@
               {% with tgt_id="comments-"|add:pid|add:"-"|add:rid|add:"-container" %}
                 <div id="{{ tgt_id }}">
                   {% for comment in conversation %}
-                    {% include 'main/comment_text.html' with comment=comment %}
+                      {% include 'main/comment_text.html' with comment=comment %} 
                   {% endfor %}
                 </div>
 
                 {# reply form targets this page and appends into this thread #}
-                {% include "main/reply_form.html" with reply_recipient=recipient.first_name top_level_comment=conversation.0 piece=piece recipient=recipient post_url=request.path target_id=tgt_id %}
+                  {% include "main/reply_form.html" with reply_recipient=recipient.first_name top_level_comment=conversation.0 piece=piece recipient=recipient post_url=request.path target_id=tgt_id %}
                 {% endwith %}
             {% endwith %}
           </div>

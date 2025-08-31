@@ -193,3 +193,23 @@ document.body.addEventListener('htmx:afterSwap', (e) => {
     'input.js-password[type="text"]',
   ]);
 });
+
+(function () {
+  function focusReply() {
+    if (location.hash !== '#reply') return;
+    // Try immediately
+    let el = document.querySelector('#reply textarea, #comment-textarea');
+    if (el) {
+      el.focus();
+      return;
+    }
+    // Try again after layout settles
+    setTimeout(() => {
+      el = document.querySelector('#reply textarea, #comment-textarea');
+      if (el) el.focus();
+    }, 50);
+  }
+
+  document.addEventListener('DOMContentLoaded', focusReply);
+  window.addEventListener('pageshow', focusReply); // handles back/forward bfcache
+})();

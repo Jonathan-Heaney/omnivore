@@ -59,15 +59,41 @@
       {% include 'main/heart_button.html' with piece=piece %}
     </div>
 
-    <div class="received-comments-section">
-      <div id="comments-{{ piece.id }}-container">
-        {% for comment in comments %}
-          {% if comment.art_piece == piece %}
-            {% include 'main/comment_text.html' %}
-          {% endif %}
-        {% endfor %}
-      </div>
-      {% include 'main/comment_form.html' with reply_recipient=piece.user.first_name piece=piece %}
+    <div class="conversation-preview piece-summary">
+      {% with pv=previews|dict_get:piece.id %}
+        {% if pv.thread_exists %}
+          <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <div class="text-muted">
+              <span class="me-2">Last message:</span>
+              {% with m=pv.last %}
+                <strong>{{ m.sender.first_name }} {{ m.sender.last_name }}</strong>
+                — {{ m.text|truncatechars:120 }}
+              {% endwith %}
+              {% if pv.unread_count %}
+                <span class="badge summary-badge ms-2" aria-label="{{ pv.unread_count }} unread">
+                  {{ pv.unread_count }} unread
+                </span>
+              {% endif %}
+            </div>
+            <a href="{% url 'art_detail' piece.public_id %}"
+              class="btn btn-cta btn-sm"
+              aria-label="Open conversation for {{ piece.piece_name }}">
+              <i class="fa-regular fa-comments me-1"></i>
+              Open conversation
+            </a>
+          </div>
+        {% else %}
+          <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <div class="text-muted">No messages yet.</div>
+            <a href="{% url 'art_detail' piece.public_id %}#reply"
+              class="btn btn-cta btn-sm"
+              aria-label="Start a conversation about {{ piece.piece_name }}">
+              <i class="fa-regular fa-paper-plane me-1"></i>
+              Start a conversation
+            </a>
+          </div>
+        {% endif %}
+      {% endwith %}
     </div>
   </div>
   {% endwith %}

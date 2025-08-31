@@ -291,58 +291,84 @@ def my_received_art(request):
         .order_by('-sent_time')
     )
 
+    # Preserve old behavior: mark a specific notification as read if ?n=...
     n_id = request.GET.get("n")
     if n_id:
         Notification.objects.filter(
             id=n_id, recipient=request.user, is_read=False
         ).update(is_read=True)
 
+    # All pieces user has received
     pieces = [sap.art_piece for sap in received_qs]
-    comments = Comment.objects.filter(art_piece__in=pieces, sender=user) | Comment.objects.filter(
-        art_piece__in=pieces, recipient=user)
+    piece_ids = [p.id for p in pieces]
+    sharer_ids_by_piece = {p.id: p.user_id for p in pieces}
 
-    # Fetch liked pieces by the current user
-    liked_pieces = set(Like.objects.filter(
-        user=user).values_list('art_piece_id', flat=True))
+    # 1:1 comments between user and the sharer for all received pieces (bulk)
+    thread_qs = (
+        Comment.objects
+        .filter(art_piece_id__in=piece_ids)
+        .filter(
+            Q(sender=user, recipient_id__in=[
+              sharer_ids_by_piece[c.art_piece_id] for c in []])  # placeholder, see below
+        )
+    )
+    # ^^ The placeholder above isn't valid. Replace with the explicit ORs using the piece ↔ sharer mapping:
+    thread_qs = (
+        Comment.objects
+        .filter(art_piece_id__in=piece_ids)
+        .filter(
+            Q(sender=user, recipient__in=[p.user_id for p in pieces]) |
+            Q(recipient=user, sender__in=[p.user_id for p in pieces])
+        )
+        .select_related("sender", "recipient", "art_piece")
+        .order_by("created_at")
+    )
 
-    if 'hx-request' in request.headers:
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            art_piece_id = request.POST.get('art_piece_id')
-            piece = get_object_or_404(ArtPiece, id=art_piece_id)
+    # Group comments by art_piece_id (only user↔sharer)
+    threads_by_piece: dict[int, list[Comment]] = defaultdict(list)
+    for c in thread_qs:
+        sharer_id = sharer_ids_by_piece.get(c.art_piece_id)
+        if sharer_id is None:
+            continue
+        # Keep only true 1:1 with the sharer
+        if {c.sender_id, c.recipient_id} == {user.id, sharer_id}:
+            threads_by_piece[c.art_piece_id].append(c)
 
-            # Guard: ensure this viewer actually received this piece
-            if not SentArtPiece.objects.filter(user=request.user, art_piece=piece).exists():
-                return JsonResponse({"ok": False, "error": "Not allowed"}, status=403)
+    # Optional: unread comment count per piece
+    unread_by_piece = dict(
+        Notification.objects
+        .filter(
+            recipient=user,
+            is_read=False,
+            notification_type="comment",
+            art_piece_id__in=piece_ids,
+        )
+        .values_list("art_piece_id")
+        .annotate(cnt=Count("id"))
+        .values_list("art_piece_id", "cnt")
+    )
 
-            # Coalesce into existing top-level if present
-            top = (Comment.objects
-                   .filter(
-                       art_piece=piece,
-                       sender=request.user,
-                       recipient=piece.user,
-                       parent_comment__isnull=True,
-                   )
-                   .first())
+    # Build previews
+    previews = {}
+    for p in pieces:
+        t = threads_by_piece.get(p.id, [])
+        previews[p.id] = {
+            "thread_exists": bool(t),
+            "last": t[-1] if t else None,
+            "unread_count": unread_by_piece.get(p.id, 0),
+        }
 
-            c = form.save(commit=False)
-            c.sender = request.user
-            c.recipient = piece.user
-            c.art_piece = piece
-            if top:
-                c.parent_comment = top
-            c.save()
-
-            html = render_to_string(
-                'main/comment_text.html', {'comment': c}, request=request)
-            return HttpResponse(html)
+    # Likes (unchanged)
+    liked_pieces = set(
+        Like.objects.filter(user=user, art_piece_id__in=piece_ids)
+        .values_list('art_piece_id', flat=True)
+    )
 
     context = {
-        'received_pieces': received_qs,
-        'comments': comments,
-        'liked_pieces': liked_pieces
+        'received_pieces': received_qs,   # keep SentArtPiece rows for "New" badge
+        'previews': previews,
+        'liked_pieces': liked_pieces,
     }
-
     return render(request, 'main/my_received_art.html', context)
 
 
