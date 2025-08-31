@@ -478,27 +478,41 @@ def art_piece_detail(request, public_id):
         # If we got here, the POST shape didn't match what we expect
         return JsonResponse({"ok": False, "error": "Unsupported operation"}, status=400)
 
-    # --- GET rendering ---
+   # --- GET rendering ---
     if is_owner:
         qs = (
             Comment.objects
             .filter(art_piece=piece)
             .filter(Q(sender=user) | Q(recipient=user))
             .select_related("sender", "recipient")
+            # keep messages chronological inside each thread
             .order_by("created_at")
         )
-        # Group by the other participant
-        conversations = defaultdict(list)
+
+        conversations = defaultdict(list)  # {other_user: [comments...]}
+        last_ts = {}                       # {other_user: latest_created_at}
+
         for c in qs:
             other = c.recipient if c.sender_id == user.id else c.sender
+            # messages already oldest→newest
             conversations[other].append(c)
+            # ends up as the thread's latest ts
+            last_ts[other] = c.created_at
+
+        # Order threads by most-recent activity DESC
+        # conversations_list: list of (recipient_user, [comments...]) tuples
+        conversations_list = sorted(
+            conversations.items(),
+            key=lambda kv: last_ts[kv[0]],
+            reverse=True,
+        )
 
         context = {
             "piece": piece,
             "mode": "owner",
-            "conversations": dict(conversations),
+            "conversations": conversations_list,  # NOTE: now a list, not a dict
             "is_liked": False,
-            'likes_dict': likes_dict
+            "likes_dict": likes_dict,
         }
         return render(request, "main/art_piece_detail.html", context)
 
