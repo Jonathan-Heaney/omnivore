@@ -13,11 +13,10 @@
   <div class="row align-items-center g-5">
     <div class="col-12 col-lg-6 text-center text-lg-start">
       <h1 class="display-5 fw-bold mb-3">
-        Discover the arts — chosen by people, not algorithms.
+        A surprise piece of art, every week.
       </h1>
       <p class="lead text-muted mb-4">
-        Omnivore is a cozy place to share and receive what moves you —
-        painting, music, film, books, and more — from people you trust.
+        Omnivore is a cozy place to discover music, poetry, film, paintings, and more—shared by real people, chosen at random, just for you.
       </p>
       <div class="d-flex flex-wrap gap-3">
         <a href="{% url 'sign_up' %}" class="btn btn-cta btn-lg px-4">Create your account</a>
@@ -28,7 +27,7 @@
     <div class="col-12 col-lg-6 text-center">
       <!-- Use your existing Oliver asset; swap path if needed -->
       <img class="oliver-hero" src="{% static 'images/oliver-no-bg.png' %}" alt="Oliver the Omnivore mascot" />
-      <div class="oliver-chip" aria-hidden="true">hi, i’m oliver 🦖</div>
+      <div class="oliver-chip" aria-hidden="true">hi, i’m oliver!</div>
     </div>
   </div>
 </section>
@@ -46,10 +45,10 @@
       <div class="pill"><span aria-hidden="true">🎬</span> Film & TV</div>
     </div>
     <div class="col-6 col-md">
-      <div class="pill"><span aria-hidden="true">📚</span> Books</div>
+      <div class="pill"><span aria-hidden="true">📚</span> Literature</div>
     </div>
     <div class="col-12 col-md">
-      <div class="pill"><span aria-hidden="true">🩰</span> Performance</div>
+      <div class="pill"><span aria-hidden="true">🩰</span> Performing Arts</div>
     </div>
   </div>
 </section>
@@ -61,7 +60,7 @@
       <div class="card step h-100">
         <div class="card-body">
           <h3 class="h5 mb-2">1) Share something you love</h3>
-          <p class="text-muted mb-0">Drop in any piece that moved you — a song, a poem, a painting, a scene.</p>
+          <p class="text-muted mb-0">Drop in any piece that moved you — a song, a poem, a painting, a show.</p>
         </div>
       </div>
     </div>
@@ -69,7 +68,7 @@
       <div class="card step h-100">
         <div class="card-body">
           <h3 class="h5 mb-2">2) Receive gifts from others</h3>
-          <p class="text-muted mb-0">Your feed is people-powered — no engagement tricks, just thoughtful picks.</p>
+          <p class="text-muted mb-0">Once a week, you receive a surprise piece of art from the community.</p>
         </div>
       </div>
     </div>
@@ -89,24 +88,37 @@
   <div class="row g-4">
     <div class="col-md-4">
       <div class="value">
-        <h4 class="h6 text-uppercase text-muted mb-2">No Doomscroll</h4>
-        <p class="mb-0">We don’t optimize for time-spent. Your attention is not the product.</p>
+        <h4 class="h6 text-uppercase text-muted mb-2">People First</h4>
+        <p class="mb-0">No algorithms, no AI, no ads. Just great art and private conversation.</p>
       </div>
     </div>
     <div class="col-md-4">
       <div class="value">
-        <h4 class="h6 text-uppercase text-muted mb-2">People > Algorithms</h4>
-        <p class="mb-0">Discovery is personal, not programmatic. Trust flows between humans.</p>
+        <h4 class="h6 text-uppercase text-muted mb-2">Gift Economy</h4>
+        <p class="mb-0">Every piece shared is a gift to the community. Your contribution matters.</p>
       </div>
     </div>
     <div class="col-md-4">
       <div class="value">
-        <h4 class="h6 text-uppercase text-muted mb-2">Small Is Good</h4>
-        <p class="mb-0">Built by a solo founder. Indie web energy. You can email the person who made it.</p>
+        <h4 class="h6 text-uppercase text-muted mb-2">Serendipity & Surprise</h4>
+        <p class="mb-0">The best discoveries are unexpected. Omnivore is designed to surprise you, not to predict you.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="value">
+        <h4 class="h6 text-uppercase text-muted mb-2">Broad Horizons</h4>
+        <p class="mb-0">From music to poetry, painting to film—Omnivore is for <em>all the arts</em>. Expand your taste, deepen your curiosity.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="value">
+        <h4 class="h6 text-uppercase text-muted mb-2">Connection Through Art</h4>
+        <p class="mb-0">Every piece is an invitation. Share thoughts, start conversations, build relationships around the arts you love.</p>
       </div>
     </div>
   </div>
 </section>
+
 
 <!-- CTA FOOTER -->
 <section class="container py-5 text-center">
@@ -115,6 +127,20 @@
   <p class="text-muted mt-3 small">
     Already have an account? <a href="{% url 'login' %}">Log in</a>.
   </p>
+</section>
+
+<!-- ABOUT / FOUNDER NOTE -->
+<section class="container py-5 about-founder text-center">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <p class="text-muted mb-4">
+        I’m Jonathan — a pianist and solo developer, building Omnivore as an independent project.
+        The goal is simple: help people share what they love and have meaningful conversations about art.
+        If you have questions or ideas, I’d love to hear from you.
+      </p>
+      <a href="mailto:hello@omnivorearts.com" class="btn btn-outline-secondary btn-sm">Email Jonathan</a>
+    </div>
+  </div>
 </section>
 
 {% endblock %}
