@@ -258,3 +258,123 @@ select:focus {
 .likes-container {
   padding: var(--s0) 0;
 }
+
+/* --- Likes inline --- */
+.likes-inline {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.likes-heart {
+  font-size: 0.95rem;
+  line-height: 1;
+  transform: translateY(1px);
+}
+
+.likes-names {
+  color: var(--text);
+}
+
+.link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--brand);
+  text-decoration: underline;
+  cursor: pointer;
+  font: inherit;
+}
+.link-button:hover {
+  text-decoration: none;
+}
+
+/* --- Modal shell --- */
+.likes-modal {
+  position: fixed;
+  inset: 0;
+  display: none; /* toggled to block via JS */
+  z-index: 1050;
+}
+
+.likes-modal.is-open {
+  display: block;
+}
+
+.likes-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5); /* slate-900 @ 50% */
+  backdrop-filter: saturate(110%) blur(2px);
+}
+
+.likes-modal__dialog {
+  position: relative;
+  max-width: 520px;
+  width: calc(100% - 2rem);
+  margin: 7vh auto 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-2);
+  outline: none;
+}
+
+/* Header */
+.likes-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s1);
+  padding: var(--s2) var(--s3);
+  border-bottom: 1px solid var(--border);
+}
+.likes-modal__title {
+  margin: 0;
+  font-size: var(--fs-lg);
+  font-weight: 700;
+}
+.likes-modal__close {
+  border: 0;
+  background: none;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+}
+.likes-modal__close:hover {
+  color: var(--text);
+}
+
+/* Body */
+.likes-modal__body {
+  padding: var(--s2) var(--s3) var(--s3);
+  max-height: min(60vh, 520px);
+  overflow: auto;
+}
+
+/* List */
+.likes-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.likes-list__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--border);
+}
+.likes-list__item:last-child {
+  border-bottom: 0;
+}
+.likes-list__icon {
+  width: 1.1rem;
+  text-align: center;
+}
+.likes-list__name {
+  font-weight: 500;
+}
