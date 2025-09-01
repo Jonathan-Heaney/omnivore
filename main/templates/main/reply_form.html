@@ -11,14 +11,21 @@
   {% csrf_token %}
   <input type="hidden" name="art_piece_id" value="{{ piece.id }}">
   <input type="hidden" name="top_level_comment_id" value="{{ top_level_comment.id }}">
-  <div class="input-group">
-      <textarea name="text" rows="1" class="form-control replyTextArea"
-                placeholder="Reply to {{ reply_recipient }}..." required></textarea>
-      <button type="submit" class="sendButton">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" />
-          </svg>
-      </button>
+
+  <div class="input-group comment-input">
+    <label class="visually-hidden" for="rf-text-{{ pid }}-{{ rid }}">Reply</label>
+    <textarea id="rf-text-{{ pid }}-{{ rid }}"
+              name="text"
+              rows="1"
+              class="form-control replyTextArea input-pill"
+              placeholder="Reply to {{ reply_recipient }}..."
+              required></textarea>
+
+    <button type="submit" class="sendButton icon-btn" aria-label="Send reply">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" />
+      </svg>
+    </button>
   </div>
 </form>
   {% endwith %}

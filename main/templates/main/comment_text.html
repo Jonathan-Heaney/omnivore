@@ -1,3 +1,10 @@
-<div class="comment">
-    <p><strong>{{ comment.sender.first_name }} {{ comment.sender.last_name }}</strong>: {{ comment.text|linebreaksbr }}</p>
+<div class="comment-item">
+  <p class="comment-meta">
+    <strong>{{ comment.sender.first_name }} {{ comment.sender.last_name }}</strong>
+    <span class="comment-dot">•</span>
+    <span class="text-muted">{{ comment.created_at|date:"M j, g:i a" }}</span>
+  </p>
+  <div class="comment-bubble prose-comment">
+    {{ comment.text|linebreaksbr }}
+  </div>
 </div>
