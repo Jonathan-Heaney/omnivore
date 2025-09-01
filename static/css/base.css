@@ -26,9 +26,11 @@
   --s5: 48px;
 
   /* typography */
-  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
-    Inter, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji',
-    'Segoe UI Emoji', 'Segoe UI Symbol';
+  --font-sans: 'Noto Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    Roboto, Inter, 'Helvetica Neue', Arial, 'Apple Color Emoji',
+    'Segoe UI Emoji';
+  --font-brand: 'Madimi One', var(--font-sans);
+
   --fs-xxl: clamp(28px, 5vw, 44px);
   --fs-xl: clamp(22px, 3.5vw, 28px);
   --fs-lg: 20px;
@@ -36,10 +38,10 @@
   --fs-sm: 14px;
 
   --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-2: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-2: 0 8px 30px rgba(0, 0, 0, 0.08);
 }
 
-/* modern, gentle reset */
+/* -------- Reset / Base -------- */
 * {
   box-sizing: border-box;
 }
@@ -53,6 +55,7 @@ body {
   background: var(--bg);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 a {
   color: var(--brand);
@@ -61,9 +64,153 @@ a {
 a:hover {
   text-decoration: underline;
 }
+
 hr {
   border: 0;
   height: 1px;
   background: var(--border);
   margin: var(--s4) 0;
+}
+
+/* Layout shell */
+.site {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+  backdrop-filter: saturate(180%) blur(6px);
+  background: rgba(255, 255, 255, 0.85);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+.site-main {
+  flex: 1 1 auto;
+}
+
+/* -------- Navbar (clean, light) -------- */
+.site-nav {
+  padding: 0.4rem 0;
+}
+.site-nav .navbar-brand {
+  font-family: var(--font-brand);
+  font-size: 1.25rem;
+  letter-spacing: 0.2px;
+  color: var(--text);
+}
+.site-nav .brand-text {
+  margin-top: 2px;
+} /* optical align with logo */
+
+.navbar-oliver {
+  height: 28px;
+  width: auto;
+}
+
+.site-nav .nav-link {
+  color: #263238;
+  font-weight: 600;
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  transition: background 0.15s ease, color 0.15s ease;
+  text-underline-offset: 3px;
+}
+.site-nav .nav-link:hover {
+  background: rgba(30, 90, 150, 0.06);
+  text-decoration: none;
+}
+.site-nav .dropdown-menu {
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-2);
+}
+.site-nav .dropdown-item {
+  font-weight: 500;
+  padding: 0.55rem 0.85rem;
+}
+
+/* CTA */
+.btn-cta {
+  background: #0d6efd;
+  color: #fff !important;
+  border: 1px solid #0b5ed7;
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  box-shadow: 0 4px 10px rgba(13, 110, 253, 0.15);
+}
+.btn-cta:hover,
+.btn-cta:focus {
+  background: #0b5ed7;
+  border-color: #0a58ca;
+  transform: translateY(-1px);
+}
+.btn-cta:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(13, 110, 253, 0.2);
+}
+
+/* Notifications bell */
+#notification-link {
+  position: relative;
+}
+#notification-link.has-unread {
+  color: #dc3545;
+}
+#notification-link .notif-dot {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 8px;
+  height: 8px;
+  background: #dc3545;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px #fff;
+}
+
+/* Mobile tweaks */
+@media (max-width: 991.98px) {
+  .navbar-nav .nav-item {
+    text-align: center;
+  }
+}
+
+/* -------- Footer -------- */
+.site-footer {
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  background: #f9fafb;
+}
+.site-footer .footer-brand {
+  font-family: var(--font-brand);
+  font-size: 1.05rem;
+}
+.site-footer .footer-link {
+  font-weight: 600;
+  color: var(--brand);
+}
+.site-footer .footer-link:hover {
+  text-decoration: underline;
+}
+
+/* -------- Utilities you’ll feel everywhere -------- */
+.text-muted {
+  color: var(--muted) !important;
+}
+.rounded-2xl {
+  border-radius: 20px;
+}
+.shadow-1 {
+  box-shadow: var(--shadow-1);
+}
+.shadow-2 {
+  box-shadow: var(--shadow-2);
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
 }

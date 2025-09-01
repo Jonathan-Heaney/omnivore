@@ -2,56 +2,56 @@
 {% load static %}
 {% load humanize %}
 
-{% block title %} Notifications {% endblock %}
-{% block css_files %}
-  <link rel="stylesheet" href="{% static "css/styles.css" %}">
-{% endblock %}
+{% block title %}Notifications · Omnivore{% endblock %}
 
 {% block content %}
-<h1 class="header">Your Notifications</h1>
+<section class="container py-4">
+  <h1 class="page-title mb-4">Notifications</h1>
 
-{% if unread_notifications %}
-    <div class="unread-container">
-      <h4 class="notification-section-heading">Unread</h4>
-      <form action="{% url 'mark_all_notifications_read' %}" method="post" class="mb-3">
-    {% csrf_token %}
-      <button type="submit" class="mark-read-btn">
-      Mark all as read
-      </button>
-    </form>
-  </div>
-    <ul class="notification-list">
+  {% if unread_notifications %}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="h6 text-uppercase text-muted mb-0">Unread</h2>
+      <form action="{% url 'mark_all_notifications_read' %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-secondary btn-sm">
+          Mark all as read
+        </button>
+      </form>
+    </div>
+
+    <ul class="list-unstyled mb-5">
       {% for notification in unread_notifications %}
-        <li class="notification-item unread">
-          <a href="{% url 'notification_redirect' notification.id %}" class="notification-link">
-            <div class="notification-content">
-              <span><span class="blue-dot" aria-label="Unread notification">🔵</span> {{ notification.message }}</span>
-              <span class="notification-timestamp">{{ notification.timestamp|naturaltime }}</span>
+        <li class="notification-card unread mb-3">
+          <a href="{% url 'notification_redirect' notification.id %}" class="stretched-link"></a>
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <span class="blue-dot" aria-hidden="true">🔵</span>
+              {{ notification.message }}
             </div>
-          </a>
+            <span class="timestamp text-muted">{{ notification.timestamp|naturaltime }}</span>
+          </div>
         </li>
       {% endfor %}
     </ul>
   {% endif %}
 
   {% if read_notifications %}
-    <h4 class="notification-section-heading">Earlier</h4>
-    <ul class="notification-list">
+    <h2 class="h6 text-uppercase text-muted mb-3">Earlier</h2>
+    <ul class="list-unstyled">
       {% for notification in read_notifications %}
-        <li class="notification-item read">
-          <a href="{% url 'notification_redirect' notification.id %}" class="notification-link">
-            <div class="notification-content">
-              <span>{{ notification.message }}</span>
-              <span class="notification-timestamp">{{ notification.timestamp|naturaltime }}</span>
-            </div>
-          </a>
+        <li class="notification-card read mb-2">
+          <a href="{% url 'notification_redirect' notification.id %}" class="stretched-link"></a>
+          <div class="d-flex justify-content-between align-items-center">
+            <div>{{ notification.message }}</div>
+            <span class="timestamp text-muted">{{ notification.timestamp|naturaltime }}</span>
+          </div>
         </li>
       {% endfor %}
     </ul>
   {% endif %}
 
   {% if not unread_notifications and not read_notifications %}
-    <p>No notifications yet.</p>
+    <p class="text-muted">No notifications yet.</p>
   {% endif %}
-
+</section>
 {% endblock %}
