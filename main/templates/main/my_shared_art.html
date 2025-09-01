@@ -2,92 +2,93 @@
 {% load static %}
 {% load custom_filters %}
 
+{% block title %}My Shared Art{% endblock %}
 
-{% block title %} My Shared Art {% endblock %}
 {% block css_files %}
-  <link rel="stylesheet" href="{% static "css/styles.css" %}">
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/pages/my_shared.css' %}">
 {% endblock %}
 
 {% block content %}
 
-<h1 class="header">My Shared Art</h1>
+<h1 class="page-title">My Shared Art</h1>
 
 {% for piece in pieces %}
-<div id="art-{{ piece.public_id }}" class="card art-piece mb-4">
-    <div class="card-header"><strong>
-      <a href="{% url 'art_detail' piece.public_id %}">
-        <span class="card-title">{{ piece.piece_name }}</span>
+  <section id="art-{{ piece.public_id }}" class="shared-card">
+    <header class="shared-card__header">
+      <a class="shared-card__title" href="{% url 'art_detail' piece.public_id %}">
+        <strong>{{ piece.piece_name }}</strong>
       </a>
-        </strong>({{piece.artist_name}})</div>
-    <div class="card-body">
-      <div>
-        <p>{{piece.piece_description|linebreaksbr}}</p>
-      </div>
-      <div class="art-buttons">
+      <span class="shared-card__by">({{ piece.artist_name }})</span>
+    </header>
+
+    <div class="shared-card__body">
+      <p class="shared-card__description">{{ piece.piece_description|linebreaksbr }}</p>
+
+      <div class="shared-card__actions">
         <a href="{% url 'edit_art_piece' piece.public_id %}" class="btn btn-primary edit-btn" id="edit-btn">Edit</a>
+
         <form method="post" action="{% url 'delete_art_piece' piece.public_id %}" onsubmit="return confirmDelete();">
           {% csrf_token %}
           <button type="submit" class="btn btn-danger">Delete</button>
-      </form>
+        </form>
+
+        {% if piece.link %}
+          <a class="btn btn-outline-secondary" href="{{ piece.link }}" target="_blank" rel="noopener">Source</a>
+        {% endif %}
       </div>
-      {% if piece.link %}
-        <a class="btn btn-sm btn-outline-secondary ms-2" href="{{ piece.link }}" target="_blank" rel="noopener">Source</a>
-      {% endif %}
     </div>
-    <div class="card-footer text-muted">Shared {{piece.created_at|date:"F j, Y" }}</div>
+
+    <footer class="shared-card__meta">
+      Shared {{ piece.created_at|date:"F j, Y" }}
+    </footer>
 
     {% with users=likes_dict|dict_get:piece %}
-        {% if users %}
-          <div class="likes-container" id="likes-{{ piece.id }}-container">
-            {% include 'main/likes_display.html' with piece=piece likes_dict=likes_dict %}
-          </div>
-        {% endif %}
+      {% if users %}
+        <div class="likes-container" id="likes-{{ piece.id }}-container">
+          {% include 'main/likes_display.html' with piece=piece likes_dict=likes_dict %}
+        </div>
+      {% endif %}
     {% endwith %}
 
-
-    {# --- conversation summary (clean layout + clear CTA) --- #}
+    {# --- Conversation summary strip --- #}
     {% with s=summaries|dict_get:piece.id %}
-      <div class="piece-summary">
-        <div class="row align-items-center gy-2">
-          <div class="col-12 col-md">
-            <div class="summary-line">
-              <span class="summary-label">Conversations</span>
-              <span class="summary-value">{{ s.conv_count }}</span>
-
-              {% if s.unread_count %}
-                <span class="badge summary-badge" aria-label="{{ s.unread_count }} new conversations">
-                  {{ s.unread_count }} new
-                </span>
-              {% endif %}
-            </div>
-
-            {% if s.last %}
-              <div class="last-message text-muted">
-                <span class="last-label">Last message</span>
-                <span class="last-text">
-                  <strong>{{ s.last.sender.first_name }} {{ s.last.sender.last_name }}</strong> —
-                  {{ s.last.text|truncatechars:120 }}
-                </span>
-              </div>
+      <div class="summary">
+        <div class="summary__left">
+          <div class="summary__line">
+            <span class="summary__label">Conversations</span>
+            <span class="summary__value">{{ s.conv_count }}</span>
+            {% if s.unread_count %}
+              <span class="badge summary__badge" aria-label="{{ s.unread_count }} new conversations">
+                {{ s.unread_count }} new
+              </span>
             {% endif %}
           </div>
 
-          <div class="col-12 col-md-auto">
-            <a href="{% url 'art_detail' piece.public_id %}"
-              class="btn btn-cta btn-sm"
-              aria-label="View conversations for {{ piece.piece_name }}">
-              <i class="fa-regular fa-comments me-1"></i>
-              View conversations
-            </a>
-          </div>
+          {% if s.last %}
+            <div class="summary__last text-muted">
+              <span class="summary__last-label">Last message</span>
+              <span class="summary__last-text">
+                <strong>{{ s.last.sender.first_name }} {{ s.last.sender.last_name }}</strong> —
+                {{ s.last.text|truncatechars:120 }}
+              </span>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="summary__right">
+          <a href="{% url 'art_detail' piece.public_id %}"
+             class="btn btn-cta btn-sm"
+             aria-label="View conversations for {{ piece.piece_name }}">
+            <i class="fa-regular fa-comments me-1"></i>
+            View conversations
+          </a>
         </div>
       </div>
     {% endwith %}
-  
-    
-</div>
-
-  {% empty %}
-  <p>Nothing shared yet - share something <a href="/share-art">here</a>!</p>
+  </section>
+{% empty %}
+  <p>Nothing shared yet — share something <a href="/share-art">here</a>!</p>
 {% endfor %}
+
 {% endblock %}

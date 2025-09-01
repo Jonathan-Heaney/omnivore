@@ -1,0 +1,140 @@
+/* Page: My Shared Art
+   Clean, readable cards + a tidy summary strip
+*/
+
+.page-title {
+  margin: 1.25rem 0 0.5rem;
+  font-weight: 700;
+}
+
+/* Card */
+.shared-card {
+  border: 1px solid #e9ecef;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+}
+
+.shared-card__header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  padding: 0.85rem 1rem;
+  background: #f8f9fa;
+  border-bottom: 1px solid #eef0f2;
+}
+.shared-card__title {
+  color: inherit;
+}
+.shared-card__title:hover {
+  text-decoration: underline;
+}
+.shared-card__by {
+  color: #6c757d;
+}
+
+.shared-card__body {
+  padding: 1rem;
+  display: grid;
+  gap: 0.75rem;
+}
+.shared-card__description {
+  margin: 0;
+}
+
+.shared-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.shared-card__meta {
+  padding: 0.75rem 1rem;
+  color: #6c757d;
+  border-top: 1px solid #eef0f2;
+  background: #fbfcfd;
+}
+
+/* Likes (reuse your existing include; just spacing here) */
+.likes-container {
+  padding: 0.5rem 1rem 0.75rem;
+}
+
+/* Summary strip */
+.summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  border-top: 1px solid #eef0f2;
+  background: #fbfcfd;
+  padding: 0.9rem 1rem;
+}
+
+.summary__left {
+  min-width: 0;
+}
+
+.summary__line {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.summary__label {
+  color: #6c757d;
+}
+.summary__value {
+  font-weight: 600;
+}
+.summary__badge {
+  background: #fff3cd;
+  color: #7a5a00;
+  border: 1px solid #ffe69c;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.summary__last {
+  margin-top: 0.35rem;
+  font-size: 0.92rem;
+  color: #6c757d;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.summary__last-label {
+  margin-right: 0.35rem;
+  color: #6c757d;
+}
+.summary__last-text {
+  color: inherit;
+}
+
+.summary__right {
+  flex: 0 0 auto;
+}
+
+/* Button sizing to match the strip */
+.btn-cta.btn-sm {
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+}
+
+/* Responsive tweaks */
+@media (max-width: 575.98px) {
+  .summary {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .summary__right {
+    display: flex;
+    justify-content: flex-start;
+  }
+}
