@@ -1,20 +1,41 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static crispy_forms_tags %}
 
-{% block title %}Edit Art Piece{% endblock%}
-{% block css_files %}
-  <link rel="stylesheet" href="{% static "css/styles.css" %}">
-{% endblock %}
+{% block title %}Edit Art Piece{% endblock %}
 
-{% load crispy_forms_tags %}
+{% block content %}
+<section class="container max-w-700 py-4">
+  <header class="mb-3">
+    <h1 class="page-title">Edit your submission</h1>
+    <p class="text-muted">
+      Tweak the details below. Changes save for future recipients.
+    </p>
+  </header>
 
-{% block content %} 
+  {% if messages %}
+    <div class="mb-3">
+      {% for message in messages %}
+        <div class="alert alert-success mb-2">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
 
-<h1 class="header">Edit Art Piece</h2>
+  <div class="form-card">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {{ form|crispy }}
 
-<form method="post">
-    {% csrf_token %} {{ form|crispy }}
-    <button type="submit" class="btn btn-primary">Save Changes</button>
-</form>
+      <div class="d-flex flex-wrap gap-2 mt-3">
+        <button type="submit" class="btn btn-cta">Save changes</button>
+        {# If you have piece in context, this is a nice “back” target #}
+        {% if piece %}
+          <a href="{% url 'art_detail' piece.public_id %}" class="btn btn-outline-secondary">Cancel</a>
+        {% else %}
+          <a href="{% url 'my_shared_art' %}" class="btn btn-outline-secondary">Cancel</a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
 
+</section>
 {% endblock %}
