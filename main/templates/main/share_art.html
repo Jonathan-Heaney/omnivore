@@ -1,22 +1,35 @@
-{% extends 'base.html' %}
-{% load static %}
+={% extends 'base.html' %}
+{% load static crispy_forms_tags %}
 
-{% block title %}Share Your Art{% endblock%}
-{% block css_files %}
-  <link rel="stylesheet" href="{% static "css/styles.css" %}">
-{% endblock %}
+{% block title %}Share Your Art{% endblock %}
 
-{% load crispy_forms_tags %}
+{% block content %}
+<section class="container max-w-700 py-4">
+  <header class="mb-3">
+    <h1 class="page-title">Share a piece of art you love</h1>
+    <p class="text-muted">
+      Not sure what fits? Read the <a href="/submission-guidelines">submission guidelines</a>.
+    </p>
+  </header>
 
-{% block content %} 
+  {% if messages %}
+    <div class="mb-3">
+      {% for message in messages %}
+        <div class="alert alert-success mb-2">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
 
-<h1 class="header">Share a piece of art you love!</h1>
+  <div class="form-card">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {{ form|crispy }}
 
-<p>Unsure of what to submit? Check out our <a href="/submission-guidelines">submission guidelines</a>.</p>
-
-<form action="" method="post">
-    {% csrf_token %}{{ form|crispy }}
-    <button type="submit" class="btn btn-success">Share</button>
-</form>
-
+      <div class="d-flex gap-2 mt-3">
+        <button type="submit" class="btn btn-cta">Share</button>
+        <a href="{% url 'my_shared_art' %}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</section>
 {% endblock %}

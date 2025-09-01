@@ -378,3 +378,48 @@ select:focus {
 .likes-list__name {
   font-weight: 500;
 }
+
+/* Shared layout helpers for narrow forms */
+.max-w-700 {
+  max-width: 700px;
+}
+
+/* Page title for interior pages */
+.page-title {
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin: 0 0 var(--s1);
+}
+
+/* Card-like wrapper for forms */
+.form-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-2);
+  padding: var(--s3);
+}
+
+/* Labels / hints */
+.form-label {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.form-hint {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: var(--fs-sm);
+}
+
+/* Inputs (Bootstrap already styles, we just smooth edges) */
+.form-control {
+  border-radius: 10px;
+}
+
+/* Make alerts a bit softer */
+.alert-success {
+  background: #f0fbf4;
+  border-color: #d3f5df;
+  color: #0f5132;
+}

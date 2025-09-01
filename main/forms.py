@@ -2,6 +2,8 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm, AuthenticationForm
 from .models import ArtPiece, CustomUser, Comment
 from django.core.exceptions import ValidationError
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Field, HTML, Submit, Div
 
 
 def validate_username(value):
@@ -106,6 +108,26 @@ class ArtPieceForm(forms.ModelForm):
             "link": "Include a link to view the piece online, if applicable.",
             "piece_description": "Tell us a bit about the piece and what it means to you. Why are you sharing it? What should people know about it? "
         }
+
+        widgets = {
+            "piece_description": forms.Textarea(attrs={"rows": 6}),
+
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_tag = False  # we wrap the <form> in the template
+        self.helper.label_class = "form-label"
+        self.helper.field_class = ""
+        self.helper.form_show_labels = True
+        self.helper.layout = Layout(
+            Field("piece_name"),
+            Field("artist_name"),
+            Field("piece_description"),
+            Field("link"),
+            HTML('<p class="form-hint mt-1">Share why it matters to you—context helps!</p>')
+        )
 
 
 class CommentForm(forms.ModelForm):
