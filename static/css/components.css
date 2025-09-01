@@ -198,3 +198,63 @@ select:focus {
   min-height: 42px;
   resize: none; /* UX: grows via JS if you have autosize; otherwise stays neat */
 }
+
+/* Like button polish */
+.like-button {
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 999px;
+  padding: 6px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1;
+  box-shadow: var(--shadow-1);
+  transition: background 120ms ease, border-color 120ms ease,
+    box-shadow 120ms ease, transform 60ms ease;
+}
+
+.like-button:hover {
+  background: var(--surface);
+  border-color: #dfe3ea;
+}
+
+.like-button:active {
+  transform: translateY(0.5px);
+}
+
+.like-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(30, 90, 150, 0.14);
+  border-color: var(--brand);
+}
+
+.like-button .heart-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.like-button .heart-svg {
+  display: block;
+  /* default state inherits text color */
+  color: var(--muted);
+  fill: currentColor;
+}
+
+.like-button.liked .heart-svg {
+  color: #e11d48; /* rose-600 */
+}
+
+.like-button .heart-fallback {
+  display: none;
+} /* hide fallback when SVG present */
+.like-button.liked .like-text {
+  font-weight: 600;
+}
+
+/* Optional container spacing if you use .likes or .likes-container wrappers */
+.likes,
+.likes-container {
+  padding: var(--s0) 0;
+}

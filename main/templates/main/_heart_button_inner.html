@@ -1,0 +1,12 @@
+{# main/templates/main/_heart_button_inner.html #}
+<button
+  type="button"
+  class="like-button{% if initial_liked %} liked{% endif %}"
+  data-piece-id="{{ piece.id }}"
+  data-liked="{{ initial_liked|yesno:'true,false' }}"
+  aria-pressed="{{ initial_liked|yesno:'true,false' }}"
+  aria-label="{% if initial_liked %}Unlike{% else %}Like{% endif %} this piece"
+>
+  <span class="heart-icon" aria-hidden="true">{% if initial_liked %}❤️{% else %}♡{% endif %}</span>
+  <span class="like-text">{% if initial_liked %}Loved{% else %}Love{% endif %}</span>
+</button>
