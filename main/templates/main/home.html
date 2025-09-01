@@ -1,31 +1,120 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %} Home Page {% endblock %}
+{% block title %}Omnivore Arts · Discover the arts, from people{% endblock %}
 {% block css_files %}
-  <link rel="stylesheet" href="{% static "css/styles.css" %}">
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 {% endblock %}
 
 {% block content %}
-<h1 class="header text-center">Welcome to Omnivore Arts!</h1>
-<div class="container">
-    <div class="row home-container">
-        <div class="col-md-6 text-center oliver-container">
-            <img class="oliver img-fluid" src="{% static 'images/oliver-no-bg.png' %}" alt="Oliver the Omnivore">
-            <p class="oliver-caption">Oliver the Omnivore</p>
-        </div>
-        <div class="col-md-6 text-center">
-            <h1 class='tagline'>Share and discover art, music, and culture.</h1>
-        </div>
+
+<!-- HERO -->
+<section class="hero container py-5">
+  <div class="row align-items-center g-5">
+    <div class="col-12 col-lg-6 text-center text-lg-start">
+      <h1 class="display-5 fw-bold mb-3">
+        Discover the arts — chosen by people, not algorithms.
+      </h1>
+      <p class="lead text-muted mb-4">
+        Omnivore is a cozy place to share and receive what moves you —
+        painting, music, film, books, and more — from people you trust.
+      </p>
+      <div class="d-flex flex-wrap gap-3">
+        <a href="{% url 'sign_up' %}" class="btn btn-cta btn-lg px-4">Create your account</a>
+        <a href="#how-it-works" class="btn btn-outline-secondary btn-lg px-4">See how it works</a>
+      </div>
     </div>
-    <div class="row cta-container">
-        <div class="col-12 text-center">
-            {% if user.is_authenticated %}
-            <h4>Our first round is open for submissions - share a piece of art <a href="/share-art">here</a>!</h4>
-            {% else %}
-            <h4>Our first round is open - <a href="/sign-up">join us</a>!</h4>
-            {% endif %}
-        </div>
+
+    <div class="col-12 col-lg-6 text-center">
+      <!-- Use your existing Oliver asset; swap path if needed -->
+      <img class="oliver-hero" src="{% static 'images/oliver-no-bg.png' %}" alt="Oliver the Omnivore mascot" />
+      <div class="oliver-chip" aria-hidden="true">hi, i’m oliver 🦖</div>
     </div>
-</div>
+  </div>
+</section>
+
+<!-- “ALL THE ARTS” SIGNAL -->
+<section class="container py-4">
+  <div class="row text-center g-4">
+    <div class="col-6 col-md">
+      <div class="pill"><span aria-hidden="true">🎨</span> Painting</div>
+    </div>
+    <div class="col-6 col-md">
+      <div class="pill"><span aria-hidden="true">🎶</span> Music</div>
+    </div>
+    <div class="col-6 col-md">
+      <div class="pill"><span aria-hidden="true">🎬</span> Film & TV</div>
+    </div>
+    <div class="col-6 col-md">
+      <div class="pill"><span aria-hidden="true">📚</span> Books</div>
+    </div>
+    <div class="col-12 col-md">
+      <div class="pill"><span aria-hidden="true">🩰</span> Performance</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how-it-works" class="container py-5">
+  <div class="row g-4 align-items-stretch">
+    <div class="col-md-4">
+      <div class="card step h-100">
+        <div class="card-body">
+          <h3 class="h5 mb-2">1) Share something you love</h3>
+          <p class="text-muted mb-0">Drop in any piece that moved you — a song, a poem, a painting, a scene.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card step h-100">
+        <div class="card-body">
+          <h3 class="h5 mb-2">2) Receive gifts from others</h3>
+          <p class="text-muted mb-0">Your feed is people-powered — no engagement tricks, just thoughtful picks.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card step h-100">
+        <div class="card-body">
+          <h3 class="h5 mb-2">3) Have tiny conversations</h3>
+          <p class="text-muted mb-0">Reply privately to the person who shared it. Slow, human, and kind.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VALUES (INDIE-WEB VIBES) -->
+<section class="container py-5">
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="value">
+        <h4 class="h6 text-uppercase text-muted mb-2">No Doomscroll</h4>
+        <p class="mb-0">We don’t optimize for time-spent. Your attention is not the product.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="value">
+        <h4 class="h6 text-uppercase text-muted mb-2">People > Algorithms</h4>
+        <p class="mb-0">Discovery is personal, not programmatic. Trust flows between humans.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="value">
+        <h4 class="h6 text-uppercase text-muted mb-2">Small Is Good</h4>
+        <p class="mb-0">Built by a solo founder. Indie web energy. You can email the person who made it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FOOTER -->
+<section class="container py-5 text-center">
+  <h2 class="h3 fw-semibold mb-3">Ready to share what moves you?</h2>
+  <a href="{% url 'sign_up' %}" class="btn btn-cta btn-lg px-5">Join Omnivore</a>
+  <p class="text-muted mt-3 small">
+    Already have an account? <a href="{% url 'login' %}">Log in</a>.
+  </p>
+</section>
+
 {% endblock %}

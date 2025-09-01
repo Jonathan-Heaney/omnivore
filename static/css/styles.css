@@ -760,3 +760,97 @@ footer a:hover {
   color: #ffffffcc;
   text-decoration: underline;
 }
+
+/* Landing page (from GPT */
+
+/* ---------- Landing styles ---------- */
+:root {
+  --ink: #0f172a; /* slate-900 */
+  --subtle: #64748b; /* slate-500 */
+  --cta: #eab308; /* amber-500 (matches your golden glow vibe) */
+  --cta-ink: #1f2937; /* slate-700 for contrast */
+  --chip: #f8fafc; /* slate-50 */
+  --card: #ffffff;
+  --ring: rgba(16, 24, 40, 0.08);
+}
+
+.hero .display-5 {
+  line-height: 1.1;
+}
+.btn-cta {
+  background: var(--cta);
+  color: var(--cta-ink);
+  border: none;
+  box-shadow: 0 6px 20px -6px rgba(234, 179, 8, 0.5);
+}
+.btn-cta:hover {
+  filter: brightness(0.95);
+}
+
+.oliver-hero {
+  max-width: 360px;
+  width: 90%;
+  height: auto;
+  animation: bob 6s ease-in-out infinite;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .oliver-hero {
+    animation: none;
+  }
+}
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.oliver-chip {
+  display: inline-block;
+  margin-top: 0.75rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  background: var(--chip);
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 14px -6px var(--ring);
+}
+
+.pill {
+  display: inline-block;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  font-weight: 600;
+  background: #fff;
+  box-shadow: 0 3px 10px -6px var(--ring);
+}
+
+.step {
+  border: 1px solid #eef2f7;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px -15px var(--ring);
+}
+.step .card-body {
+  padding: 1.25rem 1.25rem;
+}
+
+.value {
+  padding: 1rem 1.25rem;
+  border-left: 3px solid var(--cta);
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px -12px var(--ring);
+}
+
+/* Subtle typography smoothing across sections */
+.hero p.lead,
+.value p,
+.step p {
+  color: var(--subtle);
+}
