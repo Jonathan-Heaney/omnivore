@@ -19,6 +19,7 @@ urlpatterns = [
     path("my-shared-art/", views.my_shared_art, name="my_shared_art"),
     path("my-received-art/", views.my_received_art, name="my_received_art"),
     path("art/<uuid:public_id>/", views.art_piece_detail, name="art_detail"),
+    path("comments/", views.comments_create, name="comments_create"),
     path('edit-art-piece/<uuid:public_id>',
          views.edit_art_piece, name='edit_art_piece'),
     path('delete-art-piece/<uuid:public_id>',

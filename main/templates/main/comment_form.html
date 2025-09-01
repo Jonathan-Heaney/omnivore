@@ -1,21 +1,21 @@
-{# Provide safe fallbacks, then use |default on variables the include may override #}
-{% url 'my_received_art' as fallback_post_url %}
+{% url 'comments_create' as create_url %}
 {% with pid=piece.id|stringformat:"s" %}
   {% with fallback_target_id="comments-"|add:pid|add:"-container" %}
 <form method="post"
-      action="{{ post_url|default:fallback_post_url }}"
+      action="{{ create_url }}"
       class="comment-form"
-      hx-post="{{ post_url|default:fallback_post_url }}"
+      hx-post="{{ create_url }}"
       hx-target="#{{ target_id|default:fallback_target_id }}"
       hx-swap="beforeend"
       hx-on::after-request="clearForm(this)">
   {% csrf_token %}
   <input type="hidden" name="art_piece_id" value="{{ piece.id }}">
+  {# no top_level_comment_id here; server will coalesce into existing top-level if present #}
   <div class="input-group">
     <textarea id="comment-textarea" name="text" rows="1" class="form-control replyTextArea"
               placeholder="Send a message to {{ reply_recipient }}..." 
               {% if autofocus %}autofocus{% endif %} required></textarea>
-    <button type="submit" name="add_comment" class="sendButton">
+    <button type="submit" class="sendButton">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
         <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" />
       </svg>
