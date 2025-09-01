@@ -1,0 +1,42 @@
+.container-narrow {
+  max-width: 880px;
+  margin-inline: auto;
+  padding-inline: var(--s3);
+}
+
+.stack > * + * {
+  margin-top: var(--s3);
+} /* vertical rhythm */
+.pad {
+  padding: var(--s3);
+}
+.pad-lg {
+  padding: var(--s4);
+}
+
+.round {
+  border-radius: var(--radius);
+}
+.surface {
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.text-muted {
+  color: var(--muted);
+}
+.center {
+  text-align: center;
+}
+
+.vh-space {
+  height: var(--s5);
+}
+
+.hidden-visually {
+  position: absolute !important;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+}

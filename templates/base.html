@@ -26,7 +26,12 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <title>{% block title %} Omnivore Arts {% endblock %}</title>
-    {% block css_files %} {% endblock %}
+    {% block css_files %} 
+        <link rel="stylesheet" href="{% static 'css/base.css' %}">
+        <link rel="stylesheet" href="{% static 'css/utilities.css' %}">
+        <link rel="stylesheet" href="{% static 'css/components.css' %}">
+        <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    {% endblock %}
 </head>
 <body>
     <div class="d-flex flex-column min-vh-100">
