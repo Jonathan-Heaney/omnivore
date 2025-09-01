@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %} Page Not Found {% endblock %}
+{% block title %} Server Error {% endblock %}
 
 {% block css_files %}
   <link rel="stylesheet" href="{% static "css/base.css" %}">
@@ -14,20 +14,20 @@
       font-family: system-ui, sans-serif;
       text-align: center;
       padding: 4rem 1rem;
-      background: #f8f9fa;
-      color: #1f2937;
+      background: #fef2f2;
+      color: #7f1d1d;
     }
     h1 {
       font-size: 1.75rem;
       margin-bottom: 1rem;
     }
     p {
-      color: #6b7280;
+      color: #991b1b;
       margin-bottom: 2rem;
     }
     a.btn-fallback {
       display: inline-block;
-      background: #0d6efd;
+      background: #dc2626;
       color: white;
       padding: 0.5rem 1rem;
       border-radius: 999px;
@@ -35,13 +35,13 @@
       font-weight: 600;
     }
     a.btn-fallback:hover {
-      background: #0b5ed7;
+      background: #b91c1c;
     }
   </style>
 {% endblock %}
 
 {% block content %}
-  <h1 class="header">Oops! Page Not Found</h1>
-  <p>Sorry, the page you were looking for doesn’t exist.</p>
+  <h1 class="header">Something went wrong</h1>
+  <p>We’re sorry — our server hit an unexpected problem.</p>
   <a href="{% url 'home' %}" class="btn-fallback">Back to Home</a>
 {% endblock %}
