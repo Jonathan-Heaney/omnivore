@@ -1,0 +1,114 @@
+/* Page: My Received Art
+   Polished card layout + tidy preview strip
+*/
+
+.page-title {
+  margin: 1.25rem 0 0.5rem;
+  font-weight: 700;
+}
+
+/* Card shell */
+.received-card {
+  border: 1px solid #e9ecef;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+}
+
+/* Header */
+.received-card__header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.6rem;
+  padding: 0.85rem 1rem;
+  background: #f8f9fa;
+  border-bottom: 1px solid #eef0f2;
+}
+.received-card__title {
+  color: inherit;
+}
+.received-card__title:hover {
+  text-decoration: underline;
+}
+.received-card__by {
+  color: #6c757d;
+}
+.received-card__header .badge-new {
+  margin-left: auto; /* push to far right on larger widths */
+}
+
+/* Body */
+.received-card__body {
+  padding: 1rem;
+  display: grid;
+  gap: 0.75rem;
+}
+.received-card__description {
+  margin: 0;
+}
+
+/* Meta footer */
+.received-card__meta {
+  padding: 0.75rem 1rem;
+  color: #6c757d;
+  border-top: 1px solid #eef0f2;
+  background: #fbfcfd;
+}
+
+/* Likes include spacing */
+.likes-container {
+  padding: 0.5rem 1rem 0.75rem;
+}
+
+/* Conversation preview strip */
+.preview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  border-top: 1px solid #eef0f2;
+  background: #fbfcfd;
+  padding: 0.9rem 1rem;
+}
+.preview__left {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.preview__badge {
+  background: #fff3cd;
+  color: #7a5a00;
+  border: 1px solid #ffe69c;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.preview__right {
+  flex: 0 0 auto;
+}
+
+.btn-cta.btn-sm {
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+}
+
+/* Responsive */
+@media (max-width: 575.98px) {
+  .received-card__header .badge-new {
+    margin-left: 0; /* keep it near the title on small screens */
+  }
+  .preview {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .preview__right {
+    display: flex;
+    justify-content: flex-start;
+  }
+}

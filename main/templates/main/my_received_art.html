@@ -2,14 +2,16 @@
 {% load static %}
 {% load custom_filters %}
 
-{% block title %} My Received Art {% endblock %}
+{% block title %}My Received Art{% endblock %}
+
 {% block css_files %}
-  <link rel="stylesheet" href="{% static "css/styles.css" %}">
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/pages/my_received.css' %}">
 {% endblock %}
 
 {% block content %}
 
-<h1 class="header">My Received Art</h1>
+<h1 class="page-title">My Received Art</h1>
 
 {% if request.user.is_authenticated and request.user.receive_art_paused %}
   <div class="alert alert-warning d-flex align-items-center justify-content-between" role="alert">
@@ -26,68 +28,66 @@
 
 {% for received in received_pieces %}
   {% with piece=received.art_piece %}
-  <div id="art-{{ piece.public_id }}" class="card mt-2 art-piece">
-    <div class="card-header d-flex align-items-center gap-2">
-      <strong>
-        <a href="{% url 'art_detail' piece.public_id %}">
-          <span class="card-title">{{ piece.piece_name }}</span>
-        </a>
-      </strong>
-      <span>({{ piece.artist_name }})</span>
+  <section id="art-{{ piece.public_id }}" class="received-card">
+    <header class="received-card__header">
+      <a class="received-card__title" href="{% url 'art_detail' piece.public_id %}">
+        <strong>{{ piece.piece_name }}</strong>
+      </a>
+      <span class="received-card__by">({{ piece.artist_name }})</span>
 
-      {# NEW badge if not yet seen #}
       {% if not received.seen_at %}
         <span class="badge-new">New</span>
       {% endif %}
+    </header>
+
+    <div class="received-card__body">
+      <p class="received-card__description">{{ piece.piece_description|linebreaksbr }}</p>
+
+      {% if piece.link %}
+        <a class="btn btn-outline-secondary btn-sm" href="{{ piece.link }}" target="_blank" rel="noopener">
+          Source
+        </a>
+      {% endif %}
     </div>
 
-    <div class="card-body d-flex flex-row justify-content-between">
-      <div>
-        <p>{{ piece.piece_description|linebreaksbr }}</p>
-      </div>
-    </div>
-
-    {% if piece.link %}
-      <a class="btn btn-sm btn-outline-secondary ms-2" href="{{ piece.link }}" target="_blank" rel="noopener">Source</a>
-    {% endif %}
-
-    <div class="card-footer text-muted">
+    <footer class="received-card__meta">
       Shared by <strong>{{ piece.user.first_name }} {{ piece.user.last_name }}</strong>
-    </div>
+    </footer>
 
     <div class="likes-container" id="heart-{{ piece.id }}-container">
       {% include 'main/heart_button.html' with piece=piece %}
     </div>
 
-    <div class="conversation-preview piece-summary">
+    {# --- conversation preview strip --- #}
+    <div class="preview">
       {% with pv=previews|dict_get:piece.id %}
         {% if pv.thread_exists %}
-          <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
-            <div class="text-muted">
-              <span class="me-2">Last message:</span>
-              {% with m=pv.last %}
-                <strong>{{ m.sender.first_name }} {{ m.sender.last_name }}</strong>
-                — {{ m.text|truncatechars:120 }}
-              {% endwith %}
-              {% if pv.unread_count %}
-                <span class="badge summary-badge ms-2" aria-label="{{ pv.unread_count }} unread">
-                  {{ pv.unread_count }} unread
-                </span>
-              {% endif %}
-            </div>
+          <div class="preview__left text-muted">
+            <span class="me-2">Last message:</span>
+            {% with m=pv.last %}
+              <strong>{{ m.sender.first_name }} {{ m.sender.last_name }}</strong>
+              — {{ m.text|truncatechars:120 }}
+            {% endwith %}
+            {% if pv.unread_count %}
+              <span class="badge preview__badge ms-2" aria-label="{{ pv.unread_count }} unread">
+                {{ pv.unread_count }} unread
+              </span>
+            {% endif %}
+          </div>
+          <div class="preview__right">
             <a href="{% url 'art_detail' piece.public_id %}"
-              class="btn btn-cta btn-sm"
-              aria-label="Open conversation for {{ piece.piece_name }}">
+               class="btn btn-cta btn-sm"
+               aria-label="Open conversation for {{ piece.piece_name }}">
               <i class="fa-regular fa-comments me-1"></i>
               Open conversation
             </a>
           </div>
         {% else %}
-          <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
-            <div class="text-muted">No messages yet.</div>
+          <div class="preview__left text-muted">No messages yet.</div>
+          <div class="preview__right">
             <a href="{% url 'art_detail' piece.public_id %}#reply"
-              class="btn btn-cta btn-sm"
-              aria-label="Start a conversation about {{ piece.piece_name }}">
+               class="btn btn-cta btn-sm"
+               aria-label="Start a conversation about {{ piece.piece_name }}">
               <i class="fa-regular fa-paper-plane me-1"></i>
               Start a conversation
             </a>
@@ -95,13 +95,11 @@
         {% endif %}
       {% endwith %}
     </div>
-  </div>
+  </section>
   {% endwith %}
-
-  {% empty %}
-  <p>You haven't received anything yet - make sure to <a href="/share-art">share something</a> so that don't miss out on getting any art!</p>
+{% empty %}
+  <p>You haven't received anything yet — make sure to
+    <a href="/share-art">share something</a> so you don't miss out!</p>
 {% endfor %}
 
 {% endblock %}
-
-
