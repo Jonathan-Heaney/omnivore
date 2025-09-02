@@ -1,155 +1,99 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Simple Transactional Email</title>
-    <style media="all" type="text/css">
-@media all {
-  .btn-primary table td:hover {
-    background-color: #ec0867 !important;
-  }
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>{{ subject|default:"You have a new comment on Omnivore Arts" }}</title>
 
-  .btn-primary a:hover {
-    background-color: #ec0867 !important;
-    border-color: #ec0867 !important;
-  }
-}
-@media only screen and (max-width: 640px) {
-  .main p,
-.main td,
-.main span {
-    font-size: 16px !important;
-  }
+    <style type="text/css">
+      /* Resets / client fixes */
+      .ExternalClass { width:100%; }
+      .ExternalClass, .ExternalClass * { line-height:100%; }
+      .apple-link a { color:inherit !important; text-decoration:none !important; }
+      #MessageViewBody a { color:inherit; text-decoration:none; }
 
-  .wrapper {
-    padding: 8px !important;
-  }
-
-  .content {
-    padding: 0 !important;
-  }
-
-  .container {
-    padding: 0 !important;
-    padding-top: 8px !important;
-    width: 100% !important;
-  }
-
-  .main {
-    border-left-width: 0 !important;
-    border-radius: 0 !important;
-    border-right-width: 0 !important;
-  }
-
-  .btn table {
-    max-width: 100% !important;
-    width: 100% !important;
-  }
-
-  .btn a {
-    font-size: 16px !important;
-    max-width: 100% !important;
-    width: 100% !important;
-  }
-}
-@media all {
-  .ExternalClass {
-    width: 100%;
-  }
-
-  .ExternalClass,
-.ExternalClass p,
-.ExternalClass span,
-.ExternalClass font,
-.ExternalClass td,
-.ExternalClass div {
-    line-height: 100%;
-  }
-
-  .apple-link a {
-    color: inherit !important;
-    font-family: inherit !important;
-    font-size: inherit !important;
-    font-weight: inherit !important;
-    line-height: inherit !important;
-    text-decoration: none !important;
-  }
-
-  #MessageViewBody a {
-    color: inherit;
-    text-decoration: none;
-    font-size: inherit;
-    font-family: inherit;
-    font-weight: inherit;
-    line-height: inherit;
-  }
-}
-</style>
+      /* Mobile */
+      @media only screen and (max-width:640px){
+        .container { width:100% !important; padding:0 !important; }
+        .wrapper { padding:16px !important; }
+        .main { border-radius:0 !important; border-left-width:0 !important; border-right-width:0 !important; }
+        .btn a { display:block !important; width:100% !important; }
+        .h1 { font-size:24px !important; }
+        .text { font-size:16px !important; }
+      }
+    </style>
   </head>
-  <body style="font-family: Noto Sans, sans-serif; -webkit-font-smoothing: antialiased; font-size: 16px; line-height: 1.3; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background-color: #f4f5f6; margin: 0; padding: 0;">
-    <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #f4f5f6; width: 100%;" width="100%" bgcolor="#f4f5f6">
+
+  <body style="margin:0; padding:0; background-color:#f4f5f6; font-family:Helvetica, Arial, 'Noto Sans', sans-serif; -webkit-font-smoothing:antialiased;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" bgcolor="#f4f5f6" style="background-color:#f4f5f6;">
       <tr>
-        <td style="font-family: Noto Sans, sans-serif; font-size: 16px; vertical-align: top;" valign="top">&nbsp;</td>
-        <td class="container" style="font-family: Noto Sans, sans-serif; font-size: 16px; vertical-align: top; max-width: 600px; padding: 0; padding-top: 24px; padding-bottom: 24px; width: 600px; margin: 0 auto;" width="600" valign="top">
-          <div class="content" style="box-sizing: border-box; display: block; margin: 0 auto; max-width: 600px; padding: 0;">
+        <td>&nbsp;</td>
 
-            <!-- START CENTERED WHITE CONTAINER -->
-            <span class="preheader" style="color: transparent; display: none; height: 0; max-height: 0; max-width: 0; opacity: 0; overflow: hidden; mso-hide: all; visibility: hidden; width: 0;">{{ subject }}</span>
-            <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="main" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; background: #ffffff; border: 1px solid #eaebed; border-radius: 16px; width: 100%;" width="100%">
+        <td class="container" width="600" style="width:600px; max-width:600px; margin:0 auto; padding:24px 0;">
+          <!-- Preheader (hidden) -->
+          <div style="display:none; visibility:hidden; opacity:0; height:0; width:0; overflow:hidden; mso-hide:all;">
+            {{ subject|default:"New message from a fellow Omnvivore." }}
+          </div>
 
-              <!-- START MAIN CONTENT AREA -->
-              <tr>
-                <td class="wrapper" style="font-family: Noto Sans, sans-serif; font-size: 16px; vertical-align: top; box-sizing: border-box; padding: 24px;" valign="top">
-                  <p style="font-family: Noto Sans, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">Hi {{recipient.first_name}},</p>
-                  <p style="font-family: Noto Sans, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">{{ body_text|safe }} <em>{{ art_piece.piece_name}}</em></p>
-            
-                  <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="btn btn-primary" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; box-sizing: border-box; width: 100%; min-width: 100%;" width="100%">
-                    <tbody>
-                      <tr>
-                        <td align="left" style="font-family: Noto Sans, sans-serif; font-size: 16px; vertical-align: top; padding-bottom: 16px;" valign="top">
-                          <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;">
-                            <tbody>
-                              <tr>
-                                <td style="font-family: Noto Sans, sans-serif; font-size: 16px; vertical-align: top; border-radius: 4px; text-align: center; background-color: #0867ec;" valign="top" align="center" bgcolor="#0867ec"> <a href="{{ target_url }}" target="_blank" style="border: solid 2px #0867ec; border-radius: 4px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 16px; font-weight: bold; margin: 0; padding: 12px 24px; text-decoration: none; background-color: #0867ec; border-color: #0867ec; color: #ffffff;">View on Omnivore Arts</a> </td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <p style="font-family: Noto Sans, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">Cheers,</p>
-                  <p style="font-family: Noto Sans, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">Oliver the Omnivore</p>
-                </td>
-                <td style="font-family: Noto Sans, sans-serif; font-size: 16px; vertical-align: bottom;" valign="bottom">&nbsp;</td>
-              </tr>
+          <!-- Card -->
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" class="main" style="background:#ffffff; border:1px solid #eaebed; border-radius:16px;">
+            <tr>
+              <td class="wrapper" style="padding:28px;">
 
-              <!-- END MAIN CONTENT AREA -->
-              </table>
+                <p class="text" style="margin:0 0 12px 0; font-size:18px; color:#334155;">
+                  Hi {{ recipient.first_name }}, <br><br>
+                  {{ body_text|safe }} <em>{{ art_piece.piece_name }}</em>. Reply on Omnivore to keep the conversation going!
+                </p>
 
+                <!-- CTA (bulletproof) -->
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" class="btn" style="margin:12px 0 8px 0;">
+                  <tr>
+                    <td align="center">
+                      <!--[if mso]>
+                      <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="{{ target_url }}" style="height:44px; v-text-anchor:middle; width:280px;" arcsize="50%" strokeweight="2px" strokecolor="#d4a106" fillcolor="#eab308">
+                        <w:anchorlock/>
+                        <center style="color:#1f2937; font-family:Helvetica, Arial, sans-serif; font-size:16px; font-weight:bold;">View & Reply</center>
+                      </v:roundrect>
+                      <![endif]-->
+                      <!--[if !mso]><!-- -->
+                      <a href="{{ target_url }}" target="_blank"
+                         style="background:#eab308; color:#1f2937; display:inline-block; padding:12px 20px; border-radius:999px; text-decoration:none; font-weight:bold; font-size:20px; border:2px solid #d4a106;">
+                        View & Reply
+                      </a>
+                      <!--<![endif]-->
+                    </td>
+                  </tr>
+                </table>
 
-            <!-- START FOOTER -->
-            <div class="footer" style="clear: both; padding-top: 24px; text-align: center; width: 100%;">
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;" width="100%">
-                <tr>
-                  <td class="content-block" style="font-family: Noto Sans, sans-serif; vertical-align: top; color: #9a9ea6; font-size: 16px; text-align: center;" valign="top" align="center">
-                    <br> Don't want these emails? <a href="{{ unsubscribe_url }}" style="text-decoration: underline; color: #9a9ea6; font-size: 16px; text-align: center;">Unsubscribe</a>.
-                  </td>
-                </tr>
-                <tr>
-                  <td class="content-block powered-by" style="font-family: Noto Sans, sans-serif; vertical-align: top; color: #9a9ea6; font-size: 16px; text-align: center;" valign="top" align="center">
-                    Powered by <a href="http://htmlemail.io" style="color: #9a9ea6; font-size: 16px; text-align: center; text-decoration: none;">HTMLemail.io</a>
-                  </td>
-                </tr>
-              </table>
-            </div> 
+                <!-- Fallback URL -->
+                <p class="text" style="margin:10px 0 0 0; font-size:13px; line-height:1.6; color:#64748b;">
+                  If the button doesn’t work, copy and paste this link:
+                </p>
+                <p style="margin:4px 0 12px 0; word-break:break-all;">
+                  <a href="{{ target_url }}" target="_blank" style="color:#1e5a96; text-decoration:underline;">{{ target_url }}</a>
+                </p>
 
-            <!-- END FOOTER -->
-            
-<!-- END CENTERED WHITE CONTAINER --></div>
+                <p class="text" style="margin:0; font-size:18px; line-height:2.0; color:#64748b;">
+                  Cheers,<br>— Oliver the Omnivore
+                </p>
+              </td>
+            </tr>
+          </table>
+
+          <!-- Footer -->
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-top:12px;">
+            <tr>
+              <td align="center" class="apple-link" style="font-size:12px; color:#94a3b8; line-height:1.6; padding:8px 12px;">
+                You’re receiving this because you opted into email notifications from Omnivore Arts.
+                <br>
+                Don’t want these emails?
+                <a href="{{ unsubscribe_url }}" style="color:#94a3b8; text-decoration:underline;">Unsubscribe</a>.
+              </td>
+            </tr>
+          </table>
         </td>
-        <td style="font-family: Noto Sans, sans-serif; font-size: 16px; vertical-align: top;" valign="top">&nbsp;</td>
+
+        <td>&nbsp;</td>
       </tr>
     </table>
   </body>

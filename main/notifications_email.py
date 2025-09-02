@@ -27,9 +27,9 @@ def send_comment_email(*, recipient, comment, notification_id=None):
         "art_detail", args=[art_piece.public_id]) + q)
 
     if art_piece.user_id == recipient.id:
-        body_text = f"{sender_full_name} sent you a message on your piece:"
+        body_text = f"<strong>{sender_full_name}</strong> sent you a message on your piece:"
     else:
-        body_text = f"{sender_full_name} replied to your message on:"
+        body_text = f"<strong>{sender_full_name}</strong> replied to your message on:"
 
     subject = f"{sender_full_name} sent you a message!"
 

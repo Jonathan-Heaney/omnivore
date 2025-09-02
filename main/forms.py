@@ -93,7 +93,7 @@ class CustomAuthenticationForm(AuthenticationForm):
         self.fields["username"].widget.attrs.update({
             "autofocus": "autofocus",
             "autocomplete": "username",
-            "placeholder": "Username",
+            "placeholder": "you@example.com",
         })
 
         # Password field: hook up your password-eye + autocomplete

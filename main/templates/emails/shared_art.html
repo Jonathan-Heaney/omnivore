@@ -31,16 +31,13 @@
         <td class="container" width="600" style="width:600px; max-width:600px; margin:0 auto; padding:24px 0;">
           <!-- Preheader (hidden) -->
           <div style="display:none; visibility:hidden; opacity:0; height:0; width:0; overflow:hidden; mso-hide:all;">
-            {{ subject|default:"Someone shared art with you on Omnivore Arts." }}
+            {{ subject|default:"New art just for you on Omnivore Arts." }}
           </div>
 
           <!-- Card -->
           <table role="presentation" width="100%" cellspacing="0" cellpadding="0" class="main" style="background:#ffffff; border:1px solid #eaebed; border-radius:16px;">
             <tr>
               <td class="wrapper" style="padding:28px;">
-                <h1 class="h1" style="margin:0 0 8px 0; font-size:28px; line-height:1.25; color:#0f172a; text-align:center;">
-                  You’ve received new art
-                </h1>
 
                 <p class="text" style="margin:0 0 12px 0; font-size:18px; line-height:2.0; color:#334155;">
                   Hi {{ recipient.first_name }}, <br>
