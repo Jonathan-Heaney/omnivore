@@ -4,13 +4,13 @@ from django.db.models import Q, Count
 from django.http import Http404
 from django.http import JsonResponse, Http404
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import RegisterForm, ArtPieceForm, CommentForm, AccountInfoForm, ArtDeliveryForm, EmailPreferencesForm, CustomPasswordChangeForm
+from .forms import RegisterForm, ArtPieceForm, CommentForm, AccountInfoForm, ArtDeliveryForm, EmailPreferencesForm, CustomPasswordChangeForm, CustomSetPasswordForm
 from django.contrib import messages
 from django.contrib.auth import login, logout, update_session_auth_hash, authenticate, views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.utils.html import strip_tags
 from django.core.mail import send_mail
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.db import IntegrityError, transaction
 import random
 from collections import defaultdict
@@ -731,6 +731,12 @@ class CustomPasswordResetView(auth_views.PasswordResetView):
         }
         form.save(**opts)
         return super(auth_views.PasswordResetView, self).form_valid(form)
+
+
+class CustomPasswordResetConfirmView(auth_views.PasswordResetConfirmView):
+    form_class = CustomSetPasswordForm
+    template_name = "registration/password_reset_confirm.html"
+    success_url = reverse_lazy("password_reset_complete")
 
 
 @login_required

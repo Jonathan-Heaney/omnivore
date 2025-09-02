@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm, AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm, AuthenticationForm, SetPasswordForm
 from .models import ArtPiece, CustomUser, Comment
 from django.core.exceptions import ValidationError
 from crispy_forms.helper import FormHelper
@@ -151,6 +151,20 @@ class CustomPasswordChangeForm(PasswordChangeForm):
         super().__init__(*args, **kwargs)
         if 'old_password' in self.fields:
             self.fields['old_password'].widget.attrs.pop('autofocus', None)
+
+
+class CustomSetPasswordForm(SetPasswordForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # ensure both fields get the toggle class + good autocomplete hints
+        for name in ("new_password1", "new_password2"):
+            w = self.fields[name].widget
+            # merge classes instead of overwriting
+            existing = w.attrs.get("class", "")
+            w.attrs["class"] = (existing + " js-password").strip()
+            # hint browsers correctly
+            w.attrs.setdefault("autocomplete", "new-password")
 
 
 class ArtPieceForm(forms.ModelForm):
