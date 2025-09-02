@@ -11,102 +11,112 @@
 
 {% block content %}
 
-<h1 class="page-title">My Shared Art</h1>
+<h1 class="page-title container-narrow">My Shared Art</h1>
+<br>
 
-{% for piece in pieces %}
-  <section id="art-{{ piece.public_id }}" class="shared-card">
-    <header class="shared-card__header">
-      <a class="shared-card__title" href="{% url 'art_detail' piece.public_id %}">
-        <strong>{{ piece.piece_name }}</strong>
-      </a>
-      <span class="shared-card__by">({{ piece.artist_name }})</span>
-    </header>
-
-    <div class="shared-card__body">
-      <p class="shared-card__description">{{ piece.piece_description|linebreaksbr }}</p>
-
-      <div class="shared-card__actions">
-        <!-- Edit -->
-        <a href="{% url 'edit_art_piece' piece.public_id %}"
-          class="btn btn-primary edit-btn"
-          id="edit-btn"
-          aria-label="Edit {{ piece.piece_name }}">
-          <i class="fa-solid fa-pen"></i>
+<div class="container-narrow">
+  <div class="shared-list">
+  {% for piece in pieces %}
+    <section id="art-{{ piece.public_id }}" class="shared-card">
+      <header class="shared-card__header">
+        <a class="shared-card__title" href="{% url 'art_detail' piece.public_id %}">
+          <strong>{{ piece.piece_name }}</strong>
         </a>
+        <span class="shared-card__by">({{ piece.artist_name }})</span>
+      </header>
 
-        <!-- Delete -->
-        <form method="post"
-              action="{% url 'delete_art_piece' piece.public_id %}"
-              onsubmit="return confirmDelete();">
-          {% csrf_token %}
-          <button type="submit"
-                  class="btn btn-danger"
-                  aria-label="Delete {{ piece.piece_name }}">
-            <i class="fa-solid fa-trash"></i>
-          </button>
-        </form>
-
-        {% if piece.link %}
-          <a class="btn btn-outline-secondary"
-            href="{{ piece.link }}"
-            target="_blank"
-            rel="noopener"
-            aria-label="View source for {{ piece.piece_name }}">
-            <span>View Source</span><i class="fa-solid fa-up-right-from-square"></i>
-          </a>
-        {% endif %}
+      <div class="shared-card__body">
+        <p class="shared-card__description">{{ piece.piece_description|linebreaksbr }}</p>
       </div>
 
-    <footer class="shared-card__meta">
-      Shared {{ piece.created_at|date:"F j, Y" }}
-    </footer>
+      <footer class="shared-card__meta">
+        <span class="shared-card__date">Shared {{ piece.created_at|date:"F j, Y" }}</span>
 
-    {% with users=likes_dict|dict_get:piece %}
-      {% if users %}
-        <div class="likes-container" id="likes-{{ piece.id }}-container">
-          {% include 'main/likes_display.html' with piece=piece likes_dict=likes_dict %}
-        </div>
-      {% endif %}
-    {% endwith %}
+        <div class="shared-card__actions">
+          <!-- Edit -->
+          <a href="{% url 'edit_art_piece' piece.public_id %}"
+             class="btn btn-outline-secondary btn-sm"
+             aria-label="Edit {{ piece.piece_name }}"
+             title="Edit">
+            <i class="fa-solid fa-pen"></i>
+          </a>
 
-    {# --- Conversation summary strip --- #}
-    {% with s=summaries|dict_get:piece.id %}
-      <div class="summary">
-        <div class="summary__left">
-          <div class="summary__line">
-            <span class="summary__label">Conversations</span>
-            <span class="summary__value">{{ s.conv_count }}</span>
-            {% if s.unread_count %}
-              <span class="badge summary__badge" aria-label="{{ s.unread_count }} new conversations">
-                {{ s.unread_count }} new
-              </span>
-            {% endif %}
-          </div>
+          <!-- Delete -->
+          <form method="post"
+                action="{% url 'delete_art_piece' piece.public_id %}"
+                onsubmit="return confirmDelete();"
+                class="d-inline">
+            {% csrf_token %}
+            <button type="submit"
+                    class="btn btn-outline-danger btn-sm"
+                    aria-label="Delete {{ piece.piece_name }}"
+                    title="Delete">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </form>
 
-          {% if s.last %}
-            <div class="summary__last text-muted">
-              <span class="summary__last-label">Last message</span>
-              <span class="summary__last-text">
-                <strong>{{ s.last.sender.first_name }} {{ s.last.sender.last_name }}</strong> —
-                {{ s.last.text|truncatechars:120 }}
-              </span>
-            </div>
+          {% if piece.link %}
+            <a class="btn btn-outline-secondary btn-sm"
+               href="{{ piece.link }}"
+               target="_blank"
+               rel="noopener"
+               aria-label="Open source link for {{ piece.piece_name }}"
+               title="Open source">
+              <i class="fa-solid fa-up-right-from-square"></i>
+            </a>
           {% endif %}
         </div>
+      </footer>
 
-        <div class="summary__right">
-          <a href="{% url 'art_detail' piece.public_id %}"
-             class="btn btn-cta btn-sm"
-             aria-label="View conversations for {{ piece.piece_name }}">
-            <i class="fa-regular fa-comments me-1"></i>
-            View conversations
-          </a>
-        </div>
-      </div>
-    {% endwith %}
-  </section>
-{% empty %}
-  <p>Nothing shared yet — share something <a href="/share-art">here</a>!</p>
-{% endfor %}
+      {% with users=likes_dict|dict_get:piece %}
+        {% if users %}
+          <div class="likes-container" id="likes-{{ piece.id }}-container">
+            {% include 'main/likes_display.html' with piece=piece likes_dict=likes_dict %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      {% with s=summaries|dict_get:piece.id %}
+        {% if s.conv_count and s.conv_count|add:0 > 0 %}
+          <div class="summary">
+            <div class="summary__left">
+              <div class="summary__line">
+                <span class="summary__label">Conversations</span>
+                <span class="summary__value">{{ s.conv_count }}</span>
+                {% if s.unread_count %}
+                  <span class="badge summary__badge" aria-label="{{ s.unread_count }} new conversations">
+                    {{ s.unread_count }} new
+                  </span>
+                {% endif %}
+              </div>
+
+              {% if s.last %}
+                <div class="summary__last text-muted">
+                  <span class="summary__last-label">Last message</span>
+                  <span class="summary__last-text">
+                    <strong>{{ s.last.sender.first_name }} {{ s.last.sender.last_name }}</strong> —
+                    {{ s.last.text|truncatechars:120 }}
+                  </span>
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="summary__right">
+              <a href="{% url 'art_detail' piece.public_id %}"
+                class="btn btn-cta btn-cta--amber btn-sm"
+                aria-label="View conversations for {{ piece.piece_name }}">
+                <i class="fa-regular fa-comments me-1"></i>
+                View conversations
+              </a>
+            </div>
+          </div>
+        {% endif %}
+      {% endwith %}
+    </section>
+  {% empty %}
+    <p>Nothing shared yet — share something <a href="/share-art">here</a>!</p>
+  {% endfor %}
+  </div>
+</div>
 
 {% endblock %}

@@ -1,32 +1,53 @@
 /* Page: My Shared Art (page-scoped) */
 
-.shared-card {
-  border: 1px solid #e9ecef;
-  border-radius: 14px;
-  background: #fff;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
-  overflow: hidden;
-  margin-bottom: 1.25rem;
+/* The list wrapper is now .container-narrow.stack from utilities.css
+   → gives you a comfortable readable width + consistent gaps */
+
+/* Massive, responsive spacing just for this list */
+.shared-list {
+  display: grid;
+  /* ~56–88px depending on viewport, feels very separated */
+  gap: clamp(56px, 7vw, 88px);
 }
 
+/* Card */
+.shared-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #fff;
+  box-shadow: var(--shadow-1);
+  overflow: hidden;
+  /* subtle brand accent on the left */
+  border-left: 4px solid var(--brand);
+  transition: box-shadow 160ms ease, transform 160ms ease;
+}
+.shared-card:hover {
+  box-shadow: var(--shadow-2);
+  transform: translateY(-1px);
+}
+
+/* Header */
 .shared-card__header {
   display: flex;
   align-items: baseline;
-  gap: 0.4rem;
-  padding: 0.85rem 1rem;
-  background: #f8f9fa;
+  gap: 0.5rem;
+  padding: 0.9rem 1rem;
+  background: #f8f9fb;
   border-bottom: 1px solid #eef0f2;
 }
 .shared-card__title {
-  color: inherit;
+  color: var(--brand);
+  text-underline-offset: 2px;
 }
 .shared-card__title:hover {
   text-decoration: underline;
+  filter: brightness(0.95);
 }
 .shared-card__by {
-  color: #6c757d;
+  color: var(--muted);
 }
 
+/* Body */
 .shared-card__body {
   padding: 1rem;
   display: grid;
@@ -35,17 +56,31 @@
 .shared-card__description {
   margin: 0;
 }
-.shared-card__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
 
+/* Meta footer + actions (now in footer) */
 .shared-card__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
   padding: 0.75rem 1rem;
-  color: #6c757d;
+  color: var(--muted);
   border-top: 1px solid #eef0f2;
   background: #fbfcfd;
+}
+.shared-card__date {
+  font-size: 0.95rem;
+}
+
+.shared-card__actions {
+  display: inline-flex;
+  gap: 0.4rem;
+  flex: 0 0 auto;
+}
+.shared-card__actions .btn {
+  padding: 6px 10px;
+  border-radius: 999px;
+  line-height: 1;
 }
 
 /* Likes include spacing */
@@ -73,10 +108,10 @@
   font-size: 0.95rem;
 }
 .summary__label {
-  color: #6c757d;
+  color: var(--muted);
 }
 .summary__value {
-  font-weight: 600;
+  font-weight: 700;
 }
 .summary__badge {
   background: #fff3cd;
@@ -85,19 +120,19 @@
   padding: 0.2rem 0.5rem;
   border-radius: 999px;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
 }
 .summary__last {
   margin-top: 0.35rem;
   font-size: 0.92rem;
-  color: #6c757d;
+  color: var(--muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .summary__last-label {
   margin-right: 0.35rem;
-  color: #6c757d;
+  color: var(--muted);
 }
 .summary__last-text {
   color: inherit;
@@ -106,9 +141,7 @@
   flex: 0 0 auto;
 }
 
-/* Button size helper exists: .btn-cta.btn-sm */
-
-@media (max-width: 575.98px) {
+@media (max-width: 767.98px) {
   .summary {
     flex-direction: column;
     align-items: stretch;
@@ -116,5 +149,8 @@
   .summary__right {
     display: flex;
     justify-content: flex-start;
+  }
+  .summary__last {
+    display: none;
   }
 }

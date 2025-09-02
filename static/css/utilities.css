@@ -1,11 +1,11 @@
 /* Layout helpers */
 .container-narrow {
-  max-width: 880px;
+  max-width: 768px;
   margin-inline: auto;
   padding-inline: var(--s3);
 }
 .stack > * + * {
-  margin-top: var(--s3);
+  margin-top: var(--s5);
 }
 .pad {
   padding: var(--s3);

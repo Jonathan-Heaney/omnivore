@@ -30,15 +30,31 @@
   color: #fff;
 }
 
-/* Optional amber variant (landing, promos) */
+/* Keep amber on hover/focus/active and readable text */
 .btn-cta--amber {
   background: #eab308;
   color: #1f2937 !important;
   border: 2px solid #d4a106;
   box-shadow: 0 6px 20px -6px rgba(234, 179, 8, 0.5);
 }
-.btn-cta--amber:hover {
+.btn-cta--amber:hover,
+.btn-cta--amber:focus {
+  background: #eab308;
+  color: #1f2937 !important;
   filter: brightness(0.95);
+  border-color: #d4a106;
+}
+.btn-cta--amber:active {
+  background: #eab308;
+  color: #1f2937 !important;
+  filter: none;
+  box-shadow: 0 4px 14px -6px rgba(234, 179, 8, 0.5);
+}
+
+/* Optional: prevent the base .btn-cta:hover rule from hijacking amber */
+.btn-cta:not(.btn-cta--amber):hover {
+  background: var(--brand-600);
+  color: #fff;
 }
 
 /* Sizing helpers often used in strips */
