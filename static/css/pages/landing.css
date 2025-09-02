@@ -1,0 +1,39 @@
+/* Landing: tiny, page-scoped layer */
+.hero .display-5 {
+  line-height: 1.1;
+}
+
+/* Oliver animation */
+.oliver-hero {
+  max-width: 360px;
+  width: 90%;
+  height: auto;
+  animation: bob 6s ease-in-out infinite;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .oliver-hero {
+    animation: none;
+  }
+}
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.oliver-chip {
+  display: inline-block;
+  margin-top: 0.75rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  background: #f8fafc; /* chip bg */
+  color: #0f172a; /* ink */
+  font-weight: 600;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 14px -6px rgba(16, 24, 40, 0.08);
+}

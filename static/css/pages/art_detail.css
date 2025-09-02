@@ -1,27 +1,18 @@
-/* Page: Art Detail
-   Light wrapper styles that lean on your design tokens and components.
-*/
-
-.page-title {
-  margin: 1.25rem 0 0.5rem;
-  font-weight: 700;
-}
+/* Page: Art Detail (page-scoped) */
 
 .piece {
   border: 1px solid #e9ecef;
   border-radius: 14px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
   background: #fff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
   margin-bottom: 1.5rem;
   overflow: hidden;
 }
-
 .piece__header {
   background: #f8f9fa;
   padding: 0.85rem 1rem;
   border-bottom: 1px solid #eef0f2;
 }
-
 .piece__title {
   font-weight: 600;
 }
@@ -35,7 +26,6 @@
   display: grid;
   gap: 0.75rem;
 }
-
 .piece__meta {
   padding: 0.75rem 1rem;
   color: #6c757d;
@@ -53,18 +43,15 @@
   gap: 1rem;
   padding: 0 1rem 1rem;
 }
-
 .thread {
   border: 1px solid #eef2f7;
   border-radius: 12px;
   background: #fff;
   box-shadow: 0 8px 24px -18px rgba(16, 24, 40, 0.2);
 }
-
 .thread--single {
   margin: 0 1rem 1rem;
 }
-
 .thread__header {
   padding: 0.75rem 0.9rem;
   display: flex;
@@ -73,7 +60,6 @@
   background: #f9fafb;
   border-bottom: 1px solid #eef2f7;
 }
-
 .thread__title {
   font-weight: 600;
 }
@@ -96,27 +82,21 @@
 .thread__body {
   padding: 0.75rem 0.9rem 0.9rem;
 }
-
 .thread__messages {
   display: grid;
   gap: 0.5rem;
   margin-bottom: 0.5rem;
 }
-
 .thread__form {
   padding-top: 0.25rem;
   border-top: 1px solid #f1f5f9;
 }
 
-/* Comment form bits (keep your existing button/svg styles) */
+/* Comment form bits */
 .comment-form .form-control {
   border: 1px solid #d0d5dd;
   border-radius: 12px;
   padding: 10px 12px;
 }
 
-/* Make the CTA match the site palette */
-.btn-cta.btn-sm {
-  padding: 0.35rem 0.7rem;
-  border-radius: 999px;
-}
+/* CTA size helper already in components: .btn-cta.btn-sm */

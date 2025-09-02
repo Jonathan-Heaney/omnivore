@@ -1,12 +1,12 @@
+/* Layout helpers */
 .container-narrow {
   max-width: 880px;
   margin-inline: auto;
   padding-inline: var(--s3);
 }
-
 .stack > * + * {
   margin-top: var(--s3);
-} /* vertical rhythm */
+}
 .pad {
   padding: var(--s3);
 }
@@ -14,6 +14,7 @@
   padding: var(--s4);
 }
 
+/* Surfaces / shape */
 .round {
   border-radius: var(--radius);
 }
@@ -21,22 +22,44 @@
   background: var(--surface);
   border: 1px solid var(--border);
 }
-
-.text-muted {
-  color: var(--muted);
+.rounded-2xl {
+  border-radius: 20px;
 }
+
+/* Shadows as utilities */
+.shadow-1 {
+  box-shadow: var(--shadow-1);
+}
+.shadow-2 {
+  box-shadow: var(--shadow-2);
+}
+
+/* Text / align */
 .center {
   text-align: center;
 }
 
+/* Spacer */
 .vh-space {
   height: var(--s5);
 }
 
+/* A11y helpers */
 .hidden-visually {
   position: absolute !important;
   height: 1px;
   width: 1px;
   overflow: hidden;
   clip: rect(1px, 1px, 1px, 1px);
+}
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

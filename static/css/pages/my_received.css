@@ -1,13 +1,5 @@
-/* Page: My Received Art
-   Polished card layout + tidy preview strip
-*/
+/* Page: My Received Art (page-scoped) */
 
-.page-title {
-  margin: 1.25rem 0 0.5rem;
-  font-weight: 700;
-}
-
-/* Card shell */
 .received-card {
   border: 1px solid #e9ecef;
   border-radius: 14px;
@@ -37,7 +29,7 @@
   color: #6c757d;
 }
 .received-card__header .badge-new {
-  margin-left: auto; /* push to far right on larger widths */
+  margin-left: auto;
 }
 
 /* Body */
@@ -69,7 +61,6 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-
   border-top: 1px solid #eef0f2;
   background: #fbfcfd;
   padding: 0.9rem 1rem;
@@ -93,15 +84,11 @@
   flex: 0 0 auto;
 }
 
-.btn-cta.btn-sm {
-  padding: 0.4rem 0.9rem;
-  border-radius: 999px;
-}
+/* Button size helper exists: .btn-cta.btn-sm */
 
-/* Responsive */
 @media (max-width: 575.98px) {
   .received-card__header .badge-new {
-    margin-left: 0; /* keep it near the title on small screens */
+    margin-left: 0;
   }
   .preview {
     flex-direction: column;

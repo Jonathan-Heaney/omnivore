@@ -3,6 +3,11 @@
 
 {% block title %}Omnivore Arts · Discover the arts, from people{% endblock %}
 
+{% block css_files %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/pages/landing.css' %}">
+{% endblock %}
+
 {% block content %}
 
 <!-- HERO -->
@@ -90,7 +95,7 @@
 </section>
 
 <!-- VALUES -->
-<section class="container py-5">
+<section class="container py-5 ">
   <div class="row g-4">
     <div class="col-md-4">
       <div class="value h-100">

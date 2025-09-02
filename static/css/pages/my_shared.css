@@ -1,13 +1,5 @@
-/* Page: My Shared Art
-   Clean, readable cards + a tidy summary strip
-*/
+/* Page: My Shared Art (page-scoped) */
 
-.page-title {
-  margin: 1.25rem 0 0.5rem;
-  font-weight: 700;
-}
-
-/* Card */
 .shared-card {
   border: 1px solid #e9ecef;
   border-radius: 14px;
@@ -43,7 +35,6 @@
 .shared-card__description {
   margin: 0;
 }
-
 .shared-card__actions {
   display: flex;
   flex-wrap: wrap;
@@ -57,7 +48,7 @@
   background: #fbfcfd;
 }
 
-/* Likes (reuse your existing include; just spacing here) */
+/* Likes include spacing */
 .likes-container {
   padding: 0.5rem 1rem 0.75rem;
 }
@@ -68,23 +59,19 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-
   border-top: 1px solid #eef0f2;
   background: #fbfcfd;
   padding: 0.9rem 1rem;
 }
-
 .summary__left {
   min-width: 0;
 }
-
 .summary__line {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   font-size: 0.95rem;
 }
-
 .summary__label {
   color: #6c757d;
 }
@@ -100,7 +87,6 @@
   font-size: 0.75rem;
   font-weight: 600;
 }
-
 .summary__last {
   margin-top: 0.35rem;
   font-size: 0.92rem;
@@ -116,18 +102,12 @@
 .summary__last-text {
   color: inherit;
 }
-
 .summary__right {
   flex: 0 0 auto;
 }
 
-/* Button sizing to match the strip */
-.btn-cta.btn-sm {
-  padding: 0.4rem 0.9rem;
-  border-radius: 999px;
-}
+/* Button size helper exists: .btn-cta.btn-sm */
 
-/* Responsive tweaks */
 @media (max-width: 575.98px) {
   .summary {
     flex-direction: column;
