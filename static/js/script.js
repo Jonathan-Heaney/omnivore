@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function () {
 function addPasswordToggles(selectors) {
   const EYE = `
     <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 5C6.5 5 2 9.5 2 12s4.5 7 10 7 10-4.5 10-7S17.5 5 12 5zm0 12c-2.8 0-5-2.24-5-5s2.2-5 5-5 5 2.24 5 5-2.2 5-5 5zm0-8a3 3 0 100 6 3 3 0 000-6z"/>
+      <path d="M12 5C6.5 5 2 9.5 2 12s4.5 7 10 7 10-4.5 10-7S17.5 5 12 5zm0 12c-2.8 0-5-2.24-5-5s2.2-5 5-5 5 2.24 5 5-2.2 5-5 5z"/>
     </svg>`;
   const EYE_SLASH = `
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -142,41 +142,67 @@ function addPasswordToggles(selectors) {
 
   selectors.forEach((sel) => {
     document.querySelectorAll(sel).forEach((input) => {
-      if (input.dataset.hasToggle) return; // avoid duplicates on re-render
+      if (input.dataset.hasToggle) return; // avoid duplicates
       input.dataset.hasToggle = 'true';
 
-      // Wrap container
-      const wrapper = document.createElement('div');
-      wrapper.className = 'pw-wrap';
-      input.parentNode.insertBefore(wrapper, input);
-      wrapper.appendChild(input);
+      // Make a positioning context that won't break crispy markup
+      const fieldContainer =
+        input.closest('.mb-3, .form-group, .form-floating') ||
+        input.parentElement;
+      fieldContainer.classList.add('pw-field'); // position:relative
 
-      // Create button
+      // Ensure room for the eye
+      if (!input.style.paddingRight) input.style.paddingRight = '2.25rem';
+
+      // Create toggle button
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'pw-toggle';
       btn.setAttribute('aria-label', 'Show password');
       btn.setAttribute('aria-pressed', 'false');
       btn.innerHTML = EYE;
-      wrapper.appendChild(btn);
+
+      // Keep the invalid-feedback as the *adjacent* sibling if present
+      const next = input.nextElementSibling;
+      if (next && next.classList.contains('invalid-feedback')) {
+        // Insert AFTER the invalid-feedback to preserve adjacency: input + invalid-feedback
+        next.insertAdjacentElement('afterend', btn);
+      } else {
+        // Normal: insert right after the input
+        input.insertAdjacentElement('afterend', btn);
+      }
 
       // Toggle logic
       btn.addEventListener('click', () => {
-        const isHidden = input.type === 'password';
-        input.type = isHidden ? 'text' : 'password';
-        input.classList.toggle('pw-visible', isHidden);
-        btn.setAttribute('aria-pressed', String(isHidden));
+        const show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        input.classList.toggle('pw-visible', show);
+        btn.setAttribute('aria-pressed', String(show));
         btn.setAttribute(
           'aria-label',
-          isHidden ? 'Hide password' : 'Show password'
+          show ? 'Hide password' : 'Show password'
         );
-        btn.innerHTML = isHidden ? EYE_SLASH : EYE;
-        // Keep focus in the input for nicer UX
+        btn.innerHTML = show ? EYE_SLASH : EYE;
         input.focus({ preventScroll: true });
       });
     });
   });
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  addPasswordToggles([
+    'input.js-password[type="password"]',
+    'input.js-password[type="text"]',
+  ]);
+});
+
+// If you use HTMX anywhere, re-run on swapped content:
+document.body.addEventListener('htmx:afterSwap', () => {
+  addPasswordToggles([
+    'input.js-password[type="password"]',
+    'input.js-password[type="text"]',
+  ]);
+});
 
 document.addEventListener('DOMContentLoaded', () => {
   // enhance only fields with .js-password

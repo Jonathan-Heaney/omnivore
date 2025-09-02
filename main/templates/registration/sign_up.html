@@ -1,21 +1,43 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static crispy_forms_tags %}
 
-{% block title %}Sign Up{% endblock%}
-{% block css_files %}
-  <link rel="stylesheet" href="{% static "css/styles.css" %}">
-{% endblock %}
+{% block title %}Create your account{% endblock %}
 
-{% load crispy_forms_tags %}
+{% block content %}
+<section class="container max-w-700 py-4">
+  <header class="mb-3 text-center">
+    <h1 class="page-title">Create your account</h1>
+    <p class="text-muted mb-0">Join Omnivore and get a surprise piece of art every week.</p>
+  </header>
 
-{% block content %} 
+<div class="form-card">
+  <form method="post" novalidate>
+    {% csrf_token %}
 
-<h1 class="header">Sign Up</h1>
+    {# Error summary at the top (accessible + explicit) #}
+    {% if form.errors %}
+      <div class="alert alert-danger" role="alert">
+        <h4 class="alert-heading mb-2">Please fix the errors below</h4>
+        <ul class="mb-0">
+          {% for field in form %}
+            {% for error in field.errors %}
+              <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+          {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %} 
 
-<form action="" method="post">
-    {% csrf_token %}{{ form|crispy }}
-    <p>Have an account? Log in <a href="/login">here</a>!</p>
-    <button type="submit" class="btn btn-success">Register</button>
-</form>
+    {{ form|crispy }}
 
+    <div class="d-flex gap-2 mt-3 align-items-center">
+      <button type="submit" class="btn btn-cta">Create account</button>
+      <a href="{% url 'login' %}" class="btn btn-outline-secondary">I already have an account</a>
+    </div>
+  </form>
+</div>
+</section>
 {% endblock %}

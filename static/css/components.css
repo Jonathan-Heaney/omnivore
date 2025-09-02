@@ -423,3 +423,52 @@ select:focus {
   border-color: #d3f5df;
   color: #0f5132;
 }
+
+/* Positioning context for the eye; applied to the field container */
+.pw-field {
+  position: relative;
+}
+
+/* The eye button */
+.pw-toggle {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pw-toggle svg {
+  width: 20px;
+  height: 20px;
+  opacity: 0.65;
+}
+.pw-toggle:hover svg {
+  opacity: 0.9;
+}
+.pw-toggle[aria-pressed='true'] svg {
+  opacity: 1;
+}
+
+/* Robust invalid-feedback visibility when the control is invalid */
+
+/* 1) Modern browsers: use :has() to show feedback if any invalid control sits in the container */
+.pw-field:has(.form-control.is-invalid) .invalid-feedback {
+  display: block;
+}
+
+/* 2) Fallback for older browsers: keep Bootstrap's intent even if a button sits between */
+.pw-field .form-control.is-invalid + .pw-toggle + .invalid-feedback,
+.pw-field .form-control.is-invalid ~ .invalid-feedback {
+  display: block;
+}
+
+.invalid-feedback {
+  display: block;
+}

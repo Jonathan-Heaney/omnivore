@@ -12,28 +12,70 @@ def validate_username(value):
 
 
 class RegisterForm(UserCreationForm):
+    error_messages = {
+        "password_mismatch": "Passwords don’t match. Please re-enter both fields."
+    }
+
     first_name = forms.CharField(
-        required=True, widget=forms.TextInput(attrs={'autofocus': 'autofocus'}))
-    last_name = forms.CharField(required=True)
-    email = forms.EmailField(required=True)
+        required=True,
+        widget=forms.TextInput(
+            attrs={"autofocus": "autofocus", "autocomplete": "given-name"})
+    )
+    last_name = forms.CharField(required=True, widget=forms.TextInput(
+        attrs={"autocomplete": "family-name"}))
+    email = forms.EmailField(required=True, widget=forms.EmailInput(
+        attrs={"autocomplete": "email"}))
     username = forms.CharField(
         required=True,
         validators=[validate_username],
-        help_text="Please choose a unique username. Do not use your email address."
+        help_text="Choose a unique username (not your email).",
+        widget=forms.TextInput(attrs={"autocomplete": "username"})
     )
     password1 = forms.CharField(
         label="Password",
-        widget=forms.PasswordInput(attrs={'class': 'js-password'})
+        widget=forms.PasswordInput(
+            attrs={"class": "js-password", "autocomplete": "new-password"})
     )
     password2 = forms.CharField(
-        label="Confirm Password",
-        widget=forms.PasswordInput(attrs={'class': 'js-password'})
+        label="Confirm password",
+        widget=forms.PasswordInput(
+            attrs={"class": "js-password", "autocomplete": "new-password"})
     )
 
     class Meta:
         model = CustomUser
         fields = ["first_name", "last_name", "username",
                   "email", "password1", "password2"]
+
+    def clean(self):
+        cleaned = super().clean()
+        p1 = cleaned.get("password1")
+        p2 = cleaned.get("password2")
+
+        # If the form has a non-field mismatch, also attach it to password2:
+        if p1 and p2 and p1 != p2:
+            self.add_error(
+                "password2", self.error_messages["password_mismatch"])
+
+        return cleaned
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_show_errors = True
+        self.helper.form_tag = False
+        self.helper.label_class = "form-label"
+        self.helper.form_show_labels = True
+        self.helper.layout = Layout(
+            Field("first_name"),
+            Field("last_name"),
+            Field("email"),
+            Field("username"),
+            Field("password1"),
+            Field("password2"),
+            HTML(
+                '<p class="form-hint mt-1">Use at least 8 characters. Avoid reusing a password.</p>'),
+        )
 
     def save(self, commit=True):
         user = super().save(commit=False)
