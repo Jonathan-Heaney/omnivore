@@ -2,9 +2,6 @@
 {% load static %}
 
 {% block title %}Omnivore Arts · Discover the arts, from people{% endblock %}
-{% block css_files %}
-  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-{% endblock %}
 
 {% block content %}
 
@@ -18,15 +15,20 @@
       <p class="lead text-muted mb-4">
         Omnivore is a cozy place to discover music, poetry, film, paintings, and more—shared by real people, chosen at random, just for you.
       </p>
-      <div class="d-flex flex-wrap gap-3">
-        <a href="{% url 'sign_up' %}" class="btn btn-cta btn-lg px-4">Create your account</a>
+      <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start">
+        <a href="{% url 'sign_up' %}" class="btn btn-cta btn-lg px-4" aria-label="Create your Omnivore account">Create your account</a>
         <a href="#how-it-works" class="btn btn-outline-secondary btn-lg px-4">See how it works</a>
       </div>
     </div>
 
     <div class="col-12 col-lg-6 text-center">
-      <!-- Use your existing Oliver asset; swap path if needed -->
-      <img class="oliver-hero" src="{% static 'images/oliver-no-bg.png' %}" alt="Oliver the Omnivore mascot" />
+      <img
+        class="oliver-hero"
+        src="{% static 'images/oliver-no-bg.png' %}"
+        alt="Oliver the Omnivore mascot"
+        width="360" height="360"
+        loading="lazy"
+      />
       <div class="oliver-chip" aria-hidden="true">hi, i’m oliver!</div>
     </div>
   </div>
@@ -34,7 +36,7 @@
 
 <!-- “ALL THE ARTS” SIGNAL -->
 <section class="container py-4">
-  <div class="row text-center g-4">
+  <div class="row text-center g-3 g-md-4">
     <div class="col-6 col-md">
       <div class="pill"><span aria-hidden="true">🎨</span> Painting</div>
     </div>
@@ -42,7 +44,7 @@
       <div class="pill"><span aria-hidden="true">🎶</span> Music</div>
     </div>
     <div class="col-6 col-md">
-      <div class="pill"><span aria-hidden="true">🎬</span> Film & TV</div>
+      <div class="pill"><span aria-hidden="true">🎬</span> Film &amp; TV</div>
     </div>
     <div class="col-6 col-md">
       <div class="pill"><span aria-hidden="true">📚</span> Literature</div>
@@ -55,6 +57,10 @@
 
 <!-- HOW IT WORKS -->
 <section id="how-it-works" class="container py-5">
+  <header class="text-center mb-3">
+    <h2 class="h3 fw-semibold mb-1">How it works</h2>
+  </header>
+
   <div class="row g-4 align-items-stretch">
     <div class="col-md-4">
       <div class="card step h-100">
@@ -83,42 +89,41 @@
   </div>
 </section>
 
-<!-- VALUES (INDIE-WEB VIBES) -->
+<!-- VALUES -->
 <section class="container py-5">
   <div class="row g-4">
     <div class="col-md-4">
-      <div class="value">
+      <div class="value h-100">
         <h4 class="h6 text-uppercase text-muted mb-2">People First</h4>
         <p class="mb-0">No algorithms, no AI, no ads. Just great art and private conversation.</p>
       </div>
     </div>
     <div class="col-md-4">
-      <div class="value">
+      <div class="value h-100">
         <h4 class="h6 text-uppercase text-muted mb-2">Gift Economy</h4>
         <p class="mb-0">Every piece shared is a gift to the community. Your contribution matters.</p>
       </div>
     </div>
     <div class="col-md-4">
-      <div class="value">
-        <h4 class="h6 text-uppercase text-muted mb-2">Serendipity & Surprise</h4>
+      <div class="value h-100">
+        <h4 class="h6 text-uppercase text-muted mb-2">Serendipity &amp; Surprise</h4>
         <p class="mb-0">The best discoveries are unexpected. Omnivore is designed to surprise you, not to predict you.</p>
       </div>
     </div>
     <div class="col-md-4">
-      <div class="value">
+      <div class="value h-100">
         <h4 class="h6 text-uppercase text-muted mb-2">Broad Horizons</h4>
-        <p class="mb-0">From music to poetry, painting to film—Omnivore is for <em>all the arts</em>. Expand your taste, deepen your curiosity.</p>
+        <p class="mb-0">From music to poetry, painting to film—Omnivore is for <em>all the arts</em>.</p>
       </div>
     </div>
     <div class="col-md-4">
-      <div class="value">
+      <div class="value h-100">
         <h4 class="h6 text-uppercase text-muted mb-2">Connection Through Art</h4>
-        <p class="mb-0">Every piece is an invitation. Share thoughts, start conversations, build relationships around the arts you love.</p>
+        <p class="mb-0">Every piece is an invitation. Share thoughts, start conversations, build relationships.</p>
       </div>
     </div>
   </div>
 </section>
-
 
 <!-- CTA FOOTER -->
 <section class="container py-5 text-center">

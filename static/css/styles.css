@@ -791,7 +791,7 @@ footer a:hover {
   max-width: 360px;
   width: 90%;
   height: auto;
-  animation: bob 6s ease-in-out infinite;
+  animation: bob 1.5s ease-in-out infinite;
   will-change: transform;
 }
 @media (prefers-reduced-motion: reduce) {
