@@ -1,28 +1,47 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %} How It Works {% endblock %}
-{% block css_files %}
-  <link rel="stylesheet" href="{% static "css/styles.css" %}">
-{% endblock %}
+{% block title %}How It Works{% endblock %}
 
 {% block content %}
-<h1 class="header">How It Works</h1>
-<p class='info-text'>Omnivore is an art-sharing platform. We start a new round every month: submit a piece of art that you love, and twice a week for the rest of the month, you'll get back a random artwork that someone else has shared.</p>
+<section class="container max-w-700 py-4">
+  <header class="mb-4 text-center">
+    <h1 class="page-title">How It Works</h1>
+    <p class="text-muted mb-0">
+      Omnivore is an art-sharing platform. We start a new round every month: submit a piece of art that you love, and twice a week for the rest of the month, you’ll get back a random artwork that someone else has shared.
+    </p>
+  </header>
 
-<div class='info-container'>
-  <h5>Our next round begins December 1st! To get involved:</h5>
-  <ul>
-    {% if not user.is_authenticated %}
-    <li><a href="/sign-up">Sign up</a> for an account, or <a href="/login">log in</a>.</li>
-    {% endif %}
-    <li>Submit one piece of art <a href="/share-art">here</a>, starting December 1st. Guidelines for submissions can be found <a href="/submission-guidelines">here</a>.</li>
-    <li>You'll get your first piece of art on December 6th. You can submit your chosen piece after that date, but you'll only receive art if you've shared something.</li>
-    <li>Enjoy the art that others have shared! You'll receive a piece every Tuesday and Friday.</li>
-    <li>Think about what you want to share next month!</li>
-  </ul>
-</div>
+  <div class="form-card">
+    <h5 class="mb-3">Our next round begins December 1st! To get involved:</h5>
+    <ol class="ps-3 mb-0">
+      {% if not user.is_authenticated %}
+      <li>
+        <a href="/sign-up">Sign up</a> for an account, or <a href="/login">log in</a>.
+      </li>
+      {% endif %}
+      <li>
+        Submit one piece of art <a href="/share-art">here</a>, starting December 1st.
+        Guidelines for submissions can be found <a href="/submission-guidelines">here</a>.
+      </li>
+      <li>
+        You’ll get your first piece of art on December 6th. You can submit your chosen piece after that date, but you’ll only receive art if you’ve shared something.
+      </li>
+      <li>
+        Enjoy the art that others have shared! You’ll receive a piece every Tuesday and Friday.
+      </li>
+      <li>
+        Think about what you want to share next month!
+      </li>
+    </ol>
+  </div>
 
-<p>Check out our <a href="/faq">FAQ page</a> for more details, or email <a href="mailto:jonathan@omnivorearts.com" >jonathan@omnivorearts.com</a> with any other questions/feedback!</p>
-
+  <footer class="mt-4">
+    <p class="text-muted mb-0">
+      Check out our <a href="/faq">FAQ page</a> for more details, or email
+      <a href="mailto:jonathan@omnivorearts.com">jonathan@omnivorearts.com</a>
+      with any other questions or feedback.
+    </p>
+  </footer>
+</section>
 {% endblock %}
