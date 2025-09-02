@@ -1,65 +1,76 @@
-{# templates/main/thanks_for_sharing.html #}
 {% extends 'base.html' %}
 {% load static %}
-{% block title %} Thank You {% endblock %}
 
-{% block css_files %}
-  <link rel="stylesheet" href="{% static "css/styles.css" %}">
-{% endblock %}
+{% block title %}Thank You{% endblock %}
 
 {% block content %}
+<section class="container max-w-700 py-4">
+  <header class="mb-4 text-center">
+    <h1 class="page-title">Thanks for sharing!</h1>
+  </header>
 
-<h1>Thanks for sharing!</h1>
-
-{% if paused %}
-  <div class="alert alert-warning">
-    You currently have new art delivery paused. You can resume it anytime in
-    <a class="alert-link fw-bold text-decoration-underline"
-       href="{% url 'account_info_settings' %}?section=art-delivery#art-delivery">
-      Settings → Art Delivery
-    </a>.
-  </div>
-  <p>Your piece has been shared with the community. Once you resume delivery, you’ll start receiving new art again.</p>
-
-{% else %}
-  {% if reciprocal_piece %}
-    <p>As a gift from the community, here’s something for you:</p>
-
-    <div id="art-{{ reciprocal_piece.id }}" class="card mt-2 art-piece">
-      <div class="card-header"><strong>
-        {% if reciprocal_piece.link %}
-          <a href="{{ reciprocal_piece.link }}" target="_blank">
-            <span class="card-title">{{ reciprocal_piece.piece_name }}</span>
-          </a>
-        {% else %}
-          <span class="card-title">{{ reciprocal_piece.piece_name }}</span>
-        {% endif %}
-      </strong> ({{ reciprocal_piece.artist_name }})</div>
-
-      <div class="card-body d-flex flex-row justify-content-between">
-        <div>
-          <p>{{ reciprocal_piece.piece_description|linebreaksbr }}</p>
-        </div>
-      </div>
-
-      <div class="card-footer text-muted">
-        Shared by <strong>{{ reciprocal_piece.user.first_name }} {{ reciprocal_piece.user.last_name }}</strong>
-      </div>
-    </div>
-
-    <div class="mt-3">
-      <small class="text-muted">
-        This gift has also been added to your
-        <a href="{% url 'my_received_art' %}#art-{{ reciprocal_piece.public_id }}">My Received Art</a>
-        so you can find it later.
-      </small>
+  {% if paused %}
+    <div class="alert alert-warning">
+      <p class="mb-1">
+        <strong>New art delivery is paused.</strong>
+        You can resume anytime in
+        <a class="alert-link fw-bold text-decoration-underline"
+           href="{% url 'account_info_settings' %}?section=art-delivery#art-delivery">
+          Settings → Art Delivery
+        </a>.
+      </p>
+      <p class="mb-0">
+        Your piece has been shared with the community. Once you resume delivery, you’ll start receiving new art again.
+      </p>
     </div>
 
   {% else %}
-    <div class="alert alert-info">
-      Thanks for contributing! We couldn’t find a new piece to share with you right now.
-      Check back on your <a href="{% url 'my_received_art' %}">My Received Art</a> page soon.
-    </div>
+    {% if reciprocal_piece %}
+      <p class="lead text-muted">As a gift from the community, here’s something for you:</p>
+
+      <div id="art-{{ reciprocal_piece.public_id }}" class="card art-piece mb-3">
+        <div class="card-header">
+          <strong>
+            {% if reciprocal_piece.link %}
+              <a href="{{ reciprocal_piece.link }}" target="_blank" rel="noopener">
+                <span class="card-title">{{ reciprocal_piece.piece_name }}</span>
+              </a>
+            {% else %}
+              <span class="card-title">{{ reciprocal_piece.piece_name }}</span>
+            {% endif %}
+          </strong>
+          <span>({{ reciprocal_piece.artist_name }})</span>
+        </div>
+
+        <div class="card-body">
+          <p>{{ reciprocal_piece.piece_description|linebreaksbr }}</p>
+        </div>
+
+        <div class="card-footer text-muted">
+          Shared by <strong>{{ reciprocal_piece.user.first_name }} {{ reciprocal_piece.user.last_name }}</strong>
+        </div>
+      </div>
+
+      <p class="small text-muted">
+        This gift has also been added to your
+        <a href="{% url 'my_received_art' %}#art-{{ reciprocal_piece.public_id }}">My Received Art</a>
+        so you can revisit it later.
+      </p>
+
+    {% else %}
+      <div class="alert alert-info">
+        <p class="mb-1"><strong>Thanks for contributing!</strong></p>
+        <p class="mb-0">
+          We couldn’t find a new piece to share with you right now.
+          Check back on your
+          <a href="{% url 'my_received_art' %}">My Received Art</a> page soon.
+        </p>
+      </div>
+    {% endif %}
   {% endif %}
-{% endif %}
+
+  <div class="text-center mt-4">
+    <a href="{% url 'share_art' %}" class="btn btn-cta px-4">Share another piece</a>
+  </div>
+</section>
 {% endblock %}
