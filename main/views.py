@@ -267,9 +267,11 @@ def my_shared_art(request):
         Like.objects
         .filter(art_piece__in=my_pieces)
         .select_related('user', 'art_piece')
+        .order_by('-created_at')  # 👈 force recency
     )
     for like in likes:
-        likes_by_piece[like.art_piece].append(like.user)
+        likes_by_piece[like.art_piece].append(
+            like.user)  # list is newest→oldest
 
     summaries = {}
     for piece in my_pieces:
@@ -406,8 +408,13 @@ def art_piece_detail(request, public_id):
 
     # Likes (for both modes; you use it differently in template)
     likes_dict = {}
-    likes = Like.objects.filter(art_piece=piece).select_related('user')
-    likes_dict[piece] = [like.user for like in likes]
+    likes = (
+        Like.objects
+        .filter(art_piece=piece)
+        .select_related('user')
+        .order_by('-created_at')  # 👈 force recency
+    )
+    likes_dict[piece] = [like.user for like in likes]  # newest→oldest
 
     if is_owner:
         # Fetch *all* comments where owner is a participant, chronological
