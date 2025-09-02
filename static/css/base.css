@@ -209,11 +209,11 @@ hr {
 
 /* Ensure anchored sections aren't hidden under the sticky navbar */
 :root {
-  --nav-offset: 56px;
+  --nav-offset: 50px;
 } /* tweak to your navbar height */
 section[id],
 [id^='art-'] {
-  scroll-margin-top: calc(var(--nav-offset) + 12px);
+  scroll-margin-top: calc(var(--nav-offset) + 6px);
 }
 
 /* Respect users who prefer reduced motion */
