@@ -284,6 +284,24 @@ select:focus {
   text-decoration: none;
 }
 
+/* Make the likes line behave like a single sentence */
+.shared-card .likes-inline,
+.piece .likes-inline {
+  display: inline; /* override inline-flex */
+  white-space: normal;
+}
+
+.shared-card .likes-heart,
+.piece .likes-heart {
+  margin-right: 0.4rem; /* tiny gap after the heart */
+}
+
+.shared-card .likes-more,
+.piece .likes-more {
+  display: inline; /* not a flex item */
+  white-space: nowrap; /* keep "and others" together */
+}
+
 /* Modal shell */
 .likes-modal {
   position: fixed;
