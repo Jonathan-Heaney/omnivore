@@ -1,7 +1,17 @@
 /* Page: My Shared Art (page-scoped) */
 
-/* The list wrapper is now .container-narrow.stack from utilities.css
-   → gives you a comfortable readable width + consistent gaps */
+/* ---- Subtle tint knobs (adjust percentages to taste) ---- */
+:root {
+  /* strength of the brand, success, and amber tints used below */
+  --tint-brand-pct: 6%; /* header */
+  --tint-like-pct: 3%; /* likes strip */
+  --tint-cta-pct: 3%; /* conversations strip */
+
+  /* optional stroke hues for edges over a tinted bg */
+  --tint-stroke: color-mix(in srgb, var(--brand) 12%, var(--border));
+  --tint-like-stroke: color-mix(in srgb, var(--danger) 12%, var(--border));
+  --tint-cta-stroke: color-mix(in srgb, var(--success) 12%, var(--border));
+}
 
 /* Massive, responsive spacing just for this list */
 .shared-list {
@@ -32,8 +42,9 @@
   align-items: baseline;
   gap: 0.5rem;
   padding: 0.9rem 1rem;
-  background: #f8f9fb;
-  border-bottom: 1px solid #eef0f2;
+  /* subtle brand wash instead of flat gray */
+  background: color-mix(in srgb, var(--brand) var(--tint-brand-pct), #fff);
+  border-bottom: 1px solid var(--tint-stroke);
 }
 .shared-card__title {
   color: var(--brand);
@@ -133,9 +144,13 @@
   box-shadow: 0 2px 8px rgba(180, 36, 49, 0.25);
 }
 
-/* Likes include spacing */
+/* Likes include spacing + tint */
 .likes-container {
   padding: 0.5rem 1rem 0.75rem;
+  background: color-mix(in srgb, var(--danger) var(--tint-like-pct), #fff);
+  border-top: 1px solid var(--tint-like-stroke);
+  /* if you prefer a rounded inset feel: */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 /* Summary strip */
@@ -144,8 +159,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  border-top: 1px solid #eef0f2;
-  background: #fbfcfd;
+  background: color-mix(in srgb, var(--success) var(--tint-cta-pct), #fff);
+  border-top: 1px solid var(--tint-cta-stroke);
   padding: 0.9rem 1rem;
 }
 .summary__left {
@@ -189,6 +204,16 @@
 }
 .summary__right {
   flex: 0 0 auto;
+}
+
+.summary__label,
+.summary__last {
+  color: color-mix(in srgb, #000 55%, #fff);
+} /* slightly stronger on tint */
+.summary__badge {
+  background: #fff3cd; /* keep badge readable on amber wash */
+  color: #7a5a00;
+  border: 1px solid #ffe69c;
 }
 
 @media (max-width: 767.98px) {
