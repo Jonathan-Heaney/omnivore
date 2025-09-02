@@ -107,4 +107,5 @@ def send_shared_art_email(*, recipient, sender, art_piece, notification_id=None)
     }
 
     subject = f"{sender.get_full_name()} shared some art with you!"
+    subject = f"You have new art from {sender.get_full_name()}!"
     send_templated_email(recipient, subject, "emails/shared_art", context)
