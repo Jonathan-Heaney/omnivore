@@ -70,7 +70,7 @@
 
       {% with users=likes_dict|dict_get:piece %}
         {% if users %}
-          <div class="likes-container" id="likes-{{ piece.id }}-container">
+          <div class="likes">
             {% include 'main/likes_display.html' with piece=piece likes_dict=likes_dict %}
           </div>
         {% endif %}

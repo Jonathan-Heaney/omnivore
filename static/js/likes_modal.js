@@ -3,16 +3,28 @@
   const openClass = 'is-open';
   let lastTrigger = null;
 
+  // --- NEW: ensure the modal is appended to <body> (portal) ---
+  function ensurePortalled(modal) {
+    if (!modal || modal.dataset.portalled === 'true') return;
+    document.body.appendChild(modal);
+    modal.dataset.portalled = 'true';
+  }
+
   function openModal(modal, trigger) {
     lastTrigger = trigger || null;
+
+    // make sure it's not inside a transformed/overflow-hidden ancestor
+    ensurePortalled(modal);
+
     modal.classList.add(openClass);
     modal.setAttribute('aria-hidden', 'false');
 
-    // focus the dialog for screen readers
     const dialog = modal.querySelector('.likes-modal__dialog');
     if (dialog) dialog.focus();
+
     const btn = modal.querySelector('[data-close-modal]');
     if (btn) btn.setAttribute('aria-label', 'Close dialog');
+
     // prevent background scroll
     document.documentElement.style.overflow = 'hidden';
   }

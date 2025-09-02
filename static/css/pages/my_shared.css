@@ -29,11 +29,10 @@
   overflow: hidden;
   /* subtle brand accent on the left */
   border-left: 4px solid var(--brand);
-  transition: box-shadow 160ms ease, transform 160ms ease;
+  transition: box-shadow 160ms ease;
 }
 .shared-card:hover {
   box-shadow: var(--shadow-2);
-  transform: translateY(-1px);
 }
 
 /* Header */
@@ -145,7 +144,7 @@
 }
 
 /* Likes include spacing + tint */
-.likes-container {
+.likes {
   padding: 0.5rem 1rem 0.75rem;
   background: color-mix(in srgb, var(--danger) var(--tint-like-pct), #fff);
   /* border-top: 1px solid var(--tint-like-stroke); */
