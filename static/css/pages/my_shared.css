@@ -37,11 +37,12 @@
 }
 .shared-card__title {
   color: var(--brand);
-  text-underline-offset: 2px;
 }
 .shared-card__title:hover {
+  color: var(--brand);
+  filter: brightness(0.9);
   text-decoration: underline;
-  filter: brightness(0.95);
+  text-underline-offset: 2px;
 }
 .shared-card__by {
   color: var(--muted);
@@ -81,6 +82,55 @@
   padding: 6px 10px;
   border-radius: 999px;
   line-height: 1;
+}
+
+/* --- Scoped overrides for the tiny icon buttons in card footer --- */
+.shared-card__actions .btn {
+  padding: 6px 10px;
+  border-radius: 999px;
+  line-height: 1;
+}
+
+/* EDIT (outline-secondary → brand outline, fill on hover) */
+.shared-card__actions .btn-outline-secondary {
+  color: var(--brand-600);
+  background: transparent;
+  border-color: var(--brand-600);
+}
+
+.shared-card__actions .btn-outline-secondary:hover,
+.shared-card__actions .btn-outline-secondary:focus {
+  color: #fff;
+  background: var(--brand-600);
+  border-color: var(--brand-600);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.shared-card__actions .btn-outline-primary {
+  color: var(--success);
+  background: transparent;
+  border-color: var(--success);
+}
+.shared-card__actions .btn-outline-primary:hover,
+.shared-card__actions .btn-outline-primary:focus {
+  color: #fff;
+  background: var(--success);
+  border-color: var(--success);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* DELETE (outline-danger → red on hover, not Bootstrap gray) */
+.shared-card__actions .btn-outline-danger {
+  color: #b42431;
+  background: transparent;
+  border-color: #e7b1b6; /* soft red border */
+}
+.shared-card__actions .btn-outline-danger:hover,
+.shared-card__actions .btn-outline-danger:focus {
+  color: #fff;
+  background: #b42431;
+  border-color: #9f202b;
+  box-shadow: 0 2px 8px rgba(180, 36, 49, 0.25);
 }
 
 /* Likes include spacing */

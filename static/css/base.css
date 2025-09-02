@@ -1,8 +1,8 @@
 :root {
   /* Brand */
-  --brand: #1e5a96;
-  --brand-600: #174a7a;
-  --brand-200: #d8e6f6;
+  --brand: #1884bd; /* primary */
+  --brand-600: #136a97; /* hover/active */
+  --brand-200: #c5e0ee; /* focus ring / subtle bg */
 
   /* Accent used in badges/alerts, also for landing CTA modifier */
   --cta: #eab308;
