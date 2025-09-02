@@ -689,11 +689,21 @@ def custom_404(request, exception):
 
 
 def custom_500(request):
-    return render(request, 'main/404.html', status=500)
+    return render(request, 'main/500.html', status=500)
 
 
 class CustomPasswordResetView(auth_views.PasswordResetView):
     email_template_name = 'registration/password_reset_email.html'
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        # Gentle UX hints
+        form.fields['email'].widget.attrs.update({
+            'autofocus': 'autofocus',
+            'autocomplete': 'email',
+            'placeholder': 'you@example.com',
+        })
+        return form
 
     def send_mail(self, subject_template_name, email_template_name,
                   context, from_email, to_email, html_email_template_name=None):
