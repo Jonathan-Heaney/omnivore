@@ -26,24 +26,36 @@
       <p class="shared-card__description">{{ piece.piece_description|linebreaksbr }}</p>
 
       <div class="shared-card__actions">
-        <a href="{% url 'edit_art_piece' piece.public_id %}" class="icon-btn" title="Edit" id="edit-btn">
+        <!-- Edit -->
+        <a href="{% url 'edit_art_piece' piece.public_id %}"
+          class="btn btn-primary edit-btn"
+          id="edit-btn"
+          aria-label="Edit {{ piece.piece_name }}">
           <i class="fa-solid fa-pen"></i>
-          <span class="visually-hidden">Edit</span>
-      </a>
+        </a>
 
-        <form method="post" action="{% url 'delete_art_piece' piece.public_id %}" onsubmit="return confirmDelete();">
+        <!-- Delete -->
+        <form method="post"
+              action="{% url 'delete_art_piece' piece.public_id %}"
+              onsubmit="return confirmDelete();">
           {% csrf_token %}
-          <button type="submit" class="icon-btn text-danger" title="Delete">
+          <button type="submit"
+                  class="btn btn-danger"
+                  aria-label="Delete {{ piece.piece_name }}">
             <i class="fa-solid fa-trash"></i>
-            <span class="visually-hidden">Delete</span>
           </button>
         </form>
 
         {% if piece.link %}
-          <a class="btn btn-outline-secondary" href="{{ piece.link }}" target="_blank" rel="noopener">Source</a>
+          <a class="btn btn-outline-secondary"
+            href="{{ piece.link }}"
+            target="_blank"
+            rel="noopener"
+            aria-label="View source for {{ piece.piece_name }}">
+            <span>View Source</span><i class="fa-solid fa-up-right-from-square"></i>
+          </a>
         {% endif %}
       </div>
-    </div>
 
     <footer class="shared-card__meta">
       Shared {{ piece.created_at|date:"F j, Y" }}
