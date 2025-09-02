@@ -26,11 +26,17 @@
       <p class="shared-card__description">{{ piece.piece_description|linebreaksbr }}</p>
 
       <div class="shared-card__actions">
-        <a href="{% url 'edit_art_piece' piece.public_id %}" class="btn btn-primary edit-btn" id="edit-btn">Edit</a>
+        <a href="{% url 'edit_art_piece' piece.public_id %}" class="icon-btn" title="Edit" id="edit-btn">
+          <i class="fa-solid fa-pen"></i>
+          <span class="visually-hidden">Edit</span>
+      </a>
 
         <form method="post" action="{% url 'delete_art_piece' piece.public_id %}" onsubmit="return confirmDelete();">
           {% csrf_token %}
-          <button type="submit" class="btn btn-danger">Delete</button>
+          <button type="submit" class="icon-btn text-danger" title="Delete">
+            <i class="fa-solid fa-trash"></i>
+            <span class="visually-hidden">Delete</span>
+          </button>
         </form>
 
         {% if piece.link %}
