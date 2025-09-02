@@ -361,6 +361,40 @@ select:focus {
   padding: var(--s3);
 }
 
+/* Password eye. Ensure the eye sits inside the field and input text doesn’t run under it */
+.pw-field {
+  position: relative;
+}
+.pw-field .pw-toggle {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.pw-field .pw-toggle svg {
+  width: 20px;
+  height: 20px;
+  opacity: 0.65;
+}
+.pw-field .pw-toggle:hover svg {
+  opacity: 0.9;
+}
+.pw-field .pw-toggle[aria-pressed='true'] svg {
+  opacity: 1;
+}
+
+/* Leave room for the eye */
+.pw-field .form-control {
+  padding-right: 2.25rem;
+}
+
 /* ---------- Notification cards ---------- */
 .notification-card {
   position: relative;

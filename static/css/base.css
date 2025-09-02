@@ -129,27 +129,52 @@ hr {
   background: rgba(30, 90, 150, 0.06);
   text-decoration: none;
 }
+
+/* --- Navbar dropdown sizing & polish --- */
 .site-nav .dropdown-menu {
+  /* Let the menu size to its content instead of the Bootstrap 10rem min */
+  min-width: unset;
+  width: max-content; /* fit to items */
+  max-width: 260px; /* safety so long labels don't explode width */
+  padding: 12px; /* a little tighter */
   border-radius: 12px;
   border: 1px solid var(--border);
   box-shadow: var(--shadow-2);
+  margin: 0 auto;
 }
+
 .site-nav .dropdown-item {
+  padding: 8px 12px; /* slightly tighter rows */
+  white-space: nowrap; /* keep single-line, keeps menu compact */
   font-weight: 500;
-  padding: 0.55rem 0.85rem;
+}
+
+/* Divider spacing inside dropdown */
+.site-nav .dropdown-divider {
+  margin: 6px 0;
+}
+
+/* Mobile: avoid overflow off the screen in the collapsed nav */
+@media (max-width: 991.98px) {
+  .site-nav .dropdown-menu {
+    max-width: 90vw; /* keep within viewport */
+  }
 }
 
 /* Notifications bell */
-#notification-link {
-  position: relative;
-}
 #notification-link.has-unread {
   color: #dc3545;
 }
+
+#notification-link .fa-bell {
+  position: relative; /* new container for the dot */
+  display: inline-block;
+}
+
 #notification-link .notif-dot {
   position: absolute;
-  top: 2px;
-  right: 2px;
+  top: -4px;
+  right: -7px; /* adjust to snugly hug the bell */
   width: 8px;
   height: 8px;
   background: #dc3545;

@@ -142,16 +142,16 @@ function addPasswordToggles(selectors) {
 
   selectors.forEach((sel) => {
     document.querySelectorAll(sel).forEach((input) => {
-      if (input.dataset.hasToggle) return; // avoid duplicates on re-render
+      if (input.dataset.hasToggle) return; // avoid duplicates
       input.dataset.hasToggle = 'true';
 
-      // Wrap container
+      // Wrap the input in the positioned container our CSS expects
       const wrapper = document.createElement('div');
-      wrapper.className = 'pw-wrap';
+      wrapper.className = 'pw-field'; // <-- was 'pw-wrap'
       input.parentNode.insertBefore(wrapper, input);
       wrapper.appendChild(input);
 
-      // Create button
+      // Create the eye button
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'pw-toggle';
@@ -171,13 +171,13 @@ function addPasswordToggles(selectors) {
           isHidden ? 'Hide password' : 'Show password'
         );
         btn.innerHTML = isHidden ? EYE_SLASH : EYE;
-        // Keep focus in the input for nicer UX
         input.focus({ preventScroll: true });
       });
     });
   });
 }
 
+// One DOMContentLoaded + one HTMX hook is enough
 document.addEventListener('DOMContentLoaded', () => {
   addPasswordToggles([
     'input.js-password[type="password"]',
@@ -185,24 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
   ]);
 });
 
-// If you use HTMX anywhere, re-run on swapped content:
 document.body.addEventListener('htmx:afterSwap', () => {
-  addPasswordToggles([
-    'input.js-password[type="password"]',
-    'input.js-password[type="text"]',
-  ]);
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-  // enhance only fields with .js-password
-  addPasswordToggles([
-    'input.js-password[type="password"]',
-    'input.js-password[type="text"]',
-  ]);
-});
-
-// If you use HTMX anywhere, re-run on swapped content:
-document.body.addEventListener('htmx:afterSwap', (e) => {
   addPasswordToggles([
     'input.js-password[type="password"]',
     'input.js-password[type="text"]',
