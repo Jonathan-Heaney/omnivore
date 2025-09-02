@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function () {
 function addPasswordToggles(selectors) {
   const EYE = `
     <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 5C6.5 5 2 9.5 2 12s4.5 7 10 7 10-4.5 10-7S17.5 5 12 5zm0 12c-2.8 0-5-2.24-5-5s2.2-5 5-5 5 2.24 5 5-2.2 5-5 5z"/>
+      <path d="M12 5C6.5 5 2 9.5 2 12s4.5 7 10 7 10-4.5 10-7S17.5 5 12 5zm0 12c-2.8 0-5-2.24-5-5s2.2-5 5-5 5 2.24 5 5-2.2 5-5 5zm0-8a3 3 0 100 6 3 3 0 000-6z"/>
     </svg>`;
   const EYE_SLASH = `
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -142,47 +142,36 @@ function addPasswordToggles(selectors) {
 
   selectors.forEach((sel) => {
     document.querySelectorAll(sel).forEach((input) => {
-      if (input.dataset.hasToggle) return; // avoid duplicates
+      if (input.dataset.hasToggle) return; // avoid duplicates on re-render
       input.dataset.hasToggle = 'true';
 
-      // Make a positioning context that won't break crispy markup
-      const fieldContainer =
-        input.closest('.mb-3, .form-group, .form-floating') ||
-        input.parentElement;
-      fieldContainer.classList.add('pw-field'); // position:relative
+      // Wrap container
+      const wrapper = document.createElement('div');
+      wrapper.className = 'pw-wrap';
+      input.parentNode.insertBefore(wrapper, input);
+      wrapper.appendChild(input);
 
-      // Ensure room for the eye
-      if (!input.style.paddingRight) input.style.paddingRight = '2.25rem';
-
-      // Create toggle button
+      // Create button
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'pw-toggle';
       btn.setAttribute('aria-label', 'Show password');
       btn.setAttribute('aria-pressed', 'false');
       btn.innerHTML = EYE;
-
-      // Keep the invalid-feedback as the *adjacent* sibling if present
-      const next = input.nextElementSibling;
-      if (next && next.classList.contains('invalid-feedback')) {
-        // Insert AFTER the invalid-feedback to preserve adjacency: input + invalid-feedback
-        next.insertAdjacentElement('afterend', btn);
-      } else {
-        // Normal: insert right after the input
-        input.insertAdjacentElement('afterend', btn);
-      }
+      wrapper.appendChild(btn);
 
       // Toggle logic
       btn.addEventListener('click', () => {
-        const show = input.type === 'password';
-        input.type = show ? 'text' : 'password';
-        input.classList.toggle('pw-visible', show);
-        btn.setAttribute('aria-pressed', String(show));
+        const isHidden = input.type === 'password';
+        input.type = isHidden ? 'text' : 'password';
+        input.classList.toggle('pw-visible', isHidden);
+        btn.setAttribute('aria-pressed', String(isHidden));
         btn.setAttribute(
           'aria-label',
-          show ? 'Hide password' : 'Show password'
+          isHidden ? 'Hide password' : 'Show password'
         );
-        btn.innerHTML = show ? EYE_SLASH : EYE;
+        btn.innerHTML = isHidden ? EYE_SLASH : EYE;
+        // Keep focus in the input for nicer UX
         input.focus({ preventScroll: true });
       });
     });

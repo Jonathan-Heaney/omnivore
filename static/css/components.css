@@ -469,6 +469,14 @@ select:focus {
   display: block;
 }
 
+/* Make sure password errors display inline */
 .invalid-feedback {
   display: block;
+}
+
+/* Remove list styling from login form errors */
+.m-0 {
+  list-style: none;
+  margin: 0 auto;
+  padding: 0 0.25rem;
 }

@@ -1,26 +1,36 @@
 {% extends 'base.html' %}
-{% load static %}
-{% load crispy_forms_tags %}
+{% load static crispy_forms_tags %}
 
-{% block title %}Login{% endblock %}
-{% block css_files %}
-  <link rel="stylesheet" href="{% static "css/styles.css" %}">
-{% endblock %}
+{% block title %}Log in{% endblock %}
 
-{% block content %} 
-<h1 class="header">Login</h1>
+{% block content %}
+<section class="container max-w-700 py-4">
+  <header class="mb-3 text-center">
+    <h1 class="page-title">Log in</h1>
+    <p class="text-muted mb-0">Welcome back to Omnivore!</p>
+  </header>
 
-<form action="" method="post">
-    {% csrf_token %}
-    {{ form|crispy }}
+  <div class="form-card">
+    <form method="post" novalidate>
+      {% csrf_token %}
 
-    {# Preserve ?next=... from the query string #}
-    {% if next %}
-      <input type="hidden" name="next" value="{{ next }}">
-    {% endif %}
-    
-    <p>Don't have an account? Create one <a href="/sign-up">here</a>!</p>
-    <p><a href="/password_reset">Forgot your password?</a></p>
-    <button type="submit" class="btn btn-success">Login</button>
-</form>
+      {{ form|crispy }}
+
+      {# Preserve ?next=... from the query string #}
+      {% if next %}
+        <input type="hidden" name="next" value="{{ next }}">
+      {% endif %}
+
+      <div class="d-flex gap-2 mt-3 align-items-center">
+        <button type="submit" class="btn btn-cta">Log in</button>
+        <a href="{% url 'password_reset' %}" class="btn btn-outline-secondary">Forgot password?</a>
+      </div>
+
+      <p class="small text-muted mt-3 mb-0">
+        Don’t have an account?
+        <a href="{% url 'sign_up' %}">Create one</a>.
+      </p>
+    </form>
+  </div>
+</section>
 {% endblock %}

@@ -88,7 +88,20 @@ class RegisterForm(UserCreationForm):
 class CustomAuthenticationForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['password'].widget.attrs.update({'class': 'js-password'})
+
+        # Username field: autofocus + proper autocomplete
+        self.fields["username"].widget.attrs.update({
+            "autofocus": "autofocus",
+            "autocomplete": "username",
+            "placeholder": "Username",
+        })
+
+        # Password field: hook up your password-eye + autocomplete
+        self.fields["password"].widget.attrs.update({
+            "class": "js-password",
+            "autocomplete": "current-password",
+            "placeholder": "Password",
+        })
 
 
 class AccountInfoForm(forms.ModelForm):
