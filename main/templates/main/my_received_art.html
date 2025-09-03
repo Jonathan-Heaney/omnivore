@@ -15,6 +15,7 @@
 <br>
 
 {% if request.user.is_authenticated and request.user.receive_art_paused %}
+<div class='container-narrow'>
   <div class="alert alert-warning d-flex align-items-center justify-content-between" role="alert">
     <div>
       <strong>New art delivery is paused.</strong>
@@ -25,6 +26,7 @@
       to resume.
     </div>
   </div>
+</div>
 {% endif %}
 
 <div class="container-narrow">
@@ -98,8 +100,7 @@
               </div>
             {% else %}
               <div class="preview__left">
-                <span class="preview__label">No messages yet</span>
-                <span class="preview__hint">— say hi to {{ piece.user.first_name }}!</span>
+                <span class="preview__hint">No messages yet - say hi to {{ piece.user.first_name }}!</span>
               </div>
               <div class="preview__right">
                 <a href="{% url 'art_detail' piece.public_id %}#reply"

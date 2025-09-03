@@ -104,24 +104,34 @@
   background: color-mix(in srgb, var(--success) var(--tint-cta-pct, 3%), #fff);
   padding: 0.9rem 1rem;
 }
+
 .preview__left {
-  min-width: 0;
+  display: flex; /* NEW */
+  align-items: baseline; /* tidy vertical alignment */
+  gap: 0.5rem;
+  min-width: 0; /* allow children to shrink */
 }
+
 .preview__label {
+  /* stays natural size */
+  flex: 0 0 auto;
   color: color-mix(in srgb, #000 55%, #fff);
-  margin-right: 0.35rem;
+  margin-right: 0.1rem; /* small separation before text */
 }
+
 .preview__text {
-  color: inherit;
+  /* this is the shrinky bit */
+  flex: 1 1 auto; /* NEW: take remaining space */
+  min-width: 0; /* REQUIRED for ellipsis in flex */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-.preview__hint {
-  color: var(--muted);
+  color: inherit;
 }
 
 .preview__badge {
+  /* keep badge from shrinking */
+  flex: 0 0 auto;
   background: #fff3cd;
   color: #7a5a00;
   border: 1px solid #ffe69c;
@@ -130,6 +140,16 @@
   font-size: 0.75rem;
   font-weight: 700;
   margin-left: 0.5rem;
+}
+
+/* “No messages yet — say hi …” variant */
+.preview__hint {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--muted);
 }
 
 .preview__right {
@@ -145,10 +165,10 @@
     display: flex;
     justify-content: flex-start;
   }
-  /* Hide the long last-message snippet on very small screens, like Shared */
-  .preview__text {
+  .preview__text,
+  .preview__label {
     display: none;
-  }
+  } /* as you had */
 }
 
 /* Reuse underline-on-hover for CTA text but not icons (same fix as Shared) */
