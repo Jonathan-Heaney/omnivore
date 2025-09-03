@@ -95,6 +95,23 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
+/* Center the single like button vertically inside the strip */
+.received-card .likes-container {
+  display: flex;
+  align-items: center; /* vertical centering */
+  /* optional: slightly tighter vertical rhythm */
+  padding-top: 0.65rem;
+  padding-bottom: 0.65rem;
+}
+
+/* Ensure the button doesn’t introduce baseline weirdness */
+.received-card .likes-container .like-button {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1; /* optical centering */
+  margin: 0; /* just in case */
+}
+
 /* ----- Conversation preview (no count, just preview) ----- */
 .preview {
   display: flex;
