@@ -53,13 +53,6 @@
              aria-label="Open source for {{ piece.piece_name }}">
             View source <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
           </a>
-        {% else %}
-          {# tiny icon set like Shared meta; keep here for convenience too #}
-          <a class="btn btn-outline-primary btn-sm"
-             href="{{ piece.link }}" target="_blank" rel="noopener"
-             aria-label="Open source link for {{ piece.piece_name }}">
-            <i class="fa-solid fa-up-right-from-square"></i>
-          </a>
         {% endif %}
       {% endif %}
     </div>
@@ -78,15 +71,18 @@
         {% endif %}
       {% endwith %}
 
-      <footer class="piece__meta">
-        <span class="piece__date">Shared {{ piece.created_at|date:"F j, Y" }}</span>
+      <footer class="shared-card__meta">
+        <span class="shared-card__date">Shared {{ piece.created_at|date:"F j, Y" }}</span>
 
-        <div class="piece__actions">
+        <div class="shared-card__actions">
+          <!-- Edit -->
           <a href="{% url 'edit_art_piece' piece.public_id %}"
-             class="btn btn-outline-secondary btn-sm"
-             aria-label="Edit {{ piece.piece_name }}" title="Edit">
+            class="btn btn-outline-secondary btn-sm"
+            aria-label="Edit {{ piece.piece_name }}" title="Edit">
             <i class="fa-solid fa-pen"></i>
           </a>
+
+          <!-- Delete -->
           <form method="post"
                 action="{% url 'delete_art_piece' piece.public_id %}"
                 onsubmit="return confirmDelete();"
@@ -98,10 +94,11 @@
               <i class="fa-solid fa-trash"></i>
             </button>
           </form>
+
           {% if piece.link %}
             <a class="btn btn-outline-primary btn-sm"
-               href="{{ piece.link }}" target="_blank" rel="noopener"
-               aria-label="Open source link for {{ piece.piece_name }}" title="Open source">
+              href="{{ piece.link }}" target="_blank" rel="noopener"
+              aria-label="Open source link for {{ piece.piece_name }}" title="Open source">
               <i class="fa-solid fa-up-right-from-square"></i>
             </a>
           {% endif %}
