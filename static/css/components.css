@@ -195,6 +195,7 @@ select:focus {
 }
 .icon-btn {
   border: none;
+  color: var(--brand);
   background: transparent;
   padding: 0 6px 0 10px;
   display: inline-flex;
@@ -207,6 +208,7 @@ select:focus {
 }
 .icon-btn:hover svg {
   opacity: 1;
+  color: var(--brand-600);
 }
 .icon-btn:disabled svg {
   opacity: 0.4;
@@ -217,7 +219,28 @@ select:focus {
 }
 .comment-input .form-control {
   min-height: 42px;
+  border-radius: var(--radius-sm); /* same rounding as other form inputs */
+  padding: 10px 12px;
   resize: none;
+}
+
+/* Comment form layout + rounding */
+.comment-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.comment-input .form-control {
+  min-height: 42px;
+  resize: none;
+  border-radius: var(--radius-sm); /* 10px from your tokens */
+  padding: 10px 12px;
+}
+
+/* tiny spacing so the icon doesn't visually “attach” to the field */
+.comment-input .icon-btn {
+  margin-left: 2px;
 }
 
 /* ---------- Likes (button + inline names + modal) ---------- */

@@ -11,7 +11,7 @@
   {% csrf_token %}
   <input type="hidden" name="art_piece_id" value="{{ piece.id }}">
 
-  <div class="input-group comment-input">
+  <div class="comment-input">
     <label class="visually-hidden" for="cf-text-{{ pid }}">Message</label>
     <textarea id="cf-text-{{ pid }}"
               name="text"
