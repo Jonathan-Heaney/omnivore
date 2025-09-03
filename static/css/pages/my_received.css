@@ -14,7 +14,7 @@
   background: #fff;
   box-shadow: var(--shadow-1);
   overflow: hidden;
-  border-left: 4px solid var(--brand);
+  border-left: 4px solid color-mix(in srgb, var(--success) 70%, #fff);
   transition: box-shadow 160ms ease;
 }
 .received-card:hover {
