@@ -106,63 +106,81 @@
       </footer>
     {% endif %}
 
-    {# ---------- Threads area (full comments) ---------- #}
+       {# end of the ART CARD — do not put conversations below this line #}
+    </section>  {# /.piece #}
+
+    {# ---------- Conversations section (separate from art card) ---------- #}
     {% if mode == "recipient" %}
-      <section class="thread thread--single">
-        {% with pid=piece.id|stringformat:"s" %}
-          {% with tgt_id="comments-"|add:pid|add:"-container" %}
-            <div id="{{ tgt_id }}" class="thread__messages">
-              {% for comment in thread %}
-                {% include 'main/comment_text.html' with comment=comment %}
-              {% endfor %}
-            </div>
-            <div id="reply" class="thread__form">
-              {% include "main/comment_form.html" with reply_recipient=piece.user.first_name piece=piece post_url=request.path target_id=tgt_id autofocus=1 %}
-            </div>
+      <section id="conversations" class="conv-section">
+        <header class="conv-section__header">
+          <h2 class="conv-section__title">Conversation</h2>
+        </header>
+
+        <article class="thread thread--single">
+          {% with pid=piece.id|stringformat:"s" %}
+            {% with tgt_id="comments-"|add:pid|add:"-container" %}
+              <div class="thread__body">  {# <-- add this wrapper #}
+                <div id="{{ tgt_id }}" class="thread__messages">
+                  {% for comment in thread %}
+                    {% include 'main/comment_text.html' with comment=comment %}
+                  {% endfor %}
+                </div>
+                <div id="reply" class="thread__form">
+                  {% include "main/comment_form.html" with reply_recipient=piece.user.first_name piece=piece post_url=request.path target_id=tgt_id autofocus=1 %}
+                </div>
+              </div>
+            {% endwith %}
           {% endwith %}
-        {% endwith %}
+        </article>
       </section>
+
     {% else %}
       {% if conversations %}
-        <section class="threads">
-          {% for recipient, conversation in conversations %}
-            <article class="thread">
-              <header class="thread__header">
-                <div class="thread__title">
-                  Conversation with <strong>{{ recipient.first_name }} {{ recipient.last_name }}</strong>
-                </div>
-                {% with pid=piece.id|stringformat:"s" rid=recipient.id|stringformat:"s" %}
-                  <button class="toggle-comment-btn"
-                          id="toggle-button-{{ pid }}-{{ rid }}"
-                          onclick="toggleComments({{ piece.id }}, {{ recipient.id }})"
-                          aria-controls="comments-{{ pid }}-{{ rid }}-container"
-                          aria-expanded="true">
-                    <i class="fa-solid fa-minus"></i>
-                  </button>
-                {% endwith %}
-              </header>
+        <section id="conversations" class="conv-section">
+          <header class="conv-section__header">
+            <h2 class="conv-section__title">Conversations</h2>
+            <span class="conv-section__count">{{ conversations|length }}</span>
+          </header>
 
-              <div class="thread__body">
-                {% with pid=piece.id|stringformat:"s" rid=recipient.id|stringformat:"s" %}
-                  {% with tgt_id="comments-"|add:pid|add:"-"|add:rid|add:"-container" %}
-                    <div id="{{ tgt_id }}" class="thread__messages">
-                      {% for comment in conversation %}
-                        {% include 'main/comment_text.html' with comment=comment %}
-                      {% endfor %}
-                    </div>
-                    <div class="thread__form">
-                      {% include "main/reply_form.html" with reply_recipient=recipient.first_name top_level_comment=conversation.0 piece=piece recipient=recipient post_url=request.path target_id=tgt_id %}
-                    </div>
+          <div class="threads">
+            {% for recipient, conversation in conversations %}
+              <article class="thread">
+                <header class="thread__header">
+                  <div class="thread__title">
+                    Conversation with <strong>{{ recipient.first_name }} {{ recipient.last_name }}</strong>
+                  </div>
+                  {% with pid=piece.id|stringformat:"s" rid=recipient.id|stringformat:"s" %}
+                    <button class="toggle-comment-btn"
+                            id="toggle-button-{{ pid }}-{{ rid }}"
+                            onclick="toggleComments({{ piece.id }}, {{ recipient.id }})"
+                            aria-controls="comments-{{ pid }}-{{ rid }}-container"
+                            aria-expanded="true">
+                      <i class="fa-solid fa-minus"></i>
+                    </button>
                   {% endwith %}
-                {% endwith %}
-              </div>
-            </article>
-          {% endfor %}
+                </header>
+
+                <div class="thread__body">
+                  {% with pid=piece.id|stringformat:"s" rid=recipient.id|stringformat:"s" %}
+                    {% with tgt_id="comments-"|add:pid|add:"-"|add:rid|add:"-container" %}
+                      <div id="{{ tgt_id }}" class="thread__messages">
+                        {% for comment in conversation %}
+                          {% include 'main/comment_text.html' with comment=comment %}
+                        {% endfor %}
+                      </div>
+                      <div class="thread__form">
+                        {% include "main/reply_form.html" with reply_recipient=recipient.first_name top_level_comment=conversation.0 piece=piece recipient=recipient post_url=request.path target_id=tgt_id %}
+                      </div>
+                    {% endwith %}
+                  {% endwith %}
+                </div>
+              </article>
+            {% endfor %}
+          </div>
         </section>
       {% endif %}
     {% endif %}
 
-  </section>
 </div>
 
 {% endblock %}

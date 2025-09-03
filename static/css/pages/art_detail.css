@@ -170,10 +170,55 @@
   align-items: center;
 }
 
+/* ---------- Conversation section shell ---------- */
+.conv-section {
+  margin-top: clamp(24px, 4vw, 40px);
+}
+
+.conv-section__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.conv-section__title {
+  margin: 0;
+  font-size: clamp(18px, 2.3vw, 22px);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.conv-section__count {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: var(--fs-sm);
+  background: #fff8e1;
+  color: #7a5a00;
+  border: 1px solid #ffe69c;
+}
+
+.conv-section .thread--single {
+  margin-top: 0.5rem;
+}
+
+/* mobile padding to align with cards */
+@media (max-width: 575.98px) {
+  .conv-section__header {
+    padding-left: 1.35rem;
+    padding-right: 1.35rem;
+  }
+}
+
 /* ---------- Threads (full comments) ---------- */
 .threads {
   display: grid;
-  gap: 1.1rem;
+  margin-top: 0.5rem;
+  gap: clamp(40px, 6vw, 64px); /* was 1.1rem */
   padding: 0 1.25rem 1.25rem;
 }
 .thread {
@@ -223,7 +268,6 @@
 }
 .thread__form {
   padding-top: 0.35rem;
-  border-top: 1px solid #f1f5f9;
 }
 
 /* mobile breathing room to match cards */
