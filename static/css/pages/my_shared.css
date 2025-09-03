@@ -16,8 +16,8 @@
 /* Massive, responsive spacing just for this list */
 .shared-list {
   display: grid;
-  /* ~56–88px depending on viewport, feels very separated */
-  gap: clamp(56px, 7vw, 88px);
+  /* was clamp(56px, 7vw, 88px) */
+  gap: clamp(72px, 8.5vw, 112px);
 }
 
 /* Card */
@@ -39,8 +39,8 @@
 .shared-card__header {
   display: flex;
   align-items: baseline;
-  gap: 0.5rem;
-  padding: 0.9rem 1rem;
+  padding: 1.05rem 1.25rem; /* was 0.9rem 1rem */
+  gap: 0.6rem; /* tiny extra space around title/by */
   /* subtle brand wash instead of flat gray */
   background: color-mix(in srgb, var(--brand) var(--tint-brand-pct), #fff);
   /* border-bottom: 1px solid var(--tint-stroke); */
@@ -54,16 +54,18 @@
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+
 .shared-card__by {
   color: var(--muted);
 }
 
 /* Body */
 .shared-card__body {
-  padding: 1rem;
+  padding: 1.25rem 1.25rem; /* was 1rem */
+  gap: 0.95rem;
   display: grid;
-  gap: 0.75rem;
 }
+
 .shared-card__description {
   margin: 0;
 }
@@ -145,7 +147,7 @@
 
 /* Likes include spacing + tint */
 .likes {
-  padding: 0.5rem 1rem 0.75rem;
+  padding: 0.85rem 1.25rem 1rem;
   background: color-mix(in srgb, var(--danger) var(--tint-like-pct), #fff);
   /* border-top: 1px solid var(--tint-like-stroke); */
   /* if you prefer a rounded inset feel: */
@@ -157,10 +159,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  padding: 1.05rem 1.25rem; /* was 0.9rem 1rem */
+  gap: 1.1rem;
   background: color-mix(in srgb, var(--success) var(--tint-cta-pct), #fff);
   /* border-top: 1px solid var(--tint-cta-stroke); */
-  padding: 0.9rem 1rem;
 }
 .summary__left {
   min-width: 0;
@@ -187,7 +189,7 @@
   font-weight: 700;
 }
 .summary__last {
-  margin-top: 0.35rem;
+  margin-top: 0.45rem;
   font-size: 0.92rem;
   color: var(--muted);
   white-space: nowrap;
@@ -226,5 +228,20 @@
   }
   .summary__last {
     display: none;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .shared-card__header,
+  .shared-card__body,
+  .shared-card__meta,
+  .likes,
+  .summary {
+    padding-left: 1.35rem;
+    padding-right: 1.35rem;
+  }
+  .shared-card__body {
+    padding-top: 1.35rem;
+    padding-bottom: 1.35rem;
   }
 }

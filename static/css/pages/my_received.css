@@ -3,8 +3,7 @@
 /* Massive, responsive spacing just for this list */
 .shared-list {
   display: grid;
-  /* ~56–88px depending on viewport, feels very separated */
-  gap: clamp(56px, 7vw, 88px);
+  gap: clamp(72px, 8.5vw, 112px);
 }
 
 /* Use the same card proportions, accent, and subtle tints */
@@ -25,9 +24,9 @@
 .received-card__header {
   display: grid;
   grid-template-columns: 1fr auto auto;
-  gap: 0.5rem 0.75rem;
+  padding: 1.05rem 1.25rem; /* was 0.9rem 1rem */
+  gap: 0.6rem 0.9rem;
   align-items: center;
-  padding: 0.9rem 1rem;
   background: color-mix(in srgb, var(--brand) var(--tint-brand-pct, 6%), #fff);
 }
 
@@ -73,9 +72,9 @@
 
 /* ----- Body ----- */
 .received-card__body {
-  padding: 1rem;
   display: grid;
-  gap: 0.9rem;
+  padding: 1.25rem 1.25rem; /* was 1rem */
+  gap: 1rem;
 }
 .received-card__description {
   margin: 0;
@@ -90,7 +89,7 @@
 
 /* ----- Like button placement (re-uses global like styles) ----- */
 .likes-container {
-  padding: 0.5rem 1rem 0.9rem;
+  padding: 0.85rem 1.25rem 1rem;
   background: color-mix(in srgb, var(--danger) var(--tint-like-pct, 3%), #fff);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
@@ -117,10 +116,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  padding: 1.05rem 1.25rem; /* was 0.9rem 1rem */
+  gap: 1.1rem;
   background: color-mix(in srgb, var(--success) var(--tint-cta-pct, 3%), #fff);
-  padding: 0.9rem 1rem;
-  border: 1px solid red;
 }
 
 .preview__left {
@@ -208,10 +206,19 @@
   } /* as you had */
 }
 
-/* Reuse underline-on-hover for CTA text but not icons (same fix as Shared) */
-.preview .btn i {
-  text-decoration: none;
-}
-.preview .btn:hover i {
-  text-decoration: none;
+@media (max-width: 575.98px) {
+  .received-card__header,
+  .received-card__body,
+  .likes-container,
+  .preview {
+    padding-left: 1.35rem;
+    padding-right: 1.35rem;
+  }
+  .received-card__body {
+    padding-top: 1.35rem;
+    padding-bottom: 1.35rem;
+  }
+  .preview {
+    row-gap: 0.25rem;
+  } /* keeps the “View conversation” row comfy */
 }
