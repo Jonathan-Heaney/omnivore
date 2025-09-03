@@ -333,3 +333,95 @@
     padding-bottom: calc(var(--thread-pad-y) + 4px);
   }
 }
+
+/* ===== Soften the visual noise (drop-in overrides) ===== */
+
+/* 1) Softer default strokes + more separation via space */
+:root {
+  --soft-stroke: color-mix(in srgb, var(--border) 70%, transparent);
+  --soft-surface: color-mix(in srgb, var(--surface) 65%, #fff);
+}
+
+/* 2) Art card: keep the left accent, lighten the outline & shadow */
+.piece {
+  border-color: var(--soft-stroke);
+  box-shadow: 0 4px 24px -20px rgba(0, 0, 0, 0.25);
+}
+
+/* 3) Likes strips: keep the wash, lose the heavy inset line */
+.likes,
+.likes-container {
+  background: color-mix(
+    in srgb,
+    var(--danger) max(1.5%, calc(var(--tint-like-pct, 3%) - 1.5%)),
+    #fff
+  );
+  box-shadow: none; /* remove inset highlight line */
+}
+
+/* 4) Conversation section header: more air, no boxes */
+.conv-section__header {
+  margin-bottom: 0.85rem; /* was 0.5 */
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+/* 5) Thread cards: “soft cards” (less box, more breathing room) */
+.thread {
+  border-color: transparent; /* drop the visible border */
+  background: #fff;
+  box-shadow: 0 10px 30px -22px rgba(0, 0, 0, 0.35); /* lighter shadow */
+  outline: 1px solid transparent; /* prepares for hover ring */
+}
+.thread:hover {
+  outline-color: var(--soft-stroke); /* subtle ring on hover */
+}
+
+/* 6) Thread header: remove hard bar; use a faint underline only */
+.thread__header {
+  background: transparent; /* was #f9fafb */
+  border-bottom: none;
+  box-shadow: inset 0 -1px 0 var(--soft-stroke); /* hairline divider */
+}
+
+/* 7) Thread body: use soft surface, lose seams */
+.thread__body {
+  background: var(--soft-surface); /* gentle tint to separate from page */
+  border-radius: 10px; /* soft inner container */
+}
+
+/* 8) Messages: room to breathe, no extra lines */
+.thread__messages {
+  gap: clamp(12px, 2.2vw, 18px);
+  margin-bottom: clamp(10px, 1.8vw, 16px);
+}
+
+/* 9) Reply area: remove top border line; rely on space instead */
+.thread__form {
+  padding-top: clamp(8px, 1.6vw, 14px);
+  border-top: none;
+}
+
+/* 10) Comment bubbles: softer edge & less contrasty border */
+.comment-bubble {
+  background: #fff;
+  border-color: var(--soft-stroke);
+  box-shadow: none; /* avoid stacked shadows in lists */
+}
+
+/* 11) Toggle button: quieter look */
+.toggle-comment-btn {
+  border-color: var(--soft-stroke);
+  background: #fff;
+}
+.toggle-comment-btn:hover {
+  background: color-mix(in srgb, var(--surface) 80%, #fff);
+}
+
+/* 12) Mobile: preserve softness without crowding the input */
+@media (max-width: 575.98px) {
+  .thread__body {
+    border-radius: 12px;
+    padding-bottom: calc(var(--thread-pad-y, 16px) + 4px);
+  }
+}
