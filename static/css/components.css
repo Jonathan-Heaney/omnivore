@@ -47,6 +47,21 @@
   box-shadow: 0 8px 26px -8px rgba(234, 179, 8, 0.55);
 }
 
+/* SUCCESS (outline-success → green fill on hover) */
+.received-card__source.btn-outline-success {
+  color: #fff;
+  background-color: var(--success);
+  border-color: 1px solid #1b5d5a;
+}
+
+.received-card__source.btn-outline-success:hover,
+.received-card__source.btn-outline-success:focus {
+  color: #fff;
+  background: #1b7e5a;
+  /* border-color: 1px solid #1b5d5a; */
+  box-shadow: 0 2px 8px rgba(27, 143, 90, 0.25); /* subtle green glow */
+}
+
 /* Optional: prevent the base .btn-cta:hover rule from hijacking amber */
 .btn-cta:not(.btn-cta--amber):hover {
   background: var(--brand-600);

@@ -59,11 +59,11 @@
           <p class="received-card__description">{{ piece.piece_description|linebreaksbr }}</p>
 
           {% if piece.link %}
-            <a class="btn btn-cta btn-cta--amber received-card__source"
+            <a class="btn btn-outline-success received-card__source"
                href="{{ piece.link }}" target="_blank" rel="noopener"
                aria-label="Open source for {{ piece.piece_name }}">
-              <i class="fa-solid fa-up-right-from-square me-1" aria-hidden="true"></i>
               View source
+              <i class="fa-solid fa-up-right-from-square me-1" aria-hidden="true"></i>
             </a>
           {% endif %}
         </div>
@@ -92,10 +92,10 @@
               </div>
               <div class="preview__right">
                 <a href="{% url 'art_detail' piece.public_id %}"
-                   class="btn btn-cta btn-sm"
-                   aria-label="Open conversation for {{ piece.piece_name }}">
+                   class="btn btn-cta btn-cta--amber btn-sm"
+                   aria-label="View conversation for {{ piece.piece_name }}">
                   <i class="fa-regular fa-comments me-1" aria-hidden="true"></i>
-                  Open conversation
+                  View conversation
                 </a>
               </div>
             {% else %}
