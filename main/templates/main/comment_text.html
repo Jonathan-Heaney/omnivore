@@ -1,4 +1,4 @@
-<div class="comment-item">
+<div class="comment-item {% if comment.sender_id == request.user.id %}is-mine{% else %}is-theirs{% endif %}">
   <p class="comment-meta">
     <strong>{{ comment.sender.first_name }} {{ comment.sender.last_name }}</strong>
     <span class="comment-dot">•</span>

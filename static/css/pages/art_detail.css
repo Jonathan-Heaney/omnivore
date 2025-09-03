@@ -425,3 +425,85 @@
     padding-bottom: calc(var(--thread-pad-y, 16px) + 4px);
   }
 }
+
+/* ===== Pops of color in Conversations (drop-in) ===== */
+
+/* Tunable knobs for comment tints */
+:root {
+  --cmt-brand-tint: 6%; /* brand wash in owner-ish rows */
+  --cmt-success-tint: 6%; /* success wash in recipient-ish rows */
+  --cmt-badge-bg: #fff8e1; /* matches your amber count pill */
+  --cmt-badge-fg: #7a5a00;
+}
+
+/* 1) Color the conversation titles subtly */
+.thread__title strong {
+  color: var(--brand-600);
+}
+
+/* 2) Make author names pop a bit in meta lines */
+.comment-meta strong {
+  color: var(--brand-600);
+}
+
+/* 3) Links inside messages: readable, clearly interactive */
+.prose-comment a {
+  color: var(--brand);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.prose-comment a:hover {
+  filter: brightness(0.9);
+  text-decoration: none;
+}
+
+.thread__messages .comment-item.is-mine .comment-bubble {
+  background: color-mix(in srgb, var(--brand) var(--cmt-brand-tint), #fff);
+  border-color: color-mix(in srgb, var(--brand) 18%, var(--border));
+}
+.thread__messages .comment-item.is-theirs .comment-bubble {
+  background: color-mix(in srgb, var(--success) var(--cmt-success-tint), #fff);
+  border-color: color-mix(in srgb, var(--success) 18%, var(--border));
+}
+
+/* 5) Tiny badges (if you ever render tags/labels in meta text) */
+.comment-meta .badge {
+  background: var(--cmt-badge-bg);
+  color: var(--cmt-badge-fg);
+  border-color: #ffe69c;
+  font-weight: 700;
+}
+
+/* 6) Input focus: a touch more brand when composing */
+.input-pill:focus {
+  border-color: var(--brand-200);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand) 20%, transparent);
+}
+
+/* 7) Send icon & toggle button: on-brand but not shouty */
+.icon-btn {
+  color: var(--brand);
+}
+.icon-btn:hover {
+  color: var(--brand-600);
+}
+.toggle-comment-btn {
+  color: var(--brand-600);
+  border-color: color-mix(
+    in srgb,
+    var(--brand) 28%,
+    var(--soft-stroke, var(--border))
+  );
+}
+.toggle-comment-btn:hover {
+  background: color-mix(in srgb, var(--brand) 8%, #fff);
+}
+
+/* 8) Optional: a gentle colored edge on hover to group each message stack */
+.thread:hover {
+  outline-color: color-mix(
+    in srgb,
+    var(--brand) 18%,
+    var(--soft-stroke, var(--border))
+  );
+}
