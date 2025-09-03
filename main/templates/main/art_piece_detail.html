@@ -11,106 +11,161 @@
 
 {% block content %}
 
-<section id="art-{{ piece.public_id }}" class="piece">
-  <header class="piece__header">
-    <div class="piece__title">
-      <strong>{{ piece.piece_name }}</strong>
-      <span class="piece__by">({{ piece.artist_name }})</span>
-    </div>
-  </header>
+<div class="container-narrow">
 
-  <div class="piece__body">
-    <p class="piece__description">{{ piece.piece_description|linebreaksbr }}</p>
+  {# card accent & header layout change by mode #}
+  <section id="art-{{ piece.public_id }}"
+           class="piece {% if mode == 'recipient' %}piece--received{% else %}piece--shared{% endif %}">
 
-    {% if piece.link %}
-      <a class="btn btn-cta btn-sm" href="{{ piece.link }}" target="_blank" rel="noopener">
-        Source
-      </a>
-    {% endif %}
-  </div>
-
-  <footer class="piece__meta">
-    Shared by <strong>{{ piece.user.first_name }} {{ piece.user.last_name }}</strong> ·
-    {{ piece.created_at|date:"F j, Y" }}
-  </footer>
-
-  {# Likes #}
-  {% if request.user != piece.user %}
-    <div class="likes">
-      {% include 'main/heart_button.html' with piece=piece is_liked=is_liked %}
-    </div>
-  {% else %}
-    {% with users=likes_dict|dict_get:piece %}
-      {% if users %}
-        <div class="likes">
-          {% include 'main/likes_display.html' with piece=piece likes_dict=likes_dict %}
+    {# ---------- Header ---------- #}
+    {% if mode == "recipient" %}
+      {# mirror My Received header: title/artist on left, "Shared by ..." on right #}
+      <header class="piece__header piece__header--received">
+        <div class="piece__titlewrap">
+          <a class="piece__title" href="{% url 'art_detail' piece.public_id %}">
+            <strong>{{ piece.piece_name }}</strong>
+          </a>
+          <span class="piece__by">({{ piece.artist_name }})</span>
         </div>
-      {% endif %}
-    {% endwith %}
-  {% endif %}
-
-  {# === RECIPIENT VIEW: single 1:1 thread with sharer === #}
-  {% if mode == "recipient" %}
-    <section class="thread thread--single">
-      {% with pid=piece.id|stringformat:"s" %}
-        {% with tgt_id="comments-"|add:pid|add:"-container" %}
-          <div id="{{ tgt_id }}" class="thread__messages">
-            {% for comment in thread %}
-              {% include 'main/comment_text.html' with comment=comment %}
-            {% endfor %}
-          </div>
-
-          <div id="reply" class="thread__form">
-            {% include "main/comment_form.html" with reply_recipient=piece.user.first_name piece=piece post_url=request.path target_id=tgt_id autofocus=1 %}
-          </div>
-        {% endwith %}
-      {% endwith %}
-    </section>
-
-  {# === OWNER VIEW: multiple 1:1 threads (sorted by latest activity DESC) === #}
-  {% elif mode == "owner" %}
-    {% if conversations %}
-      <section class="threads">
-        {% for recipient, conversation in conversations %}
-          <article class="thread">
-            <header class="thread__header">
-              <div class="thread__title">
-                Conversation with
-                <strong>{{ recipient.first_name }} {{ recipient.last_name }}</strong>
-              </div>
-              {% with pid=piece.id|stringformat:"s" rid=recipient.id|stringformat:"s" %}
-                <button
-                  class="toggle-comment-btn"
-                  id="toggle-button-{{ pid }}-{{ rid }}"
-                  onclick="toggleComments({{ piece.id }}, {{ recipient.id }})"
-                  aria-controls="comments-{{ pid }}-{{ rid }}-container"
-                  aria-expanded="true"
-                >
-                  <i class="fa-solid fa-minus"></i>
-                </button>
-              {% endwith %}
-            </header>
-
-            <div class="thread__body">
-              {% with pid=piece.id|stringformat:"s" rid=recipient.id|stringformat:"s" %}
-                {% with tgt_id="comments-"|add:pid|add:"-"|add:rid|add:"-container" %}
-                  <div id="{{ tgt_id }}" class="thread__messages">
-                    {% for comment in conversation %}
-                      {% include 'main/comment_text.html' with comment=comment %}
-                    {% endfor %}
-                  </div>
-
-                  <div class="thread__form">
-                    {% include "main/reply_form.html" with reply_recipient=recipient.first_name top_level_comment=conversation.0 piece=piece recipient=recipient post_url=request.path target_id=tgt_id %}
-                  </div>
-                {% endwith %}
-              {% endwith %}
-            </div>
-          </article>
-        {% endfor %}
-      </section>
+        <div class="piece__from">
+          Shared by <strong>{{ piece.user.first_name }} {{ piece.user.last_name }}</strong>
+        </div>
+      </header>
+    {% else %}
+      {# mirror My Shared header: title + (artist) inline #}
+      <header class="piece__header">
+        <a class="piece__title" href="{% url 'art_detail' piece.public_id %}">
+          <strong>{{ piece.piece_name }}</strong>
+        </a>
+        <span class="piece__by">({{ piece.artist_name }})</span>
+      </header>
     {% endif %}
-  {% endif %}
-</section>
+
+    {# ---------- Body ---------- #}
+    <div class="piece__body">
+      <p class="piece__description">{{ piece.piece_description|linebreaksbr }}</p>
+
+      {% if piece.link %}
+        {% if mode == "recipient" %}
+          {# green like Received #}
+          <a class="btn btn-outline-success btn-sm received-card__source"
+             href="{{ piece.link }}" target="_blank" rel="noopener"
+             aria-label="Open source for {{ piece.piece_name }}">
+            View source <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
+          </a>
+        {% else %}
+          {# tiny icon set like Shared meta; keep here for convenience too #}
+          <a class="btn btn-outline-primary btn-sm"
+             href="{{ piece.link }}" target="_blank" rel="noopener"
+             aria-label="Open source link for {{ piece.piece_name }}">
+            <i class="fa-solid fa-up-right-from-square"></i>
+          </a>
+        {% endif %}
+      {% endif %}
+    </div>
+
+    {# ---------- Meta / likes strip (matches list pages) ---------- #}
+    {% if mode == "recipient" %}
+      <div class="likes-container">
+        {% include 'main/heart_button.html' with piece=piece is_liked=is_liked %}
+      </div>
+    {% else %}
+      {% with users=likes_dict|dict_get:piece %}
+        {% if users %}
+          <div class="likes">
+            {% include 'main/likes_display.html' with piece=piece likes_dict=likes_dict %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <footer class="piece__meta">
+        <span class="piece__date">Shared {{ piece.created_at|date:"F j, Y" }}</span>
+
+        <div class="piece__actions">
+          <a href="{% url 'edit_art_piece' piece.public_id %}"
+             class="btn btn-outline-secondary btn-sm"
+             aria-label="Edit {{ piece.piece_name }}" title="Edit">
+            <i class="fa-solid fa-pen"></i>
+          </a>
+          <form method="post"
+                action="{% url 'delete_art_piece' piece.public_id %}"
+                onsubmit="return confirmDelete();"
+                class="d-inline">
+            {% csrf_token %}
+            <button type="submit"
+                    class="btn btn-outline-danger btn-sm"
+                    aria-label="Delete {{ piece.piece_name }}" title="Delete">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </form>
+          {% if piece.link %}
+            <a class="btn btn-outline-primary btn-sm"
+               href="{{ piece.link }}" target="_blank" rel="noopener"
+               aria-label="Open source link for {{ piece.piece_name }}" title="Open source">
+              <i class="fa-solid fa-up-right-from-square"></i>
+            </a>
+          {% endif %}
+        </div>
+      </footer>
+    {% endif %}
+
+    {# ---------- Threads area (full comments) ---------- #}
+    {% if mode == "recipient" %}
+      <section class="thread thread--single">
+        {% with pid=piece.id|stringformat:"s" %}
+          {% with tgt_id="comments-"|add:pid|add:"-container" %}
+            <div id="{{ tgt_id }}" class="thread__messages">
+              {% for comment in thread %}
+                {% include 'main/comment_text.html' with comment=comment %}
+              {% endfor %}
+            </div>
+            <div id="reply" class="thread__form">
+              {% include "main/comment_form.html" with reply_recipient=piece.user.first_name piece=piece post_url=request.path target_id=tgt_id autofocus=1 %}
+            </div>
+          {% endwith %}
+        {% endwith %}
+      </section>
+    {% else %}
+      {% if conversations %}
+        <section class="threads">
+          {% for recipient, conversation in conversations %}
+            <article class="thread">
+              <header class="thread__header">
+                <div class="thread__title">
+                  Conversation with <strong>{{ recipient.first_name }} {{ recipient.last_name }}</strong>
+                </div>
+                {% with pid=piece.id|stringformat:"s" rid=recipient.id|stringformat:"s" %}
+                  <button class="toggle-comment-btn"
+                          id="toggle-button-{{ pid }}-{{ rid }}"
+                          onclick="toggleComments({{ piece.id }}, {{ recipient.id }})"
+                          aria-controls="comments-{{ pid }}-{{ rid }}-container"
+                          aria-expanded="true">
+                    <i class="fa-solid fa-minus"></i>
+                  </button>
+                {% endwith %}
+              </header>
+
+              <div class="thread__body">
+                {% with pid=piece.id|stringformat:"s" rid=recipient.id|stringformat:"s" %}
+                  {% with tgt_id="comments-"|add:pid|add:"-"|add:rid|add:"-container" %}
+                    <div id="{{ tgt_id }}" class="thread__messages">
+                      {% for comment in conversation %}
+                        {% include 'main/comment_text.html' with comment=comment %}
+                      {% endfor %}
+                    </div>
+                    <div class="thread__form">
+                      {% include "main/reply_form.html" with reply_recipient=recipient.first_name top_level_comment=conversation.0 piece=piece recipient=recipient post_url=request.path target_id=tgt_id %}
+                    </div>
+                  {% endwith %}
+                {% endwith %}
+              </div>
+            </article>
+          {% endfor %}
+        </section>
+      {% endif %}
+    {% endif %}
+
+  </section>
+</div>
 
 {% endblock %}

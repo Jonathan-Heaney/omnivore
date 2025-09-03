@@ -1,47 +1,125 @@
-/* Page: Art Detail (page-scoped) */
+/* Page: Art Detail – match Shared/Received visual language */
 
 .piece {
-  border: 1px solid #e9ecef;
-  border-radius: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   background: #fff;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
-  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-1);
   overflow: hidden;
+  transition: box-shadow 160ms ease;
+  margin: 0; /* contained by .container-narrow, no extra outer gap */
 }
+.piece:hover {
+  box-shadow: var(--shadow-2);
+}
+
+/* left accent varies by context */
+.piece--shared {
+  border-left: 4px solid var(--brand);
+}
+.piece--received {
+  border-left: 4px solid color-mix(in srgb, var(--success) 70%, #fff);
+}
+
+/* ---------- Header ---------- */
 .piece__header {
-  background: #f8f9fa;
-  padding: 0.85rem 1rem;
-  border-bottom: 1px solid #eef0f2;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding: 1.05rem 1.25rem; /* match list cards */
+  background: color-mix(in srgb, var(--brand) var(--tint-brand-pct, 6%), #fff);
+}
+.piece__header--received {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.6rem 0.9rem;
+  align-items: center;
+}
+.piece__titlewrap {
+  min-width: 0;
 }
 .piece__title {
-  font-weight: 600;
+  color: var(--brand);
+}
+.piece__title:hover {
+  color: var(--brand);
+  filter: brightness(0.9);
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 .piece__by {
-  color: #6c757d;
-  margin-left: 0.25rem;
+  color: var(--muted);
+}
+.piece__from {
+  color: color-mix(in srgb, #000 60%, #fff);
+  white-space: nowrap;
 }
 
+@media (max-width: 575.98px) {
+  .piece__header--received {
+    grid-template-columns: 1fr;
+  }
+  .piece__from {
+    justify-self: start;
+  }
+}
+
+/* ---------- Body ---------- */
 .piece__body {
-  padding: 1rem;
-  display: grid;
-  gap: 0.75rem;
-}
-.piece__meta {
-  padding: 0.75rem 1rem;
-  color: #6c757d;
-  border-top: 1px solid #eef0f2;
-  background: #fbfcfd;
-}
-
-.likes {
-  padding: 0.5rem 1rem 0.75rem;
-}
-
-/* Threads */
-.threads {
   display: grid;
   gap: 1rem;
-  padding: 0 1rem 1rem;
+  padding: 1.25rem 1.25rem;
+}
+.piece__description {
+  margin: 0;
+}
+
+/* reuse the smaller green source pill from Received */
+.received-card__source {
+  align-self: start;
+  width: fit-content;
+  border-radius: 999px;
+}
+
+/* ---------- Meta (owner only) ---------- */
+.piece__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1.25rem;
+  color: var(--muted);
+  background: #fbfcfd;
+}
+.piece__actions {
+  display: inline-flex;
+  gap: 0.4rem;
+}
+.piece__actions .btn {
+  padding: 6px 10px;
+  border-radius: 999px;
+  line-height: 1;
+}
+
+/* ---------- Likes strips ---------- */
+.likes {
+  padding: 0.85rem 1.25rem 1rem;
+  background: color-mix(in srgb, var(--danger) var(--tint-like-pct, 3%), #fff);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+.likes-container {
+  padding: 0.85rem 1.25rem 1rem;
+  background: color-mix(in srgb, var(--danger) var(--tint-like-pct, 3%), #fff);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+}
+
+/* ---------- Threads (full comments) ---------- */
+.threads {
+  display: grid;
+  gap: 1.1rem;
+  padding: 0 1.25rem 1.25rem;
 }
 .thread {
   border: 1px solid #eef2f7;
@@ -50,10 +128,11 @@
   box-shadow: 0 8px 24px -18px rgba(16, 24, 40, 0.2);
 }
 .thread--single {
-  margin: 0 1rem 1rem;
+  margin: 0 1.25rem 1.25rem;
 }
+
 .thread__header {
-  padding: 0.75rem 0.9rem;
+  padding: 0.85rem 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -80,23 +159,34 @@
 }
 
 .thread__body {
-  padding: 0.75rem 0.9rem 0.9rem;
+  padding: 0.9rem 1rem 1rem;
 }
 .thread__messages {
   display: grid;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  gap: 0.6rem;
+  margin-bottom: 0.6rem;
 }
 .thread__form {
-  padding-top: 0.25rem;
+  padding-top: 0.35rem;
   border-top: 1px solid #f1f5f9;
 }
 
-/* Comment form bits */
-.comment-form .form-control {
-  border: 1px solid #d0d5dd;
-  border-radius: 12px;
-  padding: 10px 12px;
+/* mobile breathing room to match cards */
+@media (max-width: 575.98px) {
+  .piece__header,
+  .piece__body,
+  .likes,
+  .likes-container,
+  .piece__meta {
+    padding-left: 1.35rem;
+    padding-right: 1.35rem;
+  }
+  .piece__body {
+    padding-top: 1.35rem;
+    padding-bottom: 1.35rem;
+  }
+  .thread--single {
+    margin-left: 1.25rem;
+    margin-right: 1.25rem;
+  }
 }
-
-/* CTA size helper already in components: .btn-cta.btn-sm */
