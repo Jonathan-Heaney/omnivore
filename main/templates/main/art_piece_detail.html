@@ -22,9 +22,7 @@
       {# mirror My Received header: title/artist on left, "Shared by ..." on right #}
       <header class="piece__header piece__header--received">
         <div class="piece__titlewrap">
-          <a class="piece__title" href="{% url 'art_detail' piece.public_id %}">
             <strong>{{ piece.piece_name }}</strong>
-          </a>
           <span class="piece__by">({{ piece.artist_name }})</span>
         </div>
         <div class="piece__from">
@@ -34,9 +32,7 @@
     {% else %}
       {# mirror My Shared header: title + (artist) inline #}
       <header class="piece__header">
-        <a class="piece__title" href="{% url 'art_detail' piece.public_id %}">
           <strong>{{ piece.piece_name }}</strong>
-        </a>
         <span class="piece__by">({{ piece.artist_name }})</span>
       </header>
     {% endif %}

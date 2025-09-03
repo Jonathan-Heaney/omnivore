@@ -289,3 +289,47 @@
     margin-right: 1.25rem;
   }
 }
+
+/* Responsive spacing tokens just for conversation threads */
+:root {
+  /* inner horizontal & vertical padding for thread header/body */
+  --thread-pad-x: clamp(18px, 3.6vw, 24px);
+  --thread-pad-y: clamp(14px, 3vw, 20px);
+  /* vertical spacing between message bubbles */
+  --thread-gap: clamp(10px, 2.2vw, 16px);
+}
+
+/* Roomier header */
+.thread__header {
+  padding: var(--thread-pad-y) var(--thread-pad-x);
+}
+
+/* Roomier body with comfy bottom padding for the input */
+.thread__body {
+  padding: var(--thread-pad-y) var(--thread-pad-x)
+    calc(var(--thread-pad-y) + 6px);
+}
+
+/* More air between messages */
+.thread__messages {
+  gap: var(--thread-gap);
+  margin-bottom: calc(var(--thread-gap) + 2px);
+}
+
+/* Slightly larger breathing space above the reply form */
+.thread__form {
+  padding-top: calc(var(--thread-gap) - 2px);
+  border-top: 1px solid #f1f5f9; /* keep your existing divider look */
+}
+
+/* Keep single-thread margins consistent with the multi-thread grid spacing */
+.thread--single {
+  margin: 0 var(--thread-pad-x) var(--thread-pad-x);
+}
+
+/* Mobile: keep padding but don’t crowd the input */
+@media (max-width: 575.98px) {
+  .thread__body {
+    padding-bottom: calc(var(--thread-pad-y) + 4px);
+  }
+}
