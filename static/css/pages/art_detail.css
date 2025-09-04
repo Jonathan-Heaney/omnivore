@@ -1030,18 +1030,21 @@
   }
 }
 
-/* privacy chip */
+/* privacy chip — always centered */
 .conv-privacy {
-  display: inline-flex;
+  display: flex; /* block-level, not inline */
   align-items: center;
   gap: 8px;
+
+  width: max-content; /* shrink to fit text */
+  margin: 8px auto 12px; /* <-- centers the chip */
+
   font-size: 0.9rem;
   color: var(--muted);
   background: #fff;
   border: 1px solid var(--soft-stroke);
   border-radius: 999px;
-  padding: 4px 10px;
-  margin: 6px var(--thread-pad-x) 2px;
+  padding: 4px 12px;
 }
 .conv-privacy i {
   font-size: 0.9em;
