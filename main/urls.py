@@ -31,6 +31,7 @@ urlpatterns = [
          views.notification_redirect, name='notification_redirect'),
     path('notifications/mark-all-read/', views.mark_all_notifications_read,
          name='mark_all_notifications_read'),
+    path("threads/mark-read/", views.mark_thread_read, name="mark_thread_read"),
     path('password_reset/', views.CustomPasswordResetView.as_view(template_name="registration/password_reset.html"),
          name='password_reset'),
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(

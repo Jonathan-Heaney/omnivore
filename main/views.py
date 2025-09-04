@@ -16,7 +16,7 @@ import random
 from collections import defaultdict
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
-from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
+from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.core.signing import BadSignature, SignatureExpired
 from django.utils import timezone
 from datetime import timedelta
@@ -394,7 +394,7 @@ def art_piece_detail(request, public_id):
         raise Http404("Not found")
 
     # Mark notifications for this piece as read (GET only)
-    if request.method == "GET":
+    if request.method == "GET" and not is_owner:
         Notification.objects.filter(
             recipient=user,
             art_piece=piece,
@@ -444,10 +444,24 @@ def art_piece_detail(request, public_id):
             reverse=True,
         )
 
+        # map[other_user_id] -> unread count (comments sent by `other` to `user`)
+        unread_by_other = dict(
+            Notification.objects.filter(
+                recipient=user,
+                art_piece=piece,
+                notification_type="comment",
+                is_read=False,
+            )
+            .values_list("sender_id")
+            .annotate(cnt=Count("id"))
+            .values_list("sender_id", "cnt")
+        )
+
         context = {
             "piece": piece,
             "mode": "owner",
             "conversations": conversations_list,   # list, not dict
+            "unread_by_other": unread_by_other,
             "is_liked": False,
             "likes_dict": likes_dict,
         }
@@ -589,6 +603,34 @@ def comments_create(request):
     html = render_to_string("main/comment_text.html",
                             {"comment": c}, request=request)
     return HttpResponse(html)
+
+
+@require_POST
+@login_required
+def mark_thread_read(request):
+    piece_pub = request.POST.get("piece")
+    other_id = request.POST.get("other")
+    if not piece_pub or not other_id:
+        return HttpResponse(status=400)
+
+    piece = get_object_or_404(ArtPiece, public_id=piece_pub)
+
+    # Owner or recipient must be the opener
+    if request.user.id not in {piece.user_id, int(other_id)}:
+        return HttpResponseForbidden()
+
+    # Mark only comment notifs for this piece from the *other* participant
+    (Notification.objects
+        .filter(
+            recipient=request.user,
+            art_piece=piece,
+            notification_type='comment',
+            is_read=False,
+            sender_id=other_id,
+        )
+        .update(is_read=True))
+
+    return HttpResponse(status=204)
 
 
 @login_required

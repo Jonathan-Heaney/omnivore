@@ -1069,3 +1069,29 @@
     display: none;
   }
 }
+
+/* unread state in thread headers */
+.thread__header--unread {
+  background: color-mix(in srgb, var(--brand) 6%, #fff);
+}
+
+/* badge next to the time */
+.unread-badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  margin-left: 8px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 700;
+  background: var(--brand-600, #2563eb);
+  color: #fff;
+}
+
+/* alternatively (or additionally) make the name bold when unread */
+.thread__header--unread .imrow__name {
+  font-weight: 900;
+}

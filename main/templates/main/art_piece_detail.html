@@ -170,14 +170,21 @@
           <div class="threads">
             {% for recipient, conversation in conversations %}
               <article class="thread" id="thread-{{ piece.id }}-{{ recipient.id }}">
-                <header class="thread__header is-toggle"
-                      id="toggle-header-{{ piece.id }}-{{ recipient.id }}"
-                      role="button"
-                      tabindex="0"
-                      aria-controls="comments-{{ piece.id }}-{{ recipient.id }}-container"
-                      aria-expanded="false"
-                      data-art="{{ piece.id }}"
-                      data-recipient="{{ recipient.id }}">
+                <header class="thread__header is-toggle
+                          {% with u=unread_by_other|dict_get:recipient.id %}
+                            {% if u and u|add:0 > 0 %} thread__header--unread{% endif %}
+                          {% endwith %}"
+                    id="toggle-header-{{ piece.id }}-{{ recipient.id }}"
+                    role="button"
+                    tabindex="0"
+                    aria-controls="comments-{{ piece.id }}-{{ recipient.id }}-container"
+                    aria-expanded="false"
+                    data-art="{{ piece.public_id }}"
+                    data-recipient="{{ recipient.id }}"
+                    hx-post="{% url 'mark_thread_read' %}"
+                    hx-vals='{"piece":"{{ piece.public_id }}","other":"{{ recipient.id }}"}'
+                    hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+                    hx-swap="none">
                 {% with last=conversation|last %}
                   <div class="imrow">
                     <div class="imrow__avatar" aria-hidden="true">
@@ -192,11 +199,14 @@
                     </div>
 
                     <div class="imrow__when">
-                      {% if last %}
-                        <time datetime="{{ last.created_at|date:'c' }}">
-                          {{ last.created_at|recency_stamp }}
-                        </time>
-                      {% endif %}
+                      {% if last %}<time datetime="{{ last.created_at|date:'c' }}">{{ last.created_at|recency_stamp }}</time>{% endif %}
+                      {% with u=unread_by_other|dict_get:recipient.id %}
+                        {% if u and u|add:0 > 0 %}
+                          <span class="unread-badge" aria-label="{{ u }} unread message{{ u|pluralize }}">
+                            {{ u }}
+                          </span>
+                        {% endif %}
+                      {% endwith %}
                     </div>
                   </div>
                 {% endwith %}
