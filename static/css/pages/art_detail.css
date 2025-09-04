@@ -887,3 +887,55 @@
   row-gap: -5px;
   margin-bottom: 1px;
 }
+
+/* keep messages tight */
+.thread__messages {
+  gap: 0;
+}
+.msg {
+  position: relative;
+  margin-top: 12px;
+  max-width: min(75%, 520px);
+}
+.msg--mine + .msg--mine,
+.msg--theirs + .msg--theirs {
+  margin-top: 4px;
+}
+
+/* bubble stays below the timestamp in the stacking order */
+.msg__bubble {
+  position: relative;
+  z-index: 1;
+}
+
+/* timestamp sits above, with its own pill background */
+.msg__time {
+  position: absolute;
+  top: -18px;
+  font-size: 0.8rem;
+  color: var(--muted);
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, #fff 92%, var(--soft-surface, #f7f9fb));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  z-index: 2; /* <- above bubble */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 160ms ease, visibility 0s linear 160ms;
+  pointer-events: none;
+}
+.msg--theirs .msg__time {
+  left: 0;
+  text-align: left;
+}
+.msg--mine .msg__time {
+  right: 0;
+  text-align: right;
+}
+
+.msg:hover .msg__time,
+.msg:focus-within .msg__time {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
