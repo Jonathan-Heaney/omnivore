@@ -12,12 +12,13 @@
   <input type="hidden" name="art_piece_id" value="{{ piece.id }}">
 
   <div class="comment-input">
-    <label class="visually-hidden" for="cf-text-{{ pid }}">Message</label>
+    <label class="sr-only" for="cf-text-{{ pid }}">Private message to {{ reply_recipient }}</label>
     <textarea id="cf-text-{{ pid }}"
               name="text"
               rows="1"
               class="form-control replyTextArea input-pill"
-              placeholder="Send a private message to {{ reply_recipient }}..."
+              placeholder="Message {{ reply_recipient }}..."
+              aria-describedby="privacy-{{ piece.id }}{% if recipient %}-{{ recipient.id }}{% endif %}"
               {% if autofocus %}autofocus{% endif %}
               required></textarea>
 

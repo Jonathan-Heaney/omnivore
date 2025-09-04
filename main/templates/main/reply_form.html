@@ -13,12 +13,12 @@
   <input type="hidden" name="top_level_comment_id" value="{{ top_level_comment.id }}">
 
   <div class="comment-input">
-    <label class="visually-hidden" for="rf-text-{{ pid }}-{{ rid }}">Reply</label>
+    <label class="sr-only" for="rf-text-{{ pid }}-{{ rid }}">Private message to {{ reply_recipient }}</label>
     <textarea id="rf-text-{{ pid }}-{{ rid }}"
               name="text"
               rows="1"
               class="form-control replyTextArea input-pill"
-              placeholder="Reply to {{ reply_recipient }}..."
+             placeholder="Message {{ reply_recipient }}..."
               required></textarea>
 
     <button type="submit" class="sendButton icon-btn" aria-label="Send reply">

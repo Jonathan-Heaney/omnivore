@@ -138,6 +138,12 @@
           {% with pid=piece.id|stringformat:"s" %}
             {% with tgt_id="comments-"|add:pid|add:"-container" %}
               <div class="thread__body">
+                <!-- Privacy chip -->
+                <div class="conv-privacy" id="privacy-{{ piece.id }}">
+                  <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                  <span>Private — only you and {{ piece.user.first_name }} can see this</span>
+                </div>
+
                 <div id="{{ tgt_id }}" class="thread__messages">
                   {% for comment in thread %}
                     {% include 'main/comment_text.html' with comment=comment %}
@@ -206,6 +212,12 @@
                 <div class="thread__body" hidden>
                   {% with pid=piece.id|stringformat:"s" rid=recipient.id|stringformat:"s" %}
                     {% with tgt_id="comments-"|add:pid|add:"-"|add:rid|add:"-container" %}
+                      <!-- Privacy chip -->
+                      <div class="conv-privacy" id="privacy-{{ piece.id }}-{{ recipient.id }}">
+                        <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                        <span>Private — only you and {{ recipient.first_name }} can see this</span>
+                      </div>
+
                       <div id="{{ tgt_id }}" class="thread__messages msgs--time-above">
                         {% for comment in conversation %}
                           {% include 'main/comment_text.html' with comment=comment %}
