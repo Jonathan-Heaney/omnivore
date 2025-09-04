@@ -507,3 +507,96 @@
     var(--soft-stroke, var(--border))
   );
 }
+
+.thread__header--imsg {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.imsg-head {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: center;
+  min-width: 0; /* allow preview to truncate */
+}
+
+.imsg-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  font-size: 0.9rem;
+  color: #fff;
+  /* brand gradient like iMessage contact circles */
+  background: radial-gradient(circle at 30% 30%, #1da1f2, var(--brand));
+  box-shadow: 0 2px 8px rgba(24, 132, 189, 0.25);
+}
+
+.imsg-meta {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.imsg-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.imsg-name {
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.imsg-ts {
+  color: var(--muted);
+  font-size: 0.86rem;
+  white-space: nowrap;
+}
+
+.imsg-preview {
+  color: color-mix(in srgb, #000 70%, #fff);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.thread.is-collapsed .imsg-preview {
+  display: block;
+}
+.thread:not(.is-collapsed) .imsg-preview {
+  display: none;
+}
+
+/* Tighten the header when collapsed to feel list-like */
+.thread.is-collapsed .thread__header--imsg {
+  padding-bottom: 10px;
+}
+
+/* Make the collapsed card feel tappable */
+.thread.is-collapsed {
+  cursor: pointer;
+}
+.thread.is-collapsed .toggle-comment-btn {
+  pointer-events: auto;
+}
+
+/* Mobile sizing */
+@media (max-width: 575.98px) {
+  .imsg-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
+  }
+  .imsg-ts {
+    font-size: 0.8rem;
+  }
+}

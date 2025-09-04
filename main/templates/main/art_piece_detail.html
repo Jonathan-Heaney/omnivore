@@ -140,23 +140,54 @@
 
           <div class="threads">
             {% for recipient, conversation in conversations %}
-              <article class="thread">
-                <header class="thread__header">
-                  <div class="thread__title">
-                    Conversation with <strong>{{ recipient.first_name }} {{ recipient.last_name }}</strong>
+              {% with last=conversation|slice:"-1"|first %}
+              <article class="thread is-collapsed" id="thread-{{ piece.id }}-{{ recipient.id }}">
+                <header class="thread__header thread__header--imsg">
+                  <div class="imsg-head">
+                    <div class="imsg-avatar" aria-hidden="true">
+                      {{ recipient|initials }}
+                    </div>
+
+                    <div class="imsg-meta">
+                      <div class="imsg-row">
+                        <div class="imsg-name">
+                          {{ recipient.first_name }} {{ recipient.last_name }}
+                        </div>
+                        {% if last %}
+                          <time class="imsg-ts" datetime="{{ last.created_at|date:'c' }}">
+                            {{ last.created_at|recency_stamp }}
+                          </time>
+                        {% endif %}
+                      </div>
+
+                      {% if last %}
+                        <div class="imsg-preview">
+                          {% if last.sender_id != request.user.id %}
+                            <strong>{{ last.sender.first_name }}:</strong>
+                          {% else %}
+                            <span class="text-muted">You:</span>
+                          {% endif %}
+                          {{ last.text|truncatechars:120 }}
+                        </div>
+                      {% else %}
+                        <div class="imsg-preview text-muted">No messages yet.</div>
+                      {% endif %}
+                    </div>
                   </div>
+
                   {% with pid=piece.id|stringformat:"s" rid=recipient.id|stringformat:"s" %}
                     <button class="toggle-comment-btn"
                             id="toggle-button-{{ pid }}-{{ rid }}"
                             onclick="toggleComments({{ piece.id }}, {{ recipient.id }})"
                             aria-controls="comments-{{ pid }}-{{ rid }}-container"
-                            aria-expanded="true">
-                      <i class="fa-solid fa-minus"></i>
+                            aria-expanded="false"
+                            title="Open conversation">
+                      <i class="fa-solid fa-plus"></i>
                     </button>
                   {% endwith %}
                 </header>
 
-                <div class="thread__body">
+                <div class="thread__body" hidden>
                   {% with pid=piece.id|stringformat:"s" rid=recipient.id|stringformat:"s" %}
                     {% with tgt_id="comments-"|add:pid|add:"-"|add:rid|add:"-container" %}
                       <div id="{{ tgt_id }}" class="thread__messages">
@@ -171,6 +202,7 @@
                   {% endwith %}
                 </div>
               </article>
+              {% endwith %}
             {% endfor %}
           </div>
         </section>

@@ -1,47 +1,98 @@
-function toggleComments(artPieceId, recipientId) {
-  var commentsSection = document.getElementById(
-    'comments-' + artPieceId + '-' + recipientId + '-container'
-  );
-  var toggleButton = document.getElementById(
-    'toggle-button-' + artPieceId + '-' + recipientId
-  );
+// --- iMessage-style conversation toggling ---
 
-  if (commentsSection.style.display === 'none') {
-    commentsSection.style.display = 'block';
-    toggleButton.innerHTML = '<i class="fa-solid fa-minus"></i>';
-    localStorage.setItem(
-      'comments-' + artPieceId + '-' + recipientId + '-container',
-      'shown'
-    );
+function toggleComments(artPieceId, recipientId) {
+  const article = document.getElementById(
+    `thread-${artPieceId}-${recipientId}`
+  );
+  if (!article) return;
+
+  const btn = document.getElementById(
+    `toggle-button-${artPieceId}-${recipientId}`
+  );
+  const body = article.querySelector('.thread__body');
+  const inner = document.getElementById(
+    `comments-${artPieceId}-${recipientId}-container`
+  ); // optional: inner messages
+  const key = `thread-state-${artPieceId}-${recipientId}`;
+
+  const expanded = btn?.getAttribute('aria-expanded') === 'true';
+
+  if (expanded) {
+    // collapse
+    if (body) body.hidden = true;
+    if (inner) inner.style.display = 'none'; // backward-compat
+    article.classList.add('is-collapsed');
+    if (btn) {
+      btn.setAttribute('aria-expanded', 'false');
+      btn.innerHTML = '<i class="fa-solid fa-plus"></i>';
+      btn.title = 'Open conversation';
+    }
+    localStorage.setItem(key, 'collapsed');
   } else {
-    commentsSection.style.display = 'none';
-    toggleButton.innerHTML = '<i class="fa-solid fa-plus"></i>';
-    localStorage.setItem(
-      'comments-' + artPieceId + '-' + recipientId + '-container',
-      'hidden'
-    );
+    // expand
+    if (body) body.hidden = false;
+    if (inner) inner.style.display = 'block'; // backward-compat
+    article.classList.remove('is-collapsed');
+    if (btn) {
+      btn.setAttribute('aria-expanded', 'true');
+      btn.innerHTML = '<i class="fa-solid fa-minus"></i>';
+      btn.title = 'Hide conversation';
+    }
+    localStorage.setItem(key, 'expanded');
   }
 }
 
-// Set the initial state based on localStorage
+// Initialize threads on load based on saved state
 document.addEventListener('DOMContentLoaded', function () {
-  var commentSections = document.querySelectorAll(
-    '[id^="comments-"][id$="-container"]'
-  );
+  const articles = document.querySelectorAll('article.thread[id^="thread-"]');
 
-  commentSections.forEach(function (section) {
-    var sectionId = section.id;
-    var toggleButton = document.getElementById(
-      'toggle-button-' + sectionId.split('-')[1] + '-' + sectionId.split('-')[2]
+  articles.forEach((article) => {
+    const id = article.id; // e.g., "thread-123-456"
+    const [, artPieceId, recipientId] = id.split('-'); // ["thread","123","456"]
+    const key = `thread-state-${artPieceId}-${recipientId}`;
+    const state = localStorage.getItem(key);
+
+    const btn = document.getElementById(
+      `toggle-button-${artPieceId}-${recipientId}`
+    );
+    const body = article.querySelector('.thread__body');
+    const inner = document.getElementById(
+      `comments-${artPieceId}-${recipientId}-container`
     );
 
-    var storedState = localStorage.getItem(sectionId);
-    if (storedState === 'hidden') {
-      section.style.display = 'none';
-      toggleButton.innerHTML = '<i class="fa-solid fa-plus"></i>';
+    // Default collapsed in markup; open if saved as expanded
+    const shouldExpand = state === 'expanded';
+
+    if (shouldExpand) {
+      if (body) body.hidden = false;
+      if (inner) inner.style.display = 'block';
+      article.classList.remove('is-collapsed');
+      if (btn) {
+        btn.setAttribute('aria-expanded', 'true');
+        btn.innerHTML = '<i class="fa-solid fa-minus"></i>';
+        btn.title = 'Hide conversation';
+      }
     } else {
-      section.style.display = 'block';
-      toggleButton.innerHTML = '<i class="fa-solid fa-minus"></i>';
+      if (body) body.hidden = true;
+      if (inner) inner.style.display = 'none';
+      article.classList.add('is-collapsed');
+      if (btn) {
+        btn.setAttribute('aria-expanded', 'false');
+        btn.innerHTML = '<i class="fa-solid fa-plus"></i>';
+        btn.title = 'Open conversation';
+      }
+      // store default so subsequent loads are stable
+      if (state === null) localStorage.setItem(key, 'collapsed');
+    }
+
+    // Optional: make the header click also toggle (keeps button semantics)
+    const header = article.querySelector('.thread__header');
+    if (header) {
+      header.addEventListener('click', (e) => {
+        // avoid double-trigger when the actual button is clicked
+        if (e.target.closest('.toggle-comment-btn')) return;
+        toggleComments(artPieceId, recipientId);
+      });
     }
   });
 });
