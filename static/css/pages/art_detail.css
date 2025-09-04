@@ -775,3 +775,107 @@
   display: grid;
   gap: 6px; /* tweak as you like */
 }
+
+/* === iMessage-style bubbles left/right === */
+
+/* The list is already a column grid; this is fine. */
+.thread__messages {
+  display: grid;
+  gap: var(--thread-gap, 12px);
+}
+
+/* Message row: stacks bubble then time */
+.msg {
+  display: grid;
+  grid-template-rows: auto auto;
+  max-width: min(75%, 520px);
+}
+
+/* Align each row to its side */
+.msg--theirs {
+  justify-self: start;
+}
+.msg--mine {
+  justify-self: end;
+}
+
+/* Bubbles: reuse your existing .comment-bubble look/tints,
+   but bind it to the new structure */
+.msg__bubble {
+  background: #fff;
+  border: 1px solid var(--soft-stroke, #e5e7eb);
+  border-radius: 18px;
+  padding: 10px 12px;
+  line-height: 1.4;
+  word-wrap: break-word;
+  box-shadow: none;
+}
+
+/* Keep your color tints (was .comment-item .comment-bubble) */
+.msg--mine .msg__bubble {
+  background: color-mix(in srgb, var(--brand) var(--cmt-brand-tint, 6%), #fff);
+  border-color: color-mix(in srgb, var(--brand) 18%, var(--border, #e5e7eb));
+}
+.msg--theirs .msg__bubble {
+  background: color-mix(
+    in srgb,
+    var(--success) var(--cmt-success-tint, 6%),
+    #fff
+  );
+  border-color: color-mix(in srgb, var(--success) 18%, var(--border, #e5e7eb));
+}
+
+/* Tiny timestamp under the bubble */
+.msg__time {
+  margin-top: 4px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+/* Align timestamp with its bubble */
+.msg--theirs .msg__time {
+  text-align: left;
+}
+.msg--mine .msg__time {
+  text-align: right;
+}
+
+/* Optional: classic chat “tails” (subtle) */
+.msg--mine .msg__bubble {
+  border-bottom-right-radius: 6px;
+}
+.msg--theirs .msg__bubble {
+  border-bottom-left-radius: 6px;
+}
+
+/* Hide the old meta line if any instance remains */
+.comment-meta {
+  display: none;
+}
+
+/* Visually hidden (a11y helper) */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* By default, hide the timestamp completely */
+.msg__time {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 160ms ease;
+}
+
+/* Reveal when hovering over or focusing the bubble row */
+.msg:hover .msg__time,
+.msg:focus-within .msg__time {
+  opacity: 1;
+  visibility: visible;
+}

@@ -1,15 +1,26 @@
-<div class="comment-item {% if comment.sender_id == request.user.id %}is-mine{% else %}is-theirs{% endif %}">
-  <p class="comment-meta">
-    <strong>{{ comment.sender.first_name }} {{ comment.sender.last_name }}</strong>
-    <span class="comment-dot">•</span>
-    <span class="text-muted">
-      {% load tz %}
-      <time datetime="{{ comment.created_at|date:'c' }}">
-        {{ comment.created_at|localtime|date:"M j, Y, g:i a" }}
-      </time>
-    </span>
-  </p>
-  <div class="comment-bubble prose-comment">
+{# main/comment_text.html #}
+{% load tz %}
+
+{# mine vs theirs #}
+{% with is_mine=comment.sender_id|yesno:"true,false" %}
+{% endwith %}
+
+{# Row container aligns itself left/right based on who sent it #}
+<div class="msg {% if comment.sender_id == request.user.id %}msg--mine{% else %}msg--theirs{% endif %}">
+  {# bubble #}
+  <div class="msg__bubble">
     {{ comment.text|linebreaksbr }}
   </div>
+
+  {# tiny timestamp under the bubble, aligned with the bubble side #}
+  <div class="msg__time">
+    <time datetime="{{ comment.created_at|date:'c' }}">
+      {{ comment.created_at|localtime|date:"g:i a" }}
+    </time>
+  </div>
+
+  {# accessibility: keep sender info invisible to sighted users #}
+  <span class="visually-hidden">
+    From {{ comment.sender.first_name }} {{ comment.sender.last_name }}
+  </span>
 </div>
