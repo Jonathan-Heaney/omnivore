@@ -114,14 +114,36 @@
         </header>
 
         <article class="thread thread--single">
+          {% with last=thread|last %}
+            <header class="thread__header">
+              <div class="imrow">
+                <!-- initials of the SHARER (piece.user) -->
+                <div class="imrow__avatar" aria-hidden="true">
+                  {{ piece.user.first_name|slice:":1" }}{{ piece.user.last_name|slice:":1" }}
+                </div>
+
+                <div class="imrow__main">
+                  <div class="imrow__name">{{ piece.user.first_name }} {{ piece.user.last_name }}</div>
+                </div>
+
+                <div class="imrow__when">
+                  {% if last %}
+                    <time datetime="{{ last.created_at|date:'c' }}">{{ last.created_at|recency_stamp }}</time>
+                  {% endif %}
+                </div>
+              </div>
+            </header>
+          {% endwith %}
+
           {% with pid=piece.id|stringformat:"s" %}
             {% with tgt_id="comments-"|add:pid|add:"-container" %}
-              <div class="thread__body">  {# <-- add this wrapper #}
+              <div class="thread__body">
                 <div id="{{ tgt_id }}" class="thread__messages">
                   {% for comment in thread %}
                     {% include 'main/comment_text.html' with comment=comment %}
                   {% endfor %}
                 </div>
+
                 <div id="reply" class="thread__form">
                   {% include "main/comment_form.html" with reply_recipient=piece.user.first_name piece=piece post_url=request.path target_id=tgt_id autofocus=1 %}
                 </div>

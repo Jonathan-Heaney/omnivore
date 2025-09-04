@@ -753,3 +753,25 @@
   text-align: right;
   margin-left: 12px;
 }
+
+/* Received page: single conversation is always open; header is not a toggle */
+.thread--single .thread__header {
+  cursor: default;
+}
+
+/* Keep consistent preview spacing and pinned time (reuses your imrow rules) */
+.thread--single .thread__header > .imrow {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Slight extra air below the header when there is only one thread */
+.thread--single .thread__header {
+  padding-bottom: 10px;
+}
+
+/* Ensure name-to-snippet spacing stays comfy */
+.thread--single .imrow__main {
+  display: grid;
+  gap: 6px; /* tweak as you like */
+}
