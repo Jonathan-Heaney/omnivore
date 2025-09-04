@@ -394,13 +394,23 @@ def art_piece_detail(request, public_id):
         raise Http404("Not found")
 
     # Mark notifications for this piece as read (GET only)
-    if request.method == "GET" and not is_owner:
+    if request.method == "GET":
+        # 1) Everyone: likes are considered "seen" when you view the piece
         Notification.objects.filter(
             recipient=user,
             art_piece=piece,
             is_read=False,
-            notification_type__in=["like", "comment", "shared_art"],
+            notification_type="like",
         ).update(is_read=True)
+
+        # 2) Recipients only: comments & the shared_art ping are read on open
+        if not is_owner:
+            Notification.objects.filter(
+                recipient=user,
+                art_piece=piece,
+                is_read=False,
+                notification_type__in=["comment", "shared_art"],
+            ).update(is_read=True)
 
     # Mark the SentArtPiece as seen (recipients only; GET)
     if request.method == "GET" and has_received and not is_owner:
