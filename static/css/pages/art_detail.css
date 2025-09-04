@@ -884,13 +884,13 @@
   order: -1;
 } /* move up */
 .thread__messages.msgs--time-above .msg {
-  row-gap: -5px;
+  row-gap: -3px;
   margin-bottom: 1px;
 }
 
 /* keep messages tight */
 .thread__messages {
-  gap: 0;
+  gap: 4px;
 }
 .msg {
   position: relative;
@@ -911,8 +911,8 @@
 /* timestamp sits above, with its own pill background */
 .msg__time {
   position: absolute;
-  top: -18px;
-  font-size: 0.8rem;
+  top: -20px;
+  font-size: 0.7rem;
   color: var(--muted);
   padding: 2px 8px;
   border-radius: 999px;
@@ -947,7 +947,7 @@
   white-space: nowrap; /* force single line */
   width: max-content; /* pill grows to fit text */
   max-width: 90vw; /* safety for small screens */
-  font-size: 0.8rem;
+  font-size: 0.67rem;
   color: var(--muted);
   padding: 2px 10px;
   border-radius: 999px;
