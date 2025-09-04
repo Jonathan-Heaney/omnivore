@@ -2,7 +2,12 @@
   <p class="comment-meta">
     <strong>{{ comment.sender.first_name }} {{ comment.sender.last_name }}</strong>
     <span class="comment-dot">•</span>
-    <span class="text-muted">{{ comment.created_at|date:"M j, g:i a" }}</span>
+    <span class="text-muted">
+      {% load tz %}
+      <time datetime="{{ comment.created_at|date:'c' }}">
+        {{ comment.created_at|localtime|date:"M j, Y, g:i a" }}
+      </time>
+    </span>
   </p>
   <div class="comment-bubble prose-comment">
     {{ comment.text|linebreaksbr }}

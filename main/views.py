@@ -24,6 +24,8 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.cache import never_cache
 from .models import ArtPiece, SentArtPiece, CustomUser, Comment, Like, Notification, ReciprocalGrant, WelcomeGrant
 from main.utils.email_unsub import load_unsub_token
+import json
+from zoneinfo import ZoneInfo
 
 
 def home(request):
@@ -924,3 +926,26 @@ def unsubscribe_email(request, token: str):
         "main/unsubscribe_result.html",
         {"ok": True, "category_label": KIND_LABELS.get(kind, "these emails")},
     )
+
+
+@login_required
+@require_POST
+def set_timezone(request):
+    try:
+        payload = json.loads(request.body or "{}")
+        tz = payload.get("timezone")
+        ZoneInfo(tz)  # validate
+    except Exception:
+        return HttpResponseBadRequest("Invalid timezone")
+
+    request.user.timezone = tz
+    request.user.save(update_fields=["timezone"])
+    return JsonResponse({"ok": True})
+
+
+def tz_debug(request):
+    return JsonResponse({
+        "cookie_tz": request.COOKIES.get("tz"),
+        "user_tz": getattr(getattr(request.user, "profile", None), "timezone", None) or getattr(request.user, "timezone", None),
+        "current_tz": str(timezone.get_current_timezone()),
+    })

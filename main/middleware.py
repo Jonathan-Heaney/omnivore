@@ -1,4 +1,76 @@
 from django.http import HttpResponseNotFound
+# main/middleware.py
+from urllib.parse import unquote
+from django.utils import timezone
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+class UserOrCookieTimezoneMiddleware:
+    COOKIE_NAME = "tz"
+    COOKIE_MAX_AGE = 60 * 60 * 24 * 365 * 5  # 5 years
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        tzname = None
+        cookie_raw = request.COOKIES.get(self.COOKIE_NAME)
+        cookie_decoded = None
+        should_rewrite_cookie = False
+
+       # 1) Authenticated user setting takes precedence ONLY if it's a non-UTC value
+        user_tz = getattr(request.user, "timezone",
+                          None) if request.user.is_authenticated else None
+        if user_tz and user_tz.upper() != "UTC":
+            tzname = user_tz
+
+        # 2) Otherwise fall back to cookie
+        if tzname is None and cookie_raw:
+            cookie_decoded = unquote(cookie_raw)
+            if cookie_decoded != cookie_raw:
+                should_rewrite_cookie = True
+            tzname = cookie_decoded
+
+        activated = False
+        error = None
+        if tzname:
+            try:
+                timezone.activate(ZoneInfo(tzname))
+                activated = True
+            except ZoneInfoNotFoundError as e:
+                error = f"ZoneInfoNotFound: {tzname}"
+                timezone.deactivate()
+            except Exception as e:
+                error = f"{type(e).__name__}: {e}"
+                timezone.deactivate()
+        else:
+            timezone.deactivate()
+
+        response = self.get_response(request)
+
+        # Debug headers (remove later)
+        response.headers["X-TZ-User"] = user_tz or ""
+        response.headers["X-TZ-Cookie-Raw"] = cookie_raw or ""
+        response.headers["X-TZ-Activated"] = "1" if activated else "0"
+        if error:
+            logger.warning("TZ activate failed: %s", error)
+            response.headers["X-TZ-Error"] = error
+
+        if should_rewrite_cookie and activated:
+            response.set_cookie(
+                self.COOKIE_NAME,
+                tzname,
+                max_age=self.COOKIE_MAX_AGE,
+                samesite="Lax",
+                path="/",
+            )
+        elif cookie_raw and not activated and not user_tz:
+            response.delete_cookie(self.COOKIE_NAME, path="/")
+
+        return response
 
 
 class BlockWordPressPathsMiddleware:

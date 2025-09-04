@@ -23,6 +23,10 @@ class CustomUser(AbstractUser):
     # So you don't have to query SentArtPiece each time
     last_art_sent_at = models.DateTimeField(null=True, blank=True)
 
+    # Store IANA tz name, e.g. "America/New_York"
+    timezone = models.CharField(
+        max_length=64, null=True, blank=True)
+
     groups = models.ManyToManyField(
         'auth.Group',
         related_name='customuser_set',
