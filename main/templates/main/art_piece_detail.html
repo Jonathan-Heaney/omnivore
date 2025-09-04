@@ -142,39 +142,44 @@
           <div class="threads">
             {% for recipient, conversation in conversations %}
               <article class="thread" id="thread-{{ piece.id }}-{{ recipient.id }}">
-                <header class="thread__header">
-                  {% with last=conversation|last %}
-                    <div class="imrow">
-                      <div class="imrow__avatar" aria-hidden="true">
-                        {{ recipient.first_name|slice:":1" }}{{ recipient.last_name|slice:":1" }}
-                      </div>
-                      <div class="imrow__main">
-                        <div class="imrow__name">{{ recipient.first_name }} {{ recipient.last_name }}</div>
-                        <div class="imrow__snippet">
-                          {% if last %}{{ last.text|truncatechars:140 }}{% else %}<em>No messages yet</em>{% endif %}
-                        </div>
-                      </div>
-                      <div class="imrow__when">
-                        {% if last %}
-                          <time datetime="{{ last.created_at|date:'c' }}">
-                            {{ last.created_at|recency_stamp }}
-                          </time>
-                        {% endif %}
+                <header class="thread__header is-toggle"
+                      id="toggle-header-{{ piece.id }}-{{ recipient.id }}"
+                      role="button"
+                      tabindex="0"
+                      aria-controls="comments-{{ piece.id }}-{{ recipient.id }}-container"
+                      aria-expanded="false"
+                      data-art="{{ piece.id }}"
+                      data-recipient="{{ recipient.id }}">
+                {% with last=conversation|last %}
+                  <div class="imrow">
+                    <div class="imrow__avatar" aria-hidden="true">
+                      {{ recipient.first_name|slice:":1" }}{{ recipient.last_name|slice:":1" }}
+                    </div>
+
+                    <div class="imrow__main">
+                      <div class="imrow__name">{{ recipient.first_name }} {{ recipient.last_name }}</div>
+                      <div class="imrow__snippet">
+                        {% if last %}{{ last.text|truncatechars:140 }}{% else %}<em>No messages yet</em>{% endif %}
                       </div>
                     </div>
-                  {% endwith %}
 
-                  <button
-                    class="toggle-comment-btn"
-                    id="toggle-button-{{ piece.id }}-{{ recipient.id }}"
-                    onclick="toggleComments({{ piece.id }}, {{ recipient.id }})"
-                    aria-controls="comments-{{ piece.id }}-{{ recipient.id }}-container"
-                    aria-expanded="false"
-                    title="Open conversation"
-                  >
-                    <i class="fa-solid fa-plus"></i>
-                  </button>
-                </header>
+                    <div class="imrow__when">
+                      {% if last %}
+                        <time datetime="{{ last.created_at|date:'c' }}">
+                          {{ last.created_at|recency_stamp }}
+                        </time>
+                      {% endif %}
+                    </div>
+                  </div>
+                {% endwith %}
+
+                <span class="thread__chevron" aria-hidden="true">
+                  <!-- chevron icon (down) that will rotate on expand -->
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </header>
 
                 <div class="thread__body" hidden>
                   {% with pid=piece.id|stringformat:"s" rid=recipient.id|stringformat:"s" %}

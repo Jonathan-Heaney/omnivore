@@ -694,3 +694,62 @@
   gap: 5px; /* <- adjust to taste (2–4px works well) */
   min-width: 0; /* keep truncation working */
 }
+
+/* Header remains a flex bar: row fills left, chevron stays fixed on the right */
+.thread__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer; /* big hit area */
+}
+
+/* Let the preview row grow */
+.thread__header > .imrow {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Chevron styling + rotation */
+.thread__chevron {
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--soft-stroke, #e5e7eb);
+  border-radius: 999px;
+  color: var(--brand-600);
+  transition: transform 160ms ease, background-color 120ms ease;
+}
+.thread__chevron:hover {
+  background: color-mix(in srgb, var(--brand) 8%, #fff);
+}
+
+/* Rotate chevron when expanded */
+.thread:not(.is-collapsed) .thread__chevron {
+  transform: rotate(180deg);
+}
+
+/* Keep time pinned on the right; snippet truncates */
+.imrow {
+  display: grid;
+  grid-template-columns: 40px 1fr max-content; /* avatar | text | time */
+  align-items: center;
+  gap: 12px;
+}
+.imrow__main {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+.imrow__snippet {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.imrow__when {
+  white-space: nowrap;
+  text-align: right;
+  margin-left: 12px;
+}

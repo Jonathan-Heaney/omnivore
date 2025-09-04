@@ -1,99 +1,76 @@
-// --- iMessage-style conversation toggling ---
-
 function toggleComments(artPieceId, recipientId) {
   const article = document.getElementById(
     `thread-${artPieceId}-${recipientId}`
   );
   if (!article) return;
 
-  const btn = document.getElementById(
-    `toggle-button-${artPieceId}-${recipientId}`
+  const header = document.getElementById(
+    `toggle-header-${artPieceId}-${recipientId}`
   );
   const body = article.querySelector('.thread__body');
   const inner = document.getElementById(
     `comments-${artPieceId}-${recipientId}-container`
-  ); // optional: inner messages
+  );
   const key = `thread-state-${artPieceId}-${recipientId}`;
 
-  const expanded = btn?.getAttribute('aria-expanded') === 'true';
+  const expanded = header?.getAttribute('aria-expanded') === 'true';
 
   if (expanded) {
-    // collapse
     if (body) body.hidden = true;
-    if (inner) inner.style.display = 'none'; // backward-compat
+    if (inner) inner.style.display = 'none';
     article.classList.add('is-collapsed');
-    if (btn) {
-      btn.setAttribute('aria-expanded', 'false');
-      btn.innerHTML = '<i class="fa-solid fa-plus"></i>';
-      btn.title = 'Open conversation';
-    }
+    header?.setAttribute('aria-expanded', 'false');
     localStorage.setItem(key, 'collapsed');
   } else {
-    // expand
     if (body) body.hidden = false;
-    if (inner) inner.style.display = 'block'; // backward-compat
+    if (inner) inner.style.display = 'block';
     article.classList.remove('is-collapsed');
-    if (btn) {
-      btn.setAttribute('aria-expanded', 'true');
-      btn.innerHTML = '<i class="fa-solid fa-minus"></i>';
-      btn.title = 'Hide conversation';
-    }
+    header?.setAttribute('aria-expanded', 'true');
     localStorage.setItem(key, 'expanded');
   }
 }
 
-// Initialize threads on load based on saved state
 document.addEventListener('DOMContentLoaded', function () {
   const articles = document.querySelectorAll('article.thread[id^="thread-"]');
 
   articles.forEach((article) => {
-    const id = article.id; // e.g., "thread-123-456"
-    const [, artPieceId, recipientId] = id.split('-'); // ["thread","123","456"]
+    const [, artPieceId, recipientId] = article.id.split('-'); // "thread-123-456"
     const key = `thread-state-${artPieceId}-${recipientId}`;
     const state = localStorage.getItem(key);
 
-    const btn = document.getElementById(
-      `toggle-button-${artPieceId}-${recipientId}`
+    const header = document.getElementById(
+      `toggle-header-${artPieceId}-${recipientId}`
     );
     const body = article.querySelector('.thread__body');
     const inner = document.getElementById(
       `comments-${artPieceId}-${recipientId}-container`
     );
 
-    // Default collapsed in markup; open if saved as expanded
     const shouldExpand = state === 'expanded';
 
     if (shouldExpand) {
       if (body) body.hidden = false;
       if (inner) inner.style.display = 'block';
       article.classList.remove('is-collapsed');
-      if (btn) {
-        btn.setAttribute('aria-expanded', 'true');
-        btn.innerHTML = '<i class="fa-solid fa-minus"></i>';
-        btn.title = 'Hide conversation';
-      }
+      header?.setAttribute('aria-expanded', 'true');
     } else {
       if (body) body.hidden = true;
       if (inner) inner.style.display = 'none';
       article.classList.add('is-collapsed');
-      if (btn) {
-        btn.setAttribute('aria-expanded', 'false');
-        btn.innerHTML = '<i class="fa-solid fa-plus"></i>';
-        btn.title = 'Open conversation';
-      }
-      // store default so subsequent loads are stable
+      header?.setAttribute('aria-expanded', 'false');
       if (state === null) localStorage.setItem(key, 'collapsed');
     }
 
-    // Optional: make the header click also toggle (keeps button semantics)
-    const header = article.querySelector('.thread__header');
-    if (header) {
-      header.addEventListener('click', (e) => {
-        // avoid double-trigger when the actual button is clicked
-        if (e.target.closest('.toggle-comment-btn')) return;
+    // Click & keyboard toggle
+    header?.addEventListener('click', () =>
+      toggleComments(artPieceId, recipientId)
+    );
+    header?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
         toggleComments(artPieceId, recipientId);
-      });
-    }
+      }
+    });
   });
 });
 
