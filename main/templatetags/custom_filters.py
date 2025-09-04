@@ -1,5 +1,5 @@
 from django import template
-from django.utils import timezone
+from django.utils import timezone, formats
 import sys
 
 
@@ -48,3 +48,34 @@ def recency_stamp(dt):
         return dt.strftime("%A")
 
     return dt.strftime(fmt_mdyy)
+
+
+@register.filter
+def chat_timestamp(value):
+    """
+    Human chat-style timestamp:
+      - Today 2:39 p.m.
+      - Thursday 2:39 p.m.            (within last 7 days)
+      - Mon, Aug 16 at 2:39 p.m.      (older this year)
+      - Oct 17, 2024 at 2:39 p.m.     (previous years)
+    """
+    if not value:
+        return ""
+    now = timezone.localtime(timezone.now())
+    dt = timezone.localtime(value)
+
+    if dt.date() == now.date():
+        # Today 2:39 p.m.
+        return f"Today {formats.date_format(dt, 'P')}"
+
+    delta_days = (now.date() - dt.date()).days
+    if 0 < delta_days < 7:
+        # Thursday 2:39 p.m.
+        return f"{formats.date_format(dt, 'l')} {formats.date_format(dt, 'P')}"
+
+    if dt.year == now.year:
+        # Mon, Aug 16 at 2:39 p.m.
+        return f"{formats.date_format(dt, 'D')}, {formats.date_format(dt, 'M j')} at {formats.date_format(dt, 'P')}"
+
+    # Oct 17, 2024 at 2:39 p.m.
+    return f"{formats.date_format(dt, 'M j, Y')} at {formats.date_format(dt, 'P')}"

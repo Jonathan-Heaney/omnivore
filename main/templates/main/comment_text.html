@@ -1,5 +1,6 @@
 {# main/comment_text.html #}
 {% load tz %}
+{% load custom_filters %}  
 
 {# mine vs theirs #}
 {% with is_mine=comment.sender_id|yesno:"true,false" %}
@@ -14,10 +15,13 @@
 
   {# tiny timestamp under the bubble, aligned with the bubble side #}
   <div class="msg__time">
-    <time datetime="{{ comment.created_at|date:'c' }}">
-      {{ comment.created_at|localtime|date:"g:i a" }}
+    <time
+      datetime="{{ comment.created_at|date:'c' }}"
+      title="{{ comment.created_at|date:'F j, Y, g:i a T' }}"
+    >
+      {{ comment.created_at|chat_timestamp }}
     </time>
-  </div>
+</div>
 
   {# accessibility: keep sender info invisible to sighted users #}
   <span class="visually-hidden">
