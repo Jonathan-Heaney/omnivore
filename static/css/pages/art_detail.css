@@ -939,3 +939,36 @@
   visibility: visible;
   transition-delay: 0s;
 }
+
+/* Timestamp pill: stay single-line and stretch to fit text */
+.msg__time {
+  position: absolute;
+  top: -18px; /* sits above the bubble */
+  white-space: nowrap; /* force single line */
+  width: max-content; /* pill grows to fit text */
+  max-width: 90vw; /* safety for small screens */
+  font-size: 0.8rem;
+  color: var(--muted);
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, #fff 92%, var(--soft-surface, #f7f9fb));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  z-index: 2;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 160ms ease, visibility 0s linear 160ms;
+  pointer-events: none;
+}
+
+.msg--theirs .msg__time {
+  left: 0;
+}
+.msg--mine .msg__time {
+  right: 0;
+}
+
+.msg:hover .msg__time,
+.msg:focus-within .msg__time {
+  opacity: 1;
+  visibility: visible;
+}
