@@ -879,3 +879,11 @@
   opacity: 1;
   visibility: visible;
 }
+
+.thread__messages.msgs--time-above .msg__time {
+  order: -1;
+} /* move up */
+.thread__messages.msgs--time-above .msg {
+  row-gap: -5px;
+  margin-bottom: 1px;
+}

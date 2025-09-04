@@ -206,7 +206,7 @@
                 <div class="thread__body" hidden>
                   {% with pid=piece.id|stringformat:"s" rid=recipient.id|stringformat:"s" %}
                     {% with tgt_id="comments-"|add:pid|add:"-"|add:rid|add:"-container" %}
-                      <div id="{{ tgt_id }}" class="thread__messages">
+                      <div id="{{ tgt_id }}" class="thread__messages msgs--time-above">
                         {% for comment in conversation %}
                           {% include 'main/comment_text.html' with comment=comment %}
                         {% endfor %}
