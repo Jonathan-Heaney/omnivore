@@ -972,3 +972,60 @@
   opacity: 1;
   visibility: visible;
 }
+
+/* ===== Compact thread header on small screens (no overlap) ===== */
+@media (max-width: 420px) {
+  /* Keep the header bar tidy */
+  .thread__header {
+    gap: 8px; /* tighter than 12px */
+    padding: 12px var(--thread-pad-x, 18px);
+  }
+
+  /* Let the preview row reflow into 2 rows: avatar | name ; time below name */
+  .thread__header > .imrow {
+    min-width: 0;
+    gap: 8px;
+  }
+
+  .imrow {
+    grid-template-columns: 32px 1fr; /* avatar smaller; drop fixed time column */
+    align-items: center;
+  }
+
+  .imrow__avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 0.8rem;
+  }
+
+  /* Name can wrap if needed, but stays truncated to one line */
+  .imrow__name {
+    font-weight: 800;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Put the time on its own line under the name */
+  .imrow__when {
+    grid-column: 2 / -1; /* second column, full width */
+    grid-row: 2; /* second row */
+    margin-left: 0;
+    text-align: left;
+    font-size: 0.78rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  /* Hide the snippet at XS so name + time have room */
+  .imrow__snippet {
+    display: none;
+  }
+
+  /* Keep the chevron compact so it doesn't crowd */
+  .thread__chevron {
+    width: 32px;
+    height: 32px;
+  }
+}
