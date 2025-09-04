@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load custom_filters %}
+{% load tz %}
 
 {% block title %}{{ piece.piece_name }} · Omnivore{% endblock %}
 
@@ -140,51 +141,39 @@
 
           <div class="threads">
             {% for recipient, conversation in conversations %}
-              {% with last=conversation|slice:"-1"|first %}
-              <article class="thread is-collapsed" id="thread-{{ piece.id }}-{{ recipient.id }}">
-                <header class="thread__header thread__header--imsg">
-                  <div class="imsg-head">
-                    <div class="imsg-avatar" aria-hidden="true">
-                      {{ recipient|initials }}
-                    </div>
-
-                    <div class="imsg-meta">
-                      <div class="imsg-row">
-                        <div class="imsg-name">
-                          {{ recipient.first_name }} {{ recipient.last_name }}
+              <article class="thread" id="thread-{{ piece.id }}-{{ recipient.id }}">
+                <header class="thread__header">
+                  {% with last=conversation|last %}
+                    <div class="imrow">
+                      <div class="imrow__avatar" aria-hidden="true">
+                        {{ recipient.first_name|slice:":1" }}{{ recipient.last_name|slice:":1" }}
+                      </div>
+                      <div class="imrow__main">
+                        <div class="imrow__name">{{ recipient.first_name }} {{ recipient.last_name }}</div>
+                        <div class="imrow__snippet">
+                          {% if last %}{{ last.text|truncatechars:140 }}{% else %}<em>No messages yet</em>{% endif %}
                         </div>
+                      </div>
+                      <div class="imrow__when">
                         {% if last %}
-                          <time class="imsg-ts" datetime="{{ last.created_at|date:'c' }}">
+                          <time datetime="{{ last.created_at|date:'c' }}">
                             {{ last.created_at|recency_stamp }}
                           </time>
                         {% endif %}
                       </div>
-
-                      {% if last %}
-                        <div class="imsg-preview">
-                          {% if last.sender_id != request.user.id %}
-                            <strong>{{ last.sender.first_name }}:</strong>
-                          {% else %}
-                            <span class="text-muted">You:</span>
-                          {% endif %}
-                          {{ last.text|truncatechars:120 }}
-                        </div>
-                      {% else %}
-                        <div class="imsg-preview text-muted">No messages yet.</div>
-                      {% endif %}
                     </div>
-                  </div>
-
-                  {% with pid=piece.id|stringformat:"s" rid=recipient.id|stringformat:"s" %}
-                    <button class="toggle-comment-btn"
-                            id="toggle-button-{{ pid }}-{{ rid }}"
-                            onclick="toggleComments({{ piece.id }}, {{ recipient.id }})"
-                            aria-controls="comments-{{ pid }}-{{ rid }}-container"
-                            aria-expanded="false"
-                            title="Open conversation">
-                      <i class="fa-solid fa-plus"></i>
-                    </button>
                   {% endwith %}
+
+                  <button
+                    class="toggle-comment-btn"
+                    id="toggle-button-{{ piece.id }}-{{ recipient.id }}"
+                    onclick="toggleComments({{ piece.id }}, {{ recipient.id }})"
+                    aria-controls="comments-{{ piece.id }}-{{ recipient.id }}-container"
+                    aria-expanded="false"
+                    title="Open conversation"
+                  >
+                    <i class="fa-solid fa-plus"></i>
+                  </button>
                 </header>
 
                 <div class="thread__body" hidden>
@@ -202,7 +191,6 @@
                   {% endwith %}
                 </div>
               </article>
-              {% endwith %}
             {% endfor %}
           </div>
         </section>

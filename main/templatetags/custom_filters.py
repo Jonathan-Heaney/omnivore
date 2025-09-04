@@ -1,5 +1,6 @@
 from django import template
 from django.utils import timezone
+import sys
 
 
 register = template.Library()
@@ -21,17 +22,29 @@ def initials(user):
 @register.filter
 def recency_stamp(dt):
     """
-    iMessage-like timestamp:
-      - today → '8:00 AM'
-      - this week → 'Monday'
-      - older → '8/25/25'
+    iMessage-like timestamp for an aware datetime:
+      • today        → '8:00 AM'
+      • same week    → 'Monday'
+      • older        → '8/25/25'
     """
     if not dt:
         return ""
+
+    # ensure both in local tz
     now = timezone.localtime()
     dt = timezone.localtime(dt)
+
+    # Windows doesn't support %-I / %-m / %-d
+    WIN = sys.platform.startswith("win")
+    fmt_time = "%#I:%M %p" if WIN else "%-I:%M %p"
+    fmt_mdyy = "%#m/%#d/%y" if WIN else "%-m/%-d/%y"
+
     if dt.date() == now.date():
-        return dt.strftime("%-I:%M %p")  # Linux/macOS strftime
-    if (now.date() - dt.date()).days < 7:
+        return dt.strftime(fmt_time)
+
+    # “same week” = same ISO week & year; this matches Messages behavior
+    if (dt.isocalendar().week == now.isocalendar().week
+            and dt.isocalendar().year == now.isocalendar().year):
         return dt.strftime("%A")
-    return dt.strftime("%-m/%-d/%y")
+
+    return dt.strftime(fmt_mdyy)

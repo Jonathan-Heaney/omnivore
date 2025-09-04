@@ -600,3 +600,97 @@
     font-size: 0.8rem;
   }
 }
+
+/* Preview row in the thread header */
+.imrow {
+  display: grid;
+  grid-template-columns: 40px 1fr max-content; /* <- fixed right column */
+  align-items: center;
+  gap: 12px;
+}
+
+.imrow__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  background: color-mix(in srgb, var(--brand) 15%, #eef2f7);
+  color: #0c2233;
+}
+.imrow__name {
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.imrow__main {
+  min-width: 0; /* allows ellipsis to work */
+}
+
+.imrow__snippet {
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.imrow__when {
+  color: var(--muted);
+  font-size: 0.9rem;
+  white-space: nowrap; /* never wrap */
+  text-align: right; /* anchor to the right */
+  margin-left: 12px; /* tiny breathing room from snippet */
+}
+
+/* Make the preview row fill the header so its right column
+   (the time) sits consistently at the far right edge */
+.thread__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* keep toggle on the far right */
+  gap: 12px; /* breathing room between row and button */
+}
+
+/* The preview row should expand; allow truncation inside */
+.thread__header > .imrow {
+  flex: 1 1 auto; /* <- grow to fill space */
+  min-width: 0; /* <- enables ellipsis on the snippet */
+}
+
+/* Keep the toggle a fixed-size item so it never pushes the time around */
+.toggle-comment-btn {
+  flex: 0 0 auto;
+  margin-left: 4px; /* tiny gap from the time */
+}
+
+/* Inside the preview row, keep the time in a fixed right column */
+.imrow {
+  display: grid;
+  grid-template-columns: 40px 1fr max-content; /* avatar | text | time */
+  align-items: center;
+  gap: 12px;
+}
+
+/* Ensure snippet can shrink so time never wraps or shifts */
+.imrow__main {
+  min-width: 0;
+}
+.imrow__snippet {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The time stays right-aligned and single-line */
+.imrow__when {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.imrow__main {
+  display: grid;
+  gap: 5px; /* <- adjust to taste (2–4px works well) */
+  min-width: 0; /* keep truncation working */
+}
