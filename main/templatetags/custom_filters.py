@@ -19,63 +19,73 @@ def initials(user):
     return (f + l).upper() or "?"
 
 
+# --- helper: locale-independent 12h time with AM/PM (no periods) ---
+def _ampm_time(dt):
+    """
+    12-hour time like '2:39 PM' regardless of OS/locale.
+    Assumes dt is timezone-aware and already in local time.
+    """
+    hour12 = ((dt.hour + 11) % 12) + 1  # 0->12, 13->1, etc.
+    minutes = f"{dt.minute:02d}"
+    ampm = "AM" if dt.hour < 12 else "PM"
+    return f"{hour12}:{minutes} {ampm}"
+
+
 @register.filter
 def recency_stamp(dt):
     """
-    iMessage-like timestamp for an aware datetime:
-      • today        → '8:00 AM'
-      • same week    → 'Monday'
-      • older        → '8/25/25'
+    iMessage-ish header stamp:
+      • today      → '8:00 AM'
+      • same week  → 'Mon'
+      • older      → '8/25/25'
     """
     if not dt:
         return ""
-
-    # ensure both in local tz
     now = timezone.localtime()
     dt = timezone.localtime(dt)
 
-    # Windows doesn't support %-I / %-m / %-d
-    WIN = sys.platform.startswith("win")
-    fmt_time = "%#I:%M %p" if WIN else "%-I:%M %p"
-    fmt_mdyy = "%#m/%#d/%y" if WIN else "%-m/%-d/%y"
-
     if dt.date() == now.date():
-        return dt.strftime(fmt_time)
+        return _ampm_time(dt)
 
-    # “same week” = same ISO week & year; this matches Messages behavior
+    # same ISO week & year
     if (dt.isocalendar().week == now.isocalendar().week
             and dt.isocalendar().year == now.isocalendar().year):
-        return dt.strftime("%A")
+        return dt.strftime("%a")  # Mon/Tue/Wed...
 
-    return dt.strftime(fmt_mdyy)
+    # M/D/YY without leading zeros on M/D
+    return f"{dt.month}/{dt.day}/{dt.strftime('%y')}"
 
 
 @register.filter
 def chat_timestamp(value):
     """
-    Human chat-style timestamp:
-      - Today 2:39 p.m.
-      - Thursday 2:39 p.m.            (within last 7 days)
-      - Mon, Aug 16 at 2:39 p.m.      (older this year)
-      - Oct 17, 2024 at 2:39 p.m.     (previous years)
+    Chat bubble hover/inline timestamp:
+      - Today 2:39 PM
+      - Thu 2:39 PM                 (within last 7 days)
+      - Mon, Aug 16 at 2:39 PM      (older this year)
+      - Oct 17, 2024 at 2:39 PM     (previous years)
     """
     if not value:
         return ""
-    now = timezone.localtime(timezone.now())
+    now = timezone.localtime()
     dt = timezone.localtime(value)
 
+    t = _ampm_time(dt)
+
     if dt.date() == now.date():
-        # Today 2:39 p.m.
-        return f"Today {formats.date_format(dt, 'P')}"
+        return f"Today {t}"
 
     delta_days = (now.date() - dt.date()).days
     if 0 < delta_days < 7:
-        # Thursday 2:39 p.m.
-        return f"{formats.date_format(dt, 'l')} {formats.date_format(dt, 'P')}"
+        # abbreviated weekday (Mon/Tue/…)
+        return f"{dt.strftime('%a')} {t}"
 
     if dt.year == now.year:
-        # Mon, Aug 16 at 2:39 p.m.
-        return f"{formats.date_format(dt, 'D')}, {formats.date_format(dt, 'M j')} at {formats.date_format(dt, 'P')}"
+        # Mon, Aug 16 at 2:39 PM
+        day_abbr = dt.strftime("%a")
+        mon_abbr = dt.strftime("%b")
+        return f"{day_abbr}, {mon_abbr} {dt.day}"
 
-    # Oct 17, 2024 at 2:39 p.m.
-    return f"{formats.date_format(dt, 'M j, Y')} at {formats.date_format(dt, 'P')}"
+    # Oct 17, 2024 at 2:39 PM
+    mon_abbr = dt.strftime("%b")
+    return f"{mon_abbr} {dt.day}, {dt.year}"
