@@ -221,11 +221,14 @@ def delete_art_piece(request, public_id):
 @login_required(login_url="/login")
 def my_shared_art(request):
     """
-    Owner’s list: show piece cards + conversation summary (count, unread, last message).
-    No comment POSTs here anymore; creation flows through comments_create.
+    Owner’s list: show piece cards + conversation summary:
+      - conv_count        : number of distinct 1:1 threads
+      - unread_msg_count  : total unread comment notifications
+      - new_convo_count   : threads opened since last visit (no owner reply, all unread)
     """
     user = request.user
     my_pieces = ArtPiece.objects.filter(user=user).order_by('-created_at')
+    piece_ids = list(my_pieces.values_list('id', flat=True))
 
     # Legacy support: mark read if older links still point here with ?n=
     n_id = request.GET.get("n")
@@ -234,10 +237,10 @@ def my_shared_art(request):
             id=n_id, recipient=user, is_read=False
         ).update(is_read=True)
 
-    # Summaries instead of full threads
+    # ---------- Build conversation basics (conv_count, last) ----------
     comments_qs = (
         Comment.objects
-        .filter(art_piece__in=my_pieces)
+        .filter(art_piece_id__in=piece_ids)
         .select_related('sender', 'recipient', 'art_piece')
         .order_by('created_at')  # chronological for "last" picking
     )
@@ -246,6 +249,7 @@ def my_shared_art(request):
     last_comment_by_piece = {}             # piece_id -> latest Comment
 
     for c in comments_qs:
+        # "other" relative to owner
         other = c.recipient if c.sender_id == user.id else c.sender
         pid = c.art_piece_id
         conv_set_by_piece[pid].add(other.id)
@@ -253,35 +257,69 @@ def my_shared_art(request):
         if prev is None or c.created_at > prev.created_at:
             last_comment_by_piece[pid] = c
 
-    unread_counts = {
-        row['art_piece_id']: row['cnt']
-        for row in (Notification.objects
-                    .filter(recipient=user,
-                            is_read=False,
-                            notification_type='comment',
-                            art_piece__in=my_pieces)
-                    .values('art_piece_id')
-                    .annotate(cnt=Count('id')))
-    }
+    # ---------- Unread messages & NEW conversation logic ----------
+    # Aggregate comment notifications by (piece, sender, is_read)
+    notif_rows = (
+        Notification.objects
+        .filter(
+            recipient=user,
+            notification_type='comment',
+            art_piece_id__in=piece_ids,
+        )
+        .values('art_piece_id', 'sender_id', 'is_read')
+        .annotate(cnt=Count('id'))
+    )
 
+    # piece_id -> total unread message count
+    unread_msg_counts = defaultdict(int)
+    # (piece_id, other_id) -> counts
+    pair_counts = defaultdict(lambda: {'unread': 0, 'read': 0})
+
+    for r in notif_rows:
+        pid = r['art_piece_id']
+        sender_id = r['sender_id']
+        if r['is_read']:
+            pair_counts[(pid, sender_id)]['read'] = r['cnt']
+        else:
+            pair_counts[(pid, sender_id)]['unread'] = r['cnt']
+            unread_msg_counts[pid] += r['cnt']
+
+    # Has owner replied in a given (piece, other) thread?
+    # (Owners can't start threads; any owner message will be a reply = parent_comment not null)
+    owner_reply_pairs = set(
+        Comment.objects
+        .filter(art_piece_id__in=piece_ids, sender=user, parent_comment__isnull=False)
+        .values_list('art_piece_id', 'recipient_id')
+        .distinct()
+    )
+
+    # Count NEW conversations: unread>0 AND read==0 AND owner hasn't replied yet
+    new_convo_counts = defaultdict(int)
+    for (pid, other_id), counts in pair_counts.items():
+        if counts['unread'] > 0 and counts['read'] == 0 and (pid, other_id) not in owner_reply_pairs:
+            new_convo_counts[pid] += 1
+
+    # ---------- Likes (unchanged) ----------
     likes_by_piece = defaultdict(list)
     likes = (
         Like.objects
-        .filter(art_piece__in=my_pieces)
+        .filter(art_piece_id__in=piece_ids)
         .select_related('user', 'art_piece')
-        .order_by('-created_at')  # 👈 force recency
+        .order_by('-created_at')
     )
     for like in likes:
-        likes_by_piece[like.art_piece].append(
-            like.user)  # list is newest→oldest
+        likes_by_piece[like.art_piece].append(like.user)  # newest→oldest
 
+    # ---------- Summaries per piece ----------
     summaries = {}
     for piece in my_pieces:
         pid = piece.id
         summaries[pid] = {
             'conv_count': len(conv_set_by_piece.get(pid, set())),
-            'unread_count': unread_counts.get(pid, 0),
-            'last': last_comment_by_piece.get(pid),  # may be None
+            'unread_msg_count': unread_msg_counts.get(pid, 0),
+            'new_convo_count': new_convo_counts.get(pid, 0),
+            # kept for possible future use
+            'last': last_comment_by_piece.get(pid),
         }
 
     context = {
