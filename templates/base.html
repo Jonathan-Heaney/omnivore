@@ -117,12 +117,15 @@
                 <li class="nav-item">
                   <a href="{% url 'notifications' %}"
                     id="notification-link"
-                    class="nav-link {% if has_unread_notifications %}has-unread{% endif %}"
+                    class="nav-link {% if unread_notifications_count %}has-unread{% endif %}"
                     aria-label="Notifications">
-                    <i class="{% if has_unread_notifications %}fa-solid{% else %}fa-regular{% endif %} fa-bell position-relative">
-                      {% if has_unread_notifications %}
-                        <span class="notif-dot" aria-hidden="true"></span>
-                      {% endif %}
+                    <i id="notification-icon"
+                      class="{% if unread_notifications_count %}fa-solid{% else %}fa-regular{% endif %} fa-bell position-relative">
+                      <span id="notif-badge"
+                            class="notif-badge {% if unread_notifications_count %}notif-badge--count{% endif %}"
+                            {% if not unread_notifications_count %}data-dot="1"{% endif %}>
+                        {% if unread_notifications_count %}{{ unread_notifications_count }}{% endif %}
+                      </span>
                     </i>
                   </a>
                 </li>

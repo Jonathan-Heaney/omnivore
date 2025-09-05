@@ -656,29 +656,41 @@ def comments_create(request):
 @require_POST
 @login_required
 def mark_thread_read(request):
-    piece_pub = request.POST.get("piece")
+    """
+    Owner opens a thread with 'other' for a given piece: mark only those
+    comment notifications as read. Respond with how many were cleared and
+    the user's remaining unread total (all notification types).
+    """
+    piece_public = request.POST.get("piece")
     other_id = request.POST.get("other")
-    if not piece_pub or not other_id:
-        return HttpResponse(status=400)
 
-    piece = get_object_or_404(ArtPiece, public_id=piece_pub)
+    if not piece_public or not other_id:
+        return JsonResponse({"ok": False, "error": "missing params"}, status=400)
 
-    # Owner or recipient must be the opener
-    if request.user.id not in {piece.user_id, int(other_id)}:
-        return HttpResponseForbidden()
+    piece = get_object_or_404(ArtPiece, public_id=piece_public)
 
-    # Mark only comment notifs for this piece from the *other* participant
-    (Notification.objects
-        .filter(
-            recipient=request.user,
-            art_piece=piece,
-            notification_type='comment',
-            is_read=False,
-            sender_id=other_id,
-        )
-        .update(is_read=True))
+    # Only the owner should hit this; recipients get auto-read on open.
+    if piece.user_id != request.user.id:
+        return JsonResponse({"ok": False, "error": "forbidden"}, status=403)
 
-    return HttpResponse(status=204)
+    qs = Notification.objects.filter(
+        recipient=request.user,
+        art_piece=piece,
+        sender_id=other_id,
+        notification_type="comment",
+        is_read=False,
+    )
+    cleared = qs.count()
+    if cleared:
+        qs.update(is_read=True)
+
+    # Remaining unread (all types) for the bell
+    unread_total = Notification.objects.filter(
+        recipient=request.user,
+        is_read=False,
+    ).count()
+
+    return JsonResponse({"ok": True, "cleared": cleared, "unread_total": unread_total})
 
 
 @login_required

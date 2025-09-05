@@ -3,8 +3,34 @@ function getCSRFToken() {
   return m ? decodeURIComponent(m[1]) : '';
 }
 
+function updateNotificationBell(total) {
+  const link = document.getElementById('notification-link');
+  const icon = document.getElementById('notification-icon');
+  const badge = document.getElementById('notif-badge');
+  if (!link || !icon || !badge) return;
+
+  const n = Number(total || 0);
+
+  if (n > 0) {
+    link.classList.add('has-unread');
+    icon.classList.remove('fa-regular');
+    icon.classList.add('fa-solid');
+    badge.classList.add('notif-badge--count');
+    badge.removeAttribute('data-dot');
+    badge.textContent = String(n);
+  } else {
+    link.classList.remove('has-unread');
+    icon.classList.remove('fa-solid');
+    icon.classList.add('fa-regular');
+    badge.classList.remove('notif-badge--count');
+    badge.setAttribute('data-dot', '1');
+    badge.textContent = ''; // dot mode
+  }
+}
+
 async function markThreadRead(headerEl) {
   if (!headerEl || headerEl.dataset.markedRead === '1') return;
+
   const piece = headerEl.getAttribute('data-art');
   const other = headerEl.getAttribute('data-recipient');
   const body = new URLSearchParams({ piece, other });
@@ -16,13 +42,14 @@ async function markThreadRead(headerEl) {
       body,
       credentials: 'same-origin',
     });
-    if (resp.ok) {
-      headerEl.classList.remove('thread__header--unread');
-      const b = headerEl.querySelector('.unread-badge');
-      if (b) b.remove();
-      headerEl.dataset.markedRead = '1';
-    }
-  } catch {}
+    if (!resp.ok) return;
+
+    const data = await resp.json();
+
+    updateNotificationBell(data.unread_total);
+  } catch {
+    // noop
+  }
 }
 
 function focusReplyWithoutJump(artPieceId, recipientId) {
