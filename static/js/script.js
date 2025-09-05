@@ -1,63 +1,56 @@
-function markThreadRead(headerEl) {
-  // only once per header
-  if (!headerEl || headerEl.dataset.readSent === '1') return;
+// Grab CSRF from cookie (Django default cookie name is "csrftoken")
+function getCSRFToken() {
+  const m = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]+)/);
+  return m ? decodeURIComponent(m[1]) : '';
+}
 
-  headerEl.dataset.readSent = '1'; // guard
+async function markThreadRead(headerEl) {
+  if (!headerEl || headerEl.dataset.markedRead === '1') return;
 
-  const url = headerEl.getAttribute('hx-post');
-  const valsAttr = headerEl.getAttribute('hx-vals') || '{}';
-  let vals = {};
+  const piece = headerEl.getAttribute('data-art');
+  const other = headerEl.getAttribute('data-recipient');
+
+  // Send as application/x-www-form-urlencoded to match request.POST
+  const body = new URLSearchParams({ piece, other });
+
   try {
-    vals = JSON.parse(valsAttr);
-  } catch (_) {}
-
-  const finishUI = () => {
-    headerEl.classList.remove('thread__header--unread');
-    const b = headerEl.querySelector('.unread-badge');
-    if (b) b.remove();
-  };
-
-  // Prefer HTMX if available
-  if (window.htmx && url) {
-    htmx
-      .ajax('POST', url, {
-        source: headerEl,
-        values: vals,
-        swap: 'none',
-        headers: {
-          // inline hx-headers should already cover this; this is a safety net:
-          'X-CSRFToken':
-            document.querySelector('input[name="csrfmiddlewaretoken"]')
-              ?.value ||
-            document.cookie.match(/csrftoken=([^;]+)/)?.[1] ||
-            '',
-        },
-      })
-      .finally(finishUI);
-    return;
-  }
-
-  // Fallback: plain fetch
-  if (url) {
-    const body = new URLSearchParams();
-    Object.entries(vals).forEach(([k, v]) => body.append(k, v));
-    fetch(url, {
+    const resp = await fetch('/threads/mark-read/', {
       method: 'POST',
       headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-        'HX-Request': 'true',
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'X-CSRFToken':
-          document.querySelector('input[name="csrfmiddlewaretoken"]')?.value ||
-          document.cookie.match(/csrftoken=([^;]+)/)?.[1] ||
-          '',
+        'X-CSRFToken': getCSRFToken(),
+        // NOTE: do NOT set Content-Type manually when using URLSearchParams in fetch;
+        // fetch will set it correctly (application/x-www-form-urlencoded;charset=UTF-8)
       },
       body,
-    }).finally(finishUI);
-  } else {
-    // No URL? Still clean up UI so it doesn't feel broken.
-    finishUI();
+      credentials: 'same-origin',
+    });
+
+    if (resp.ok) {
+      // Optimistically flip the UI
+      headerEl.classList.remove('thread__header--unread');
+      const b = headerEl.querySelector('.unread-badge');
+      if (b) b.remove();
+      headerEl.dataset.markedRead = '1';
+    } else {
+      // Optional: console.debug(await resp.text());
+    }
+  } catch (e) {
+    // Optional: console.debug(e);
   }
+}
+
+// --- helper: focus reply field + scroll it into view ---
+function focusReply(articleEl) {
+  const replyField = articleEl.querySelector(
+    '.thread__form textarea, .thread__form input[type="text"], .thread__form [contenteditable="true"]'
+  );
+  if (!replyField) return;
+
+  // give layout a beat to finish expanding before focusing/scolling
+  setTimeout(() => {
+    replyField.focus({ preventScroll: true });
+    replyField.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }, 50);
 }
 
 function toggleComments(artPieceId, recipientId) {
@@ -74,6 +67,7 @@ function toggleComments(artPieceId, recipientId) {
     `comments-${artPieceId}-${recipientId}-container`
   );
   const key = `thread-state-${artPieceId}-${recipientId}`;
+
   const expanded = header?.getAttribute('aria-expanded') === 'true';
 
   if (expanded) {
@@ -89,16 +83,19 @@ function toggleComments(artPieceId, recipientId) {
     header?.setAttribute('aria-expanded', 'true');
     localStorage.setItem(key, 'expanded');
 
-    // ✅ Mark as read immediately on expand
+    // ✅ mark as read + autofocus on manual expand
     markThreadRead(header);
+    focusReply(article);
   }
 }
 
 document.addEventListener('DOMContentLoaded', function () {
   const articles = document.querySelectorAll('article.thread[id^="thread-"]');
 
+  let didAutoFocus = false; // focus only the first auto-expanded thread
+
   articles.forEach((article) => {
-    const [, artPieceId, recipientId] = article.id.split('-');
+    const [, artPieceId, recipientId] = article.id.split('-'); // "thread-<piece>-<user>"
     const key = `thread-state-${artPieceId}-${recipientId}`;
     const state = localStorage.getItem(key);
 
@@ -109,6 +106,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const inner = document.getElementById(
       `comments-${artPieceId}-${recipientId}-container`
     );
+
     const shouldExpand = state === 'expanded';
 
     if (shouldExpand) {
@@ -116,8 +114,13 @@ document.addEventListener('DOMContentLoaded', function () {
       if (inner) inner.style.display = 'block';
       article.classList.remove('is-collapsed');
       header?.setAttribute('aria-expanded', 'true');
-      // (Optional) If you want auto-expanded threads to also mark read:
-      // markThreadRead(header);
+
+      // ✅ mark as read + autofocus on auto-expand (first one only)
+      markThreadRead(header);
+      if (!didAutoFocus) {
+        focusReply(article);
+        didAutoFocus = true;
+      }
     } else {
       if (body) body.hidden = true;
       if (inner) inner.style.display = 'none';
@@ -126,6 +129,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (state === null) localStorage.setItem(key, 'collapsed');
     }
 
+    // Click & keyboard toggle
     header?.addEventListener('click', () =>
       toggleComments(artPieceId, recipientId)
     );
