@@ -159,9 +159,6 @@ hr {
 }
 
 /* Notifications bell */
-#notification-link.has-unread {
-  color: #dc3545;
-}
 
 #notification-link .fa-bell {
   position: relative; /* new container for the dot */
@@ -272,49 +269,63 @@ section[id],
   color: var(--muted) !important;
 }
 
-/* Notifications bell */
+/* --- Notifications bell --- */
+
+/* Keep bell color consistent; the badge supplies the "unread" affordance */
 #notification-link.has-unread {
-  color: #dc3545;
+  color: inherit;
 }
 
+/* Make the <i> the positioning context */
 #notification-icon {
   position: relative;
   display: inline-block;
+  line-height: 1; /* tighter box so the badge sits predictably */
 }
 
-/* base badge: positioned element */
+/* Base badge (hidden by default) */
 #notif-badge {
   position: absolute;
-  top: -5px;
-  right: -7px;
-  display: none; /* hidden by default */
+  top: 0; /* start at the icon’s top-right corner */
+  right: 0;
+  transform: translate(
+    85%,
+    -65%
+  ); /* nudge outward so it doesn’t cover the bell */
+  display: none;
+
+  z-index: 2; /* always above the bell glyph */
+  box-shadow: 0 0 0 2px #fff; /* white ring so the badge “floats” off the bell */
+  border-radius: 999px;
+  font-weight: 700;
 }
 
-/* show the badge whenever link has unread OR when it has count class */
+#notification-link.has-unread {
+  color: #0000008c;
+}
+
+/* Show the badge whenever there’s unread (class added server- or client-side) */
 #notification-link.has-unread #notif-badge,
 #notif-badge.notif-badge--count {
   display: inline-grid;
   place-items: center;
 }
 
-/* tiny dot variant (no text, has data-dot attribute) */
+/* Tiny red dot version (no number) */
 #notif-badge[data-dot='1'] {
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
   background: #dc3545;
-  border-radius: 50%;
-  box-shadow: 0 0 0 2px #fff;
+  transform: translate(40%, -40%); /* slightly tighter for the dot */
 }
 
-/* numeric pill variant */
+/* Numbered pill version */
 #notif-badge.notif-badge--count {
   min-width: 18px;
   height: 18px;
   padding: 0 6px;
-  border-radius: 999px;
-  font-size: 11px;
   line-height: 18px;
-  background: #dc3545;
+  font-size: 11px;
   color: #fff;
-  box-shadow: 0 0 0 2px #fff;
+  background: #dc3545; /* FB-style blue; use #dc3545 if you prefer red */
 }
