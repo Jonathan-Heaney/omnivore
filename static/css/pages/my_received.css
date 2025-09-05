@@ -155,7 +155,6 @@
   border-radius: 999px;
   font-size: 0.75rem;
   font-weight: 700;
-  margin-left: 0.5rem;
 }
 
 /* “No messages yet — say hi …” variant */
@@ -204,6 +203,10 @@
   .preview__label {
     display: none;
   } /* as you had */
+
+  .preview__badge {
+    margin-bottom: 12px;
+  }
 }
 
 @media (max-width: 575.98px) {

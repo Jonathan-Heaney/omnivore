@@ -231,7 +231,7 @@
   }
 }
 
-/* @media (max-width: 575.98px) {
+@media (max-width: 575.98px) {
   .shared-card__header,
   .shared-card__body,
   .shared-card__meta,
@@ -244,7 +244,7 @@
     padding-top: 1.35rem;
     padding-bottom: 1.35rem;
   }
-} */
+}
 
 /* Badge palette: "new conversations" louder, "new messages" calmer */
 .badge--newconv {
