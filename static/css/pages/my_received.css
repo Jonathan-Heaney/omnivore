@@ -148,9 +148,9 @@
 .preview__badge {
   /* keep badge from shrinking */
   flex: 0 0 auto;
-  background: #fff3cd;
-  color: #7a5a00;
-  border: 1px solid #ffe69c;
+  background: #eaf2ff; /* cooler, calmer */
+  color: #0b4aa2;
+  border: 1px solid #cfe0ff;
   padding: 0.2rem 0.5rem;
   border-radius: 999px;
   font-size: 0.75rem;
