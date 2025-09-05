@@ -1,3 +1,65 @@
+function markThreadRead(headerEl) {
+  // only once per header
+  if (!headerEl || headerEl.dataset.readSent === '1') return;
+
+  headerEl.dataset.readSent = '1'; // guard
+
+  const url = headerEl.getAttribute('hx-post');
+  const valsAttr = headerEl.getAttribute('hx-vals') || '{}';
+  let vals = {};
+  try {
+    vals = JSON.parse(valsAttr);
+  } catch (_) {}
+
+  const finishUI = () => {
+    headerEl.classList.remove('thread__header--unread');
+    const b = headerEl.querySelector('.unread-badge');
+    if (b) b.remove();
+  };
+
+  // Prefer HTMX if available
+  if (window.htmx && url) {
+    htmx
+      .ajax('POST', url, {
+        source: headerEl,
+        values: vals,
+        swap: 'none',
+        headers: {
+          // inline hx-headers should already cover this; this is a safety net:
+          'X-CSRFToken':
+            document.querySelector('input[name="csrfmiddlewaretoken"]')
+              ?.value ||
+            document.cookie.match(/csrftoken=([^;]+)/)?.[1] ||
+            '',
+        },
+      })
+      .finally(finishUI);
+    return;
+  }
+
+  // Fallback: plain fetch
+  if (url) {
+    const body = new URLSearchParams();
+    Object.entries(vals).forEach(([k, v]) => body.append(k, v));
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'HX-Request': 'true',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-CSRFToken':
+          document.querySelector('input[name="csrfmiddlewaretoken"]')?.value ||
+          document.cookie.match(/csrftoken=([^;]+)/)?.[1] ||
+          '',
+      },
+      body,
+    }).finally(finishUI);
+  } else {
+    // No URL? Still clean up UI so it doesn't feel broken.
+    finishUI();
+  }
+}
+
 function toggleComments(artPieceId, recipientId) {
   const article = document.getElementById(
     `thread-${artPieceId}-${recipientId}`
@@ -12,7 +74,6 @@ function toggleComments(artPieceId, recipientId) {
     `comments-${artPieceId}-${recipientId}-container`
   );
   const key = `thread-state-${artPieceId}-${recipientId}`;
-
   const expanded = header?.getAttribute('aria-expanded') === 'true';
 
   if (expanded) {
@@ -27,6 +88,9 @@ function toggleComments(artPieceId, recipientId) {
     article.classList.remove('is-collapsed');
     header?.setAttribute('aria-expanded', 'true');
     localStorage.setItem(key, 'expanded');
+
+    // ✅ Mark as read immediately on expand
+    markThreadRead(header);
   }
 }
 
@@ -34,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const articles = document.querySelectorAll('article.thread[id^="thread-"]');
 
   articles.forEach((article) => {
-    const [, artPieceId, recipientId] = article.id.split('-'); // "thread-123-456"
+    const [, artPieceId, recipientId] = article.id.split('-');
     const key = `thread-state-${artPieceId}-${recipientId}`;
     const state = localStorage.getItem(key);
 
@@ -45,7 +109,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const inner = document.getElementById(
       `comments-${artPieceId}-${recipientId}-container`
     );
-
     const shouldExpand = state === 'expanded';
 
     if (shouldExpand) {
@@ -53,6 +116,8 @@ document.addEventListener('DOMContentLoaded', function () {
       if (inner) inner.style.display = 'block';
       article.classList.remove('is-collapsed');
       header?.setAttribute('aria-expanded', 'true');
+      // (Optional) If you want auto-expanded threads to also mark read:
+      // markThreadRead(header);
     } else {
       if (body) body.hidden = true;
       if (inner) inner.style.display = 'none';
@@ -61,7 +126,6 @@ document.addEventListener('DOMContentLoaded', function () {
       if (state === null) localStorage.setItem(key, 'collapsed');
     }
 
-    // Click & keyboard toggle
     header?.addEventListener('click', () =>
       toggleComments(artPieceId, recipientId)
     );

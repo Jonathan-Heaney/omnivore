@@ -170,21 +170,20 @@
           <div class="threads">
             {% for recipient, conversation in conversations %}
               <article class="thread" id="thread-{{ piece.id }}-{{ recipient.id }}">
-                <header class="thread__header is-toggle
-                          {% with u=unread_by_other|dict_get:recipient.id %}
-                            {% if u and u|add:0 > 0 %} thread__header--unread{% endif %}
-                          {% endwith %}"
-                    id="toggle-header-{{ piece.id }}-{{ recipient.id }}"
-                    role="button"
-                    tabindex="0"
-                    aria-controls="comments-{{ piece.id }}-{{ recipient.id }}-container"
-                    aria-expanded="false"
-                    data-art="{{ piece.public_id }}"
-                    data-recipient="{{ recipient.id }}"
-                    hx-post="{% url 'mark_thread_read' %}"
-                    hx-vals='{"piece":"{{ piece.public_id }}","other":"{{ recipient.id }}"}'
-                    hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
-                    hx-swap="none">
+                <header
+                  class="thread__header is-toggle {% if unread_by_other|dict_get:recipient.id %}thread__header--unread{% endif %}"
+                  id="toggle-header-{{ piece.id }}-{{ recipient.id }}"
+                  role="button"
+                  tabindex="0"
+                  aria-controls="comments-{{ piece.id }}-{{ recipient.id }}-container"
+                  aria-expanded="false"
+                  data-art="{{ piece.public_id }}"
+                  data-recipient="{{ recipient.id }}"
+                  hx-post="{% url 'mark_thread_read' %}"
+                  hx-vals='{"piece":"{{ piece.public_id }}","other":"{{ recipient.id }}"}'
+                  hx-swap="none"
+                  hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+                >
                 {% with last=conversation|last %}
                   <div class="imrow">
                     <div class="imrow__avatar" aria-hidden="true">
