@@ -271,7 +271,7 @@ def my_shared_art(request):
     )
 
     # piece_id -> total unread message count
-    unread_msg_counts = defaultdict(int)
+    new_msg_counts = defaultdict(int)
     # (piece_id, other_id) -> counts
     pair_counts = defaultdict(lambda: {'unread': 0, 'read': 0})
 
@@ -282,7 +282,7 @@ def my_shared_art(request):
             pair_counts[(pid, sender_id)]['read'] = r['cnt']
         else:
             pair_counts[(pid, sender_id)]['unread'] = r['cnt']
-            unread_msg_counts[pid] += r['cnt']
+            new_msg_counts[pid] += r['cnt']
 
     # Has owner replied in a given (piece, other) thread?
     # (Owners can't start threads; any owner message will be a reply = parent_comment not null)
@@ -294,10 +294,10 @@ def my_shared_art(request):
     )
 
     # Count NEW conversations: unread>0 AND read==0 AND owner hasn't replied yet
-    new_convo_counts = defaultdict(int)
+    new_conv_counts = defaultdict(int)
     for (pid, other_id), counts in pair_counts.items():
         if counts['unread'] > 0 and counts['read'] == 0 and (pid, other_id) not in owner_reply_pairs:
-            new_convo_counts[pid] += 1
+            new_conv_counts[pid] += 1
 
     # ---------- Likes (unchanged) ----------
     likes_by_piece = defaultdict(list)
@@ -316,8 +316,8 @@ def my_shared_art(request):
         pid = piece.id
         summaries[pid] = {
             'conv_count': len(conv_set_by_piece.get(pid, set())),
-            'unread_msg_count': unread_msg_counts.get(pid, 0),
-            'new_convo_count': new_convo_counts.get(pid, 0),
+            'new_msg_count': new_msg_counts.get(pid, 0),
+            'new_conv_count': new_conv_counts.get(pid, 0),
             # kept for possible future use
             'last': last_comment_by_piece.get(pid),
         }

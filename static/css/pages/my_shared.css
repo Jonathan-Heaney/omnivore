@@ -160,7 +160,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 1.05rem 1.25rem; /* was 0.9rem 1rem */
-  gap: 1.1rem;
+  gap: 1.5rem;
   background: color-mix(in srgb, var(--success) var(--tint-cta-pct), #fff);
   /* border-top: 1px solid var(--tint-cta-stroke); */
 }
@@ -231,7 +231,7 @@
   }
 }
 
-@media (max-width: 575.98px) {
+/* @media (max-width: 575.98px) {
   .shared-card__header,
   .shared-card__body,
   .shared-card__meta,
@@ -243,5 +243,55 @@
   .shared-card__body {
     padding-top: 1.35rem;
     padding-bottom: 1.35rem;
+  }
+} */
+
+/* Badge palette: "new conversations" louder, "new messages" calmer */
+.badge--newconv {
+  background: #fff1bf; /* warm/celebratory */
+  color: #7a5a00;
+  border: 1px solid #ffd970;
+}
+
+.badge--newmsg {
+  background: #eaf2ff; /* cooler, calmer */
+  color: #0b4aa2;
+  border: 1px solid #cfe0ff;
+}
+
+/* Container for multiple badges */
+.summary__badges {
+  display: inline-flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap; /* avoid clipping on medium widths */
+}
+
+/* Mobile: stack "Conversations N" on its own line, then badges as rows */
+@media (max-width: 520px) {
+  .summary__line {
+    display: block; /* break the inline row */
+    line-height: 1.2;
+  }
+
+  /* keep label + value together on the first line */
+  .summary__label,
+  .summary__value {
+    display: inline-block;
+    vertical-align: baseline;
+    margin-right: 0.45rem;
+  }
+
+  /* badges drop below as a vertical list */
+  .summary__badges {
+    display: grid;
+    gap: 12px;
+    margin-top: 12px;
+    width: 100%;
+  }
+
+  /* optional: make each pill hug its text */
+  .summary__badges .badge {
+    width: fit-content;
   }
 }

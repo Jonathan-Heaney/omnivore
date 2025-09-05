@@ -84,24 +84,22 @@
                 <span class="summary__label">Conversations</span>
                 <span class="summary__value">{{ s.conv_count }}</span>
 
-                {# NEW conversations badge (threads opened since last visit) #}
-                {% if s.new_convo_count and s.new_convo_count|add:0 > 0 %}
-                  <span class="badge summary__badge"
-                        aria-label="{{ s.new_convo_count }} new conversations">
-                    {{ s.new_convo_count }} new conversation{% if s.new_convo_count != 1 %}s{% endif %}
-                  </span>
-                {% endif %}
+                <span class="summary__badges">
+                  {% if s.new_conv_count and s.new_conv_count|add:0 > 0 %}
+                    <span class="badge badge--newconv"
+                          aria-label="{{ s.new_conv_count }} new conversation{% if s.new_conv_count != 1 %}s{% endif %}">
+                      {{ s.new_conv_count }} new conversation{% if s.new_conv_count != 1 %}s{% endif %}
+                    </span>
+                  {% endif %}
 
-                {# Optional: also show total unread messages #}
-                {% if s.unread_msg_count and s.unread_msg_count|add:0 > 0 %}
-                  <span class="badge summary__badge"
-                        aria-label="{{ s.unread_msg_count }} new messages">
-                    {{ s.unread_msg_count }} new message{% if s.unread_msg_count != 1 %}s{% endif %}
-                  </span>
-                {% endif %}
+                  {% if s.new_msg_count and s.new_msg_count|add:0 > 0 %}
+                    <span class="badge badge--newmsg"
+                          aria-label="{{ s.new_msg_count }} new message{% if s.new_msg_count != 1 %}s{% endif %}">
+                      {{ s.new_msg_count }} new message{% if s.new_msg_count != 1 %}s{% endif %}
+                    </span>
+                  {% endif %}
+                </span>
               </div>
-
-              {# Per new rules: no text preview here #}
             </div>
 
             <div class="summary__right">
