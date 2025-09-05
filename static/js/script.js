@@ -1,4 +1,3 @@
-// Grab CSRF from cookie (Django default cookie name is "csrftoken")
 function getCSRFToken() {
   const m = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]+)/);
   return m ? decodeURIComponent(m[1]) : '';
@@ -6,51 +5,64 @@ function getCSRFToken() {
 
 async function markThreadRead(headerEl) {
   if (!headerEl || headerEl.dataset.markedRead === '1') return;
-
   const piece = headerEl.getAttribute('data-art');
   const other = headerEl.getAttribute('data-recipient');
-
-  // Send as application/x-www-form-urlencoded to match request.POST
   const body = new URLSearchParams({ piece, other });
 
   try {
     const resp = await fetch('/threads/mark-read/', {
       method: 'POST',
-      headers: {
-        'X-CSRFToken': getCSRFToken(),
-        // NOTE: do NOT set Content-Type manually when using URLSearchParams in fetch;
-        // fetch will set it correctly (application/x-www-form-urlencoded;charset=UTF-8)
-      },
+      headers: { 'X-CSRFToken': getCSRFToken() },
       body,
       credentials: 'same-origin',
     });
-
     if (resp.ok) {
-      // Optimistically flip the UI
       headerEl.classList.remove('thread__header--unread');
       const b = headerEl.querySelector('.unread-badge');
       if (b) b.remove();
       headerEl.dataset.markedRead = '1';
-    } else {
-      // Optional: console.debug(await resp.text());
     }
-  } catch (e) {
-    // Optional: console.debug(e);
-  }
+  } catch {}
 }
 
-// --- helper: focus reply field + scroll it into view ---
-function focusReply(articleEl) {
-  const replyField = articleEl.querySelector(
-    '.thread__form textarea, .thread__form input[type="text"], .thread__form [contenteditable="true"]'
+function focusReplyWithoutJump(artPieceId, recipientId) {
+  const form = document.querySelector(
+    `#thread-${artPieceId}-${recipientId} .thread__form`
   );
-  if (!replyField) return;
+  if (!form) return;
 
-  // give layout a beat to finish expanding before focusing/scolling
-  setTimeout(() => {
-    replyField.focus({ preventScroll: true });
-    replyField.scrollIntoView({ behavior: 'smooth', block: 'end' });
-  }, 50);
+  // 1) Focus the input without letting the browser scroll the window
+  const input = form.querySelector(
+    "textarea, input[type='text'], [contenteditable='true']"
+  );
+  if (input) {
+    try {
+      input.focus({ preventScroll: true });
+    } catch {
+      input.focus();
+    } // older browsers
+  }
+
+  // 2) Scroll the thread card into view *politely*
+  const article = document.getElementById(
+    `thread-${artPieceId}-${recipientId}`
+  );
+  if (article) {
+    article.scrollIntoView({
+      block: 'nearest',
+      inline: 'nearest',
+      behavior: 'smooth',
+    });
+  }
+
+  // 3) Inside the thread, scroll messages to the bottom so the form + latest msg are visible
+  const msgs = article?.querySelector('.thread__messages');
+  if (msgs) {
+    // Do it on the next frame so heights are correct after expand
+    requestAnimationFrame(() => {
+      msgs.scrollTop = msgs.scrollHeight;
+    });
+  }
 }
 
 function toggleComments(artPieceId, recipientId) {
@@ -67,7 +79,6 @@ function toggleComments(artPieceId, recipientId) {
     `comments-${artPieceId}-${recipientId}-container`
   );
   const key = `thread-state-${artPieceId}-${recipientId}`;
-
   const expanded = header?.getAttribute('aria-expanded') === 'true';
 
   if (expanded) {
@@ -83,19 +94,18 @@ function toggleComments(artPieceId, recipientId) {
     header?.setAttribute('aria-expanded', 'true');
     localStorage.setItem(key, 'expanded');
 
-    // ✅ mark as read + autofocus on manual expand
+    // mark read + focus without jumping
     markThreadRead(header);
-    focusReply(article);
+    // wait a tick so the section has height, then do the polite scrolling
+    requestAnimationFrame(() => focusReplyWithoutJump(artPieceId, recipientId));
   }
 }
 
 document.addEventListener('DOMContentLoaded', function () {
   const articles = document.querySelectorAll('article.thread[id^="thread-"]');
 
-  let didAutoFocus = false; // focus only the first auto-expanded thread
-
   articles.forEach((article) => {
-    const [, artPieceId, recipientId] = article.id.split('-'); // "thread-<piece>-<user>"
+    const [, artPieceId, recipientId] = article.id.split('-');
     const key = `thread-state-${artPieceId}-${recipientId}`;
     const state = localStorage.getItem(key);
 
@@ -115,12 +125,12 @@ document.addEventListener('DOMContentLoaded', function () {
       article.classList.remove('is-collapsed');
       header?.setAttribute('aria-expanded', 'true');
 
-      // ✅ mark as read + autofocus on auto-expand (first one only)
+      // polite auto-focus when restoring an expanded thread on page load
+      requestAnimationFrame(() =>
+        focusReplyWithoutJump(artPieceId, recipientId)
+      );
+      // also ensure we mark read on load if it was previously unread
       markThreadRead(header);
-      if (!didAutoFocus) {
-        focusReply(article);
-        didAutoFocus = true;
-      }
     } else {
       if (body) body.hidden = true;
       if (inner) inner.style.display = 'none';

@@ -1095,3 +1095,7 @@
 .thread__header--unread .imrow__name {
   font-weight: 900;
 }
+
+.thread {
+  scroll-margin-top: 16px;
+} /* or the height of your fixed header */
