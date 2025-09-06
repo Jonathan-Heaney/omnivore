@@ -28,7 +28,7 @@
   box-shadow: var(--shadow-1);
   overflow: hidden;
   /* subtle brand accent on the left */
-  border-left: 4px solid var(--brand);
+  border-left: 4px solid var(--border);
   transition: box-shadow 160ms ease;
 }
 .shared-card:hover {

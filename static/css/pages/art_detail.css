@@ -13,12 +13,9 @@
   box-shadow: var(--shadow-2);
 }
 
-/* left accent varies by context */
-.piece--shared {
-  border-left: 4px solid var(--brand);
-}
+.piece--shared,
 .piece--received {
-  border-left: 4px solid color-mix(in srgb, var(--success) 70%, #fff);
+  border-left: 4px solid var(--border);
 }
 
 /* ---------- Header ---------- */
