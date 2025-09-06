@@ -20,6 +20,44 @@
         .h1 { font-size:24px !important; }
         .text { font-size:16px !important; }
       }
+
+      /* --- Omnivore button look --- */
+      .btn table td {
+        background-color: #ffffff;
+        border-radius: 999px;             /* pill */
+        text-align: center;
+      }
+
+      .btn a {
+        background-color: #ffffff;
+        border: 2px solid #1884bd;        /* Oliver blue border (for outline variant) */
+        border-radius: 999px;             /* pill */
+        color: #1884bd;
+        display: inline-block;
+        font-size: 18px;
+        font-weight: bold;
+        line-height: 1;
+        padding: 12px 24px;
+        text-decoration: none;
+      }
+
+      /* Solid primary button (default state) */
+      .btn-primary table td { background-color: #1884bd; }
+      .btn-primary a {
+        background-color: #1884bd;
+        border-color: #1884bd;
+        color: #ffffff;
+      }
+
+      /* Hover state (Gmail respects these head rules) */
+      @media all {
+        .btn-primary table td:hover { background-color: #136a97 !important; }
+        .btn-primary a:hover {
+          background-color: #136a97 !important;
+          border-color: #136a97 !important;
+          color: #ffffff !important;
+        }
+      }
     </style>
   </head>
 
@@ -133,23 +171,22 @@
                 {% endif %}
 
                 <!-- CTA (bulletproof) -->
-                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" class="btn" style="margin:20px 0 20px 0;">
-                  <tr>
-                    <td align="center">
-                      <!--[if mso]>
-                      <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="{{ cta_url }}" style="height:44px; v-text-anchor:middle; width:260px;" arcsize="50%" strokeweight="2px" strokecolor="#d4a106" fillcolor="#eab308">
-                        <w:anchorlock/>
-                        <center style="color:#1f2937; font-family:Helvetica, Arial, sans-serif; font-size:16px; font-weight:bold;">View on Omnivore</center>
-                      </v:roundrect>
-                      <![endif]-->
-                      <!--[if !mso]><!-- -->
-                      <a href="{{ cta_url }}" target="_blank"
-                         style="background:#1884bd; color:#fff; display:inline-block; padding:12px 20px; border-radius:999px; text-decoration:none; font-weight:bold; font-size:18px;">
-                        View on Omnivore
-                      </a>
-                      <!--<![endif]-->
-                    </td>
-                  </tr>
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="btn btn-primary" style="margin:20px 0 20px 0;">
+                  <tbody>
+                    <tr>
+                      <td align="center">
+                        <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <a href="{{ cta_url }}" target="_blank">View on Omnivore</a>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </td>
+                    </tr>
+                  </tbody>
                 </table>
 
                 <!-- Fallback URL -->
@@ -160,7 +197,7 @@
                   <a href="{{ cta_url }}" target="_blank" style="color:#1e5a96; text-decoration:underline;">{{ cta_url }}</a>
                 </p> {% endcomment %}
 
-                <p class="text" style="margin:0; font-size:18px; line-height:2.0; color:#64748b;">
+                <p class="text" style="margin:0; font-size:18px; line-height:2.0; color:#334155">
                   Enjoy!<br>— Oliver the Omnivore
                 </p>
               </td>

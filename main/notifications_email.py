@@ -23,7 +23,7 @@ def send_comment_email(*, recipient, comment, notification_id=None):
 
     # Deep link to art detail, carry ?n=<id> for read tracking
     q = f"?n={notification_id}" if notification_id else ""
-    target_url = _abs_url(settings.SITE_URL, reverse(
+    cta_url = _abs_url(settings.SITE_URL, reverse(
         "art_detail", args=[art_piece.public_id]) + q)
 
     if art_piece.user_id == recipient.id:
@@ -38,7 +38,7 @@ def send_comment_email(*, recipient, comment, notification_id=None):
         "sender": sender,
         "art_piece": art_piece,
         "comment": comment,
-        "target_url": target_url,
+        "cta_url": cta_url,
         "unsubscribe_url": unsubscribe_url,
         "body_text": body_text,
     }
