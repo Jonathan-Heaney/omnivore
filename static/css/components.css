@@ -550,3 +550,10 @@ select:focus {
 .settings-actions .btn-save:not(:disabled):active {
   transform: translateY(0.5px);
 }
+
+/* Remove bullet points from Django form error lists */
+.alert-danger ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0 0 0.5rem 0; /* optional: tighten spacing */
+}
