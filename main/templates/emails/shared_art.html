@@ -133,7 +133,7 @@
                 {% endif %}
 
                 <!-- CTA (bulletproof) -->
-                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" class="btn" style="margin:12px 0 8px 0;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" class="btn" style="margin:20px 0 20px 0;">
                   <tr>
                     <td align="center">
                       <!--[if mso]>
@@ -144,7 +144,7 @@
                       <![endif]-->
                       <!--[if !mso]><!-- -->
                       <a href="{{ cta_url }}" target="_blank"
-                         style="background:#eab308; color:#1f2937; display:inline-block; padding:12px 20px; border-radius:999px; text-decoration:none; font-weight:bold; font-size:20px; border:2px solid #d4a106;">
+                         style="background:#1884bd; color:#fff; display:inline-block; padding:12px 20px; border-radius:999px; text-decoration:none; font-weight:bold; font-size:18px;">
                         View on Omnivore
                       </a>
                       <!--<![endif]-->
@@ -153,12 +153,12 @@
                 </table>
 
                 <!-- Fallback URL -->
-                <p class="text" style="margin:10px 0 0 0; font-size:13px; line-height:1.6; color:#64748b;">
+                {% comment %} <p class="text" style="margin:20px 0 0 0; font-size:13px; line-height:1.6; color:#64748b;">
                   If the button doesn’t work, copy and paste this link:
                 </p>
                 <p style="margin:4px 0 12px 0; word-break:break-all;">
                   <a href="{{ cta_url }}" target="_blank" style="color:#1e5a96; text-decoration:underline;">{{ cta_url }}</a>
-                </p>
+                </p> {% endcomment %}
 
                 <p class="text" style="margin:0; font-size:18px; line-height:2.0; color:#64748b;">
                   Enjoy!<br>— Oliver the Omnivore
