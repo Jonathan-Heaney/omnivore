@@ -466,6 +466,9 @@ def art_piece_detail(request, public_id):
     )
     likes_dict[piece] = [like.user for like in likes]  # newest→oldest
 
+    focus = request.GET.get("focus")            # "piece" | "thread" | None
+    focus_other = request.GET.get("other")      # user id as str or None
+
     if is_owner:
         # Fetch *all* comments where owner is a participant, chronological
         qs = (
@@ -512,6 +515,8 @@ def art_piece_detail(request, public_id):
             "unread_by_other": unread_by_other,
             "is_liked": False,
             "likes_dict": likes_dict,
+            "focus": focus,
+            "focus_other": focus_other,
         }
         return render(request, "main/art_piece_detail.html", context)
 
@@ -529,6 +534,7 @@ def art_piece_detail(request, public_id):
         "thread": list(qs),
         "is_liked": Like.objects.filter(user=user, art_piece=piece).exists(),
         "likes_dict": likes_dict,  # not used in recipient view, but harmless
+        "autofocus_reply": (focus != "piece"),
     }
     return render(request, "main/art_piece_detail.html", context)
 

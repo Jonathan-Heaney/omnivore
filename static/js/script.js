@@ -1,3 +1,16 @@
+// script.js (near the top)
+const urlParams = new URLSearchParams(location.search);
+const FOCUS = urlParams.get('focus'); // "piece" | "thread" | null
+const FOCUS_OTHER = urlParams.get('other'); // user id string or null
+
+// Optional: clean the URL once we’ve read intent (prevents re-trigger on refresh)
+window.addEventListener('DOMContentLoaded', () => {
+  if (FOCUS || FOCUS_OTHER || urlParams.get('n')) {
+    const clean = location.pathname; // drop all query params
+    history.replaceState({}, '', clean);
+  }
+});
+
 function getCSRFToken() {
   const m = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]+)/);
   return m ? decodeURIComponent(m[1]) : '';
@@ -132,9 +145,8 @@ document.addEventListener('DOMContentLoaded', function () {
   const articles = document.querySelectorAll('article.thread[id^="thread-"]');
 
   articles.forEach((article) => {
-    const [, artPieceId, recipientId] = article.id.split('-');
+    const [, artPieceId, recipientId] = article.id.split('-'); // "thread-<pieceId>-<recipientId>"
     const key = `thread-state-${artPieceId}-${recipientId}`;
-    const state = localStorage.getItem(key);
 
     const header = document.getElementById(
       `toggle-header-${artPieceId}-${recipientId}`
@@ -144,29 +156,54 @@ document.addEventListener('DOMContentLoaded', function () {
       `comments-${artPieceId}-${recipientId}-container`
     );
 
-    const shouldExpand = state === 'expanded';
+    // ---- Decide initial state (priority: intent > saved state) ----
+    let shouldExpand = false;
+    let shouldFocus = false; // only for target thread in intent=thread
 
+    if (FOCUS === 'piece') {
+      // Explicitly collapse everything and persist that choice
+      shouldExpand = false;
+      localStorage.setItem(key, 'collapsed');
+    } else if (FOCUS === 'thread') {
+      const isTarget = String(recipientId) === String(FOCUS_OTHER || '');
+      shouldExpand = isTarget;
+      shouldFocus = isTarget;
+      // Persist: target expanded, all others collapsed
+      localStorage.setItem(key, isTarget ? 'expanded' : 'collapsed');
+    } else {
+      // No intent → restore saved state
+      const state = localStorage.getItem(key);
+      shouldExpand = state === 'expanded';
+    }
+
+    // ---- Apply state ----
     if (shouldExpand) {
       if (body) body.hidden = false;
       if (inner) inner.style.display = 'block';
       article.classList.remove('is-collapsed');
       header?.setAttribute('aria-expanded', 'true');
 
-      // polite auto-focus when restoring an expanded thread on page load
-      requestAnimationFrame(() =>
-        focusReplyWithoutJump(artPieceId, recipientId)
-      );
-      // also ensure we mark read on load if it was previously unread
-      markThreadRead(header);
+      // If this is the target of a comment notification, mark read + polite focus
+      if (shouldFocus) {
+        markThreadRead(header);
+        requestAnimationFrame(() =>
+          focusReplyWithoutJump(artPieceId, recipientId)
+        );
+      } else if (FOCUS == null && localStorage.getItem(key) === 'expanded') {
+        // Legacy restore path: keep your previous behavior
+        requestAnimationFrame(() =>
+          focusReplyWithoutJump(artPieceId, recipientId)
+        );
+        markThreadRead(header);
+      }
     } else {
       if (body) body.hidden = true;
       if (inner) inner.style.display = 'none';
       article.classList.add('is-collapsed');
       header?.setAttribute('aria-expanded', 'false');
-      if (state === null) localStorage.setItem(key, 'collapsed');
     }
 
-    // Click & keyboard toggle
+    // ---- Always wire listeners (important!) ----
     header?.addEventListener('click', () =>
       toggleComments(artPieceId, recipientId)
     );

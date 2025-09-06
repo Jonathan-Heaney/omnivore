@@ -151,7 +151,7 @@
                 </div>
 
                 <div id="reply" class="thread__form">
-                  {% include "main/comment_form.html" with reply_recipient=piece.user.first_name piece=piece post_url=request.path target_id=tgt_id autofocus=1 %}
+                  {% include "main/comment_form.html" with reply_recipient=piece.user.first_name piece=piece post_url=request.path target_id=tgt_id autofocus=autofocus_reply %}
                 </div>
               </div>
             {% endwith %}

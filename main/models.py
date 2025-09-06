@@ -4,6 +4,7 @@ from django.db import models
 from django.conf import settings
 from django.urls import reverse
 from django.db.models import Q, UniqueConstraint
+from urllib.parse import urlencode
 import uuid
 
 
@@ -243,19 +244,22 @@ class Notification(models.Model):
     from django.urls import reverse
 
     def get_redirect_url(self):
-        """
-        Always deep-link to the art detail page.
-        Include ?n=<id> so the landing view (or redirect view) can mark it read.
-        """
-        # Fallback: notifications list if somehow no piece is attached
         if not self.art_piece_id:
             return reverse("notifications")
 
-        # Always go to the art detail page (owner/recipient view is handled server-side)
         url = reverse("art_detail", args=[self.art_piece.public_id])
 
-        # Preserve the "n" param so clicks from the notifications page also mark as read
-        return f"{url}?n={self.id}"
+        params = {"n": self.id}
+
+        # Where should the detail page land/focus?
+        if self.notification_type == "comment":
+            # owner will have many threads; sender is the "other" to open
+            # recipient has only one thread — still fine to say "thread"
+            params.update({"focus": "thread", "other": self.sender_id})
+        elif self.notification_type in ("like", "shared_art"):
+            params.update({"focus": "piece"})  # don't open/focus any thread
+
+        return f"{url}?{urlencode(params)}"
 
     def __str__(self):
         return f'{self.sender} -> {self.recipient} ({self.notification_type})'
