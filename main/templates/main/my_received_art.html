@@ -11,8 +11,8 @@
 
 {% block content %}
 
-<h1 class="page-title container-narrow">My Received Art</h1>
-<br>
+<div class="container-narrow py-4">
+<h1 class="page-title">My Received Art</h1>
 
 {% if request.user.is_authenticated and request.user.receive_art_paused %}
 <div class='container-narrow'>
@@ -29,7 +29,7 @@
 </div>
 {% endif %}
 
-<div class="container-narrow">
+
   {# use the same spacing system as My Shared #}
   <div class="shared-list">
     {% for received in received_pieces %}

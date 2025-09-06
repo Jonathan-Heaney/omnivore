@@ -502,3 +502,51 @@ select:focus {
 .notification-card .notif-emoji {
   margin-right: 6px;
 }
+
+/* Remove bullets from error lists */
+.messages {
+  list-style: none;
+  padding-left: 0;
+  margin: var(--s1) 0;
+}
+.messages li {
+  list-style: none;
+  margin: 0 0 var(--s1);
+}
+
+/* Scope settings actions so we don't disturb buttons sitewide */
+.settings-actions .btn-save {
+  /* neutral base */
+  background: #eef2f6; /* soft gray surface */
+  color: #6b7280; /* slate-500 */
+  border: 1px solid #e5e7eb; /* light border */
+  cursor: not-allowed;
+  box-shadow: none;
+  transition: background 140ms ease, color 140ms ease, box-shadow 140ms ease,
+    transform 50ms ease;
+}
+
+.settings-actions .btn-save:disabled {
+  /* keep the same neutral look; important for Safari */
+  background: #eef2f6;
+  color: #6b7280;
+  border-color: #e5e7eb;
+}
+
+/* Enabled state (no Bootstrap blue) */
+.settings-actions .btn-save:not(:disabled) {
+  cursor: pointer;
+  background: var(--brand);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: var(--shadow-1);
+}
+
+.settings-actions .btn-save:not(:disabled):hover {
+  background: var(--brand-600);
+  box-shadow: var(--shadow-2);
+}
+
+.settings-actions .btn-save:not(:disabled):active {
+  transform: translateY(0.5px);
+}

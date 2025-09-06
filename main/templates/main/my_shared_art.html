@@ -11,10 +11,9 @@
 
 {% block content %}
 
-<h1 class="page-title container-narrow">My Shared Art</h1>
-<br>
+<div class="container-narrow py-4">
+  <h1 class="page-title">My Shared Art</h1>
 
-<div class="container-narrow">
   <div class="shared-list">
   {% for piece in pieces %}
     <section id="art-{{ piece.public_id }}" class="shared-card">

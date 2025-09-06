@@ -5,8 +5,8 @@
 {% block title %}Account Settings · Omnivore Arts{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-  <h1 class="mb-4">Account Settings</h1>
+<div class="container-narrow py-4">
+  <h1 class="page-title">Account Settings</h1>
 
   <!-- Account Info -->
   <section id="account-info" class="card shadow-1 mb-4">
@@ -28,8 +28,8 @@
           {% endif %}
         </div>
 
-        <div class="d-flex gap-2">
-          <button type="submit" class="btn btn-primary" id="save-account-info" disabled>
+        <div class="d-flex gap-2 settings-actions">
+          <button type="submit" class="btn btn-save" id="save-account-info" disabled>
             Save Account Info
           </button>
         </div>
@@ -47,8 +47,8 @@
 
         <div id="art-delivery-message-container"></div>
 
-        <div class="d-flex gap-2">
-          <button type="submit" class="btn btn-primary" id="save-art-delivery" disabled>
+        <div class="d-flex gap-2 settings-actions">
+          <button type="submit" class="btn btn-save" id="save-art-delivery" disabled>
             Save Art Delivery Preference
           </button>
         </div>
@@ -66,8 +66,8 @@
 
         <div id="email-message-container"></div>
 
-        <div class="d-flex gap-2">
-          <button type="submit" class="btn btn-primary" id="save-email-prefs" disabled>
+        <div class="d-flex gap-2 settings-actions">
+          <button type="submit" class="btn btn-save" id="save-email-prefs" disabled>
             Save Email Preferences
           </button>
         </div>
@@ -85,8 +85,8 @@
 
         <div id="password-message-container"></div>
 
-        <div class="d-flex gap-2">
-          <button type="submit" class="btn btn-primary" id="save-password" disabled>
+        <div class="d-flex gap-2 settings-actions">
+          <button type="submit" class="btn btn-save" id="save-password" disabled>
             Change Password
           </button>
         </div>
