@@ -475,7 +475,6 @@ select:focus {
 .notification-card.unread {
   border-left: 4px solid var(--cta);
   background: #fffbeb;
-  font-weight: 600;
 }
 .notification-card.read {
   background: #f9fafb;
@@ -486,9 +485,20 @@ select:focus {
 }
 .timestamp {
   font-size: 0.8rem;
+  white-space: nowrap;
 }
-.blue-dot {
-  margin-right: 0.5rem;
-  font-size: 0.8rem;
-  vertical-align: middle;
+
+/* Notification line emphasis */
+.notif__sender {
+  font-weight: 700; /* still pops even when the whole card is bold */
+  color: #0c2233; /* slightly stronger than body text */
+}
+
+.notif__piece {
+  color: #0c2233; /* readable, not shouty */
+  /* if you wanted italics instead of quotes, you could use: font-style: italic; */
+}
+
+.notification-card .notif-emoji {
+  margin-right: 6px;
 }

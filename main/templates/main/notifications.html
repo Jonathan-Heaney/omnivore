@@ -1,11 +1,12 @@
+{# notifications.html #}
 {% extends 'base.html' %}
 {% load static %}
-{% load humanize %}
+{% load custom_filters %}  {# add this #}
 
 {% block title %}Notifications · Omnivore{% endblock %}
 
 {% block content %}
-<section class="container py-4">
+<section class="container-narrow py-4">  {# was: container #}
   <h1 class="page-title mb-4">Notifications</h1>
 
   {% if unread_notifications %}
@@ -23,12 +24,12 @@
       {% for notification in unread_notifications %}
         <li class="notification-card unread mb-3">
           <a href="{% url 'notification_redirect' notification.id %}" class="stretched-link"></a>
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <span class="blue-dot" aria-hidden="true">🔵</span>
-              {{ notification.message }}
-            </div>
-            <span class="timestamp text-muted">{{ notification.timestamp|naturaltime }}</span>
+          <div class="d-flex justify-content-between align-items-center gap-3">
+            <div>{% include "main/_notification_line.html" with n=notification %}</div>
+            <time class="timestamp text-muted"
+                  datetime="{{ notification.timestamp|date:'c' }}">
+              {{ notification.timestamp|recency_stamp }}
+            </time>
           </div>
         </li>
       {% endfor %}
@@ -41,9 +42,12 @@
       {% for notification in read_notifications %}
         <li class="notification-card read mb-2">
           <a href="{% url 'notification_redirect' notification.id %}" class="stretched-link"></a>
-          <div class="d-flex justify-content-between align-items-center">
-            <div>{{ notification.message }}</div>
-            <span class="timestamp text-muted">{{ notification.timestamp|naturaltime }}</span>
+          <div class="d-flex justify-content-between align-items-center gap-3">
+            <div>{% include "main/_notification_line.html" with n=notification %}</div>
+            <time class="timestamp text-muted"
+                  datetime="{{ notification.timestamp|date:'c' }}">
+              {{ notification.timestamp|recency_stamp }}
+            </time>
           </div>
         </li>
       {% endfor %}
