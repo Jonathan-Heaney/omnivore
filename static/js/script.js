@@ -41,6 +41,7 @@ function updateNotificationBell(total) {
   }
 }
 
+// script.js
 async function markThreadRead(headerEl) {
   if (!headerEl || headerEl.dataset.markedRead === '1') return;
 
@@ -58,8 +59,13 @@ async function markThreadRead(headerEl) {
     if (!resp.ok) return;
 
     const data = await resp.json();
-
     updateNotificationBell(data.unread_total);
+
+    // 🔽 Immediately reflect “read” in the UI
+    headerEl.dataset.markedRead = '1';
+    headerEl.classList.remove('thread__header--unread');
+    const badge = headerEl.querySelector('.unread-badge');
+    if (badge) badge.remove();
   } catch {
     // noop
   }
