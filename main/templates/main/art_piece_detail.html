@@ -179,10 +179,7 @@
                   aria-expanded="false"
                   data-art="{{ piece.public_id }}"
                   data-recipient="{{ recipient.id }}"
-                  hx-post="{% url 'mark_thread_read' %}"
-                  hx-vals='{"piece":"{{ piece.public_id }}","other":"{{ recipient.id }}"}'
-                  hx-swap="none"
-                  hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+                  data-mark-url="{% url 'mark_thread_read' %}"
                 >
                 {% with last=conversation|last %}
                   <div class="imrow">

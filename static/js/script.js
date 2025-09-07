@@ -1,4 +1,4 @@
-// script.js (near the top)
+// ---------- intent parsing ----------
 const urlParams = new URLSearchParams(location.search);
 const FOCUS = urlParams.get('focus'); // "piece" | "thread" | null
 const FOCUS_OTHER = urlParams.get('other'); // user id string or null
@@ -6,11 +6,11 @@ const FOCUS_OTHER = urlParams.get('other'); // user id string or null
 // Optional: clean the URL once we’ve read intent (prevents re-trigger on refresh)
 window.addEventListener('DOMContentLoaded', () => {
   if (FOCUS || FOCUS_OTHER || urlParams.get('n')) {
-    const clean = location.pathname; // drop all query params
-    history.replaceState({}, '', clean);
+    history.replaceState({}, '', location.pathname);
   }
 });
 
+// ---------- helpers ----------
 function getCSRFToken() {
   const m = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]+)/);
   return m ? decodeURIComponent(m[1]) : '';
@@ -23,7 +23,6 @@ function updateNotificationBell(total) {
   if (!link || !icon || !badge) return;
 
   const n = Number(total || 0);
-
   if (n > 0) {
     link.classList.add('has-unread');
     icon.classList.remove('fa-regular');
@@ -36,23 +35,43 @@ function updateNotificationBell(total) {
     icon.classList.remove('fa-solid');
     icon.classList.add('fa-regular');
     badge.classList.remove('notif-badge--count');
-    badge.setAttribute('data-dot', '1');
-    badge.textContent = ''; // dot mode
+    badge.setAttribute('data-dot', '1'); // tiny dot mode
+    badge.textContent = '';
   }
 }
 
-// script.js
+// Flip header to "read" immediately (idempotent)
+function clearUnreadHeader(headerEl) {
+  if (!headerEl) return;
+  headerEl.classList.remove('thread__header--unread', 'is-unread');
+  headerEl.dataset.markedRead = '1';
+  headerEl.removeAttribute('data-unread');
+  headerEl.closest('article.thread')?.classList.remove('is-unread');
+  const badge = headerEl.querySelector(
+    '.unread-badge, .thread__unread, .badge-unread'
+  );
+  if (badge) badge.remove();
+}
+
+// POST to server to mark a specific thread read (owner view)
 async function markThreadRead(headerEl) {
   if (!headerEl || headerEl.dataset.markedRead === '1') return;
 
   const piece = headerEl.getAttribute('data-art');
   const other = headerEl.getAttribute('data-recipient');
+  const markUrl =
+    headerEl.getAttribute('data-mark-url') || '/threads/mark-read/';
+  if (!piece || !other || !markUrl) return;
+
   const body = new URLSearchParams({ piece, other });
 
   try {
-    const resp = await fetch('/threads/mark-read/', {
+    const resp = await fetch(markUrl, {
       method: 'POST',
-      headers: { 'X-CSRFToken': getCSRFToken() },
+      headers: {
+        'X-CSRFToken': getCSRFToken(),
+        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+      },
       body,
       credentials: 'same-origin',
     });
@@ -60,14 +79,9 @@ async function markThreadRead(headerEl) {
 
     const data = await resp.json();
     updateNotificationBell(data.unread_total);
-
-    // 🔽 Immediately reflect “read” in the UI
-    headerEl.dataset.markedRead = '1';
-    headerEl.classList.remove('thread__header--unread');
-    const badge = headerEl.querySelector('.unread-badge');
-    if (badge) badge.remove();
+    clearUnreadHeader(headerEl); // idempotent safety
   } catch {
-    // noop
+    /* noop */
   }
 }
 
@@ -77,7 +91,6 @@ function focusReplyWithoutJump(artPieceId, recipientId) {
   );
   if (!form) return;
 
-  // 1) Focus the input without letting the browser scroll the window
   const input = form.querySelector(
     "textarea, input[type='text'], [contenteditable='true']"
   );
@@ -86,10 +99,9 @@ function focusReplyWithoutJump(artPieceId, recipientId) {
       input.focus({ preventScroll: true });
     } catch {
       input.focus();
-    } // older browsers
+    }
   }
 
-  // 2) Scroll the thread card into view *politely*
   const article = document.getElementById(
     `thread-${artPieceId}-${recipientId}`
   );
@@ -101,16 +113,14 @@ function focusReplyWithoutJump(artPieceId, recipientId) {
     });
   }
 
-  // 3) Inside the thread, scroll messages to the bottom so the form + latest msg are visible
   const msgs = article?.querySelector('.thread__messages');
-  if (msgs) {
-    // Do it on the next frame so heights are correct after expand
+  if (msgs)
     requestAnimationFrame(() => {
       msgs.scrollTop = msgs.scrollHeight;
     });
-  }
 }
 
+// Expand/collapse handler wired per thread
 function toggleComments(artPieceId, recipientId) {
   const article = document.getElementById(
     `thread-${artPieceId}-${recipientId}`
@@ -140,20 +150,27 @@ function toggleComments(artPieceId, recipientId) {
     header?.setAttribute('aria-expanded', 'true');
     localStorage.setItem(key, 'expanded');
 
-    // mark read + focus without jumping
+    // instant UI + async server update
+    clearUnreadHeader(header);
     markThreadRead(header);
-    // wait a tick so the section has height, then do the polite scrolling
+
+    // polite focus/scroll
     requestAnimationFrame(() => focusReplyWithoutJump(artPieceId, recipientId));
   }
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+// ---------- page init ----------
+document.addEventListener('DOMContentLoaded', () => {
   const articles = document.querySelectorAll('article.thread[id^="thread-"]');
 
   articles.forEach((article) => {
-    const [, artPieceId, recipientId] = article.id.split('-'); // "thread-<pieceId>-<recipientId>"
-    const key = `thread-state-${artPieceId}-${recipientId}`;
+    const parts = article.id.split('-'); // "thread-<pieceId>-<recipientId>"
+    // guard: IDs like "thread-123-45"
+    if (parts.length < 3) return;
+    const artPieceId = parts[1];
+    const recipientId = parts[2];
 
+    const key = `thread-state-${artPieceId}-${recipientId}`;
     const header = document.getElementById(
       `toggle-header-${artPieceId}-${recipientId}`
     );
@@ -164,20 +181,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ---- Decide initial state (priority: intent > saved state) ----
     let shouldExpand = false;
-    let shouldFocus = false; // only for target thread in intent=thread
+    let shouldFocus = false;
 
     if (FOCUS === 'piece') {
-      // Explicitly collapse everything and persist that choice
       shouldExpand = false;
       localStorage.setItem(key, 'collapsed');
     } else if (FOCUS === 'thread') {
       const isTarget = String(recipientId) === String(FOCUS_OTHER || '');
       shouldExpand = isTarget;
       shouldFocus = isTarget;
-      // Persist: target expanded, all others collapsed
       localStorage.setItem(key, isTarget ? 'expanded' : 'collapsed');
     } else {
-      // No intent → restore saved state
       const state = localStorage.getItem(key);
       shouldExpand = state === 'expanded';
     }
@@ -189,18 +203,23 @@ document.addEventListener('DOMContentLoaded', function () {
       article.classList.remove('is-collapsed');
       header?.setAttribute('aria-expanded', 'true');
 
-      // If this is the target of a comment notification, mark read + polite focus
       if (shouldFocus) {
+        // deep-link target: clear unread immediately and POST
+        clearUnreadHeader(header);
         markThreadRead(header);
         requestAnimationFrame(() =>
           focusReplyWithoutJump(artPieceId, recipientId)
         );
       } else if (FOCUS == null && localStorage.getItem(key) === 'expanded') {
-        // Legacy restore path: keep your previous behavior
+        // legacy restore path
         requestAnimationFrame(() =>
           focusReplyWithoutJump(artPieceId, recipientId)
         );
-        markThreadRead(header);
+        // if it was unread and we restored expanded, clear + POST too
+        if (header?.classList.contains('thread__header--unread')) {
+          clearUnreadHeader(header);
+          markThreadRead(header);
+        }
       }
     } else {
       if (body) body.hidden = true;
@@ -209,7 +228,7 @@ document.addEventListener('DOMContentLoaded', function () {
       header?.setAttribute('aria-expanded', 'false');
     }
 
-    // ---- Always wire listeners (important!) ----
+    // ---- Listeners ----
     header?.addEventListener('click', () =>
       toggleComments(artPieceId, recipientId)
     );

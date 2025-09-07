@@ -424,6 +424,14 @@ def art_piece_detail(request, public_id):
     piece = get_object_or_404(ArtPiece, public_id=public_id)
     user = request.user
 
+    n_id = request.GET.get("n")
+    if n_id:
+        Notification.objects.filter(
+            id=n_id,
+            recipient=user,
+            is_read=False,
+        ).update(is_read=True)
+
     is_owner = (piece.user_id == user.id)
     has_received = SentArtPiece.objects.filter(
         user=user, art_piece=piece).exists()
