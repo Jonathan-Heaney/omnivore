@@ -557,3 +557,21 @@ select:focus {
   padding-left: 0;
   margin: 0 0 0.5rem 0; /* optional: tighten spacing */
 }
+
+.received-card--deleted {
+  opacity: 0.9;
+  border-style: dashed;
+}
+.received-card--deleted .received-card__title {
+  color: #64748b;
+}
+.preview--deleted .preview__badge,
+.preview--deleted .preview__label {
+  opacity: 0.8;
+}
+.tombstone {
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  padding: 12px;
+}

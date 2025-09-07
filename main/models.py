@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.db.models import Q, UniqueConstraint
 from urllib.parse import urlencode
 import uuid
+from django.utils import timezone
 
 
 class CustomUser(AbstractUser):
@@ -53,6 +54,11 @@ class CustomUser(AbstractUser):
         return f'{self.first_name} {self.last_name}'
 
 
+class NotDeletedManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_deleted=False)
+
+
 class ArtPiece(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.CASCADE)
@@ -71,6 +77,41 @@ class ArtPiece(models.Model):
         editable=False,
         db_index=True,
     )
+
+    is_deleted = models.BooleanField(default=False, db_index=True)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+    deleted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='deleted_artpieces'
+    )
+    delete_reason = models.CharField(max_length=200, blank=True)
+
+    objects = models.Manager()        # all rows
+    active = NotDeletedManager()      # only not-deleted
+
+    def soft_delete(self, *, user=None, reason=''):
+        if self.is_deleted:
+            return
+        self.is_deleted = True
+        self.deleted_at = timezone.now()
+        self.deleted_by = user
+        self.delete_reason = reason[:200]
+        self.approved_status = False
+        self.save(update_fields=['is_deleted',
+                  'deleted_at', 'deleted_by', 'delete_reason'])
+
+    # optional: undelete for admin
+    def restore(self):
+        if not self.is_deleted:
+            return
+        self.is_deleted = False
+        self.deleted_at = None
+        self.deleted_by = None
+        self.delete_reason = ''
+        self.save(update_fields=['is_deleted',
+                  'deleted_at', 'deleted_by', 'delete_reason'])
 
     def get_absolute_url(self):
         from django.urls import reverse

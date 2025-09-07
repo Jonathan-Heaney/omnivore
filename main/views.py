@@ -69,7 +69,7 @@ def welcome_page(request):
 
 
 def choose_welcome_piece_weighted(user):
-    qs = ArtPiece.objects.filter(
+    qs = ArtPiece.active.filter(
         approved_status=True,
         welcome_eligible=True,
     ).exclude(
@@ -212,9 +212,12 @@ def edit_art_piece(request, public_id):
 @login_required(login_url="/login")
 @require_POST
 def delete_art_piece(request, public_id):
-    art_piece = get_object_or_404(
-        ArtPiece, public_id=public_id, user=request.user)
-    art_piece.delete()
+    piece = get_object_or_404(ArtPiece, public_id=public_id, user=request.user)
+    piece.soft_delete(user=request.user, reason='user-initiated')
+    piece.approved_status = False
+    piece.save(update_fields=['approved_status'])
+    messages.success(
+        request, "Your piece was deleted. Past recipients will see it as removed.")
     return redirect("my_shared_art")
 
 
@@ -774,12 +777,12 @@ def LogOut(request):
 
 def choose_art_piece(user):
     # Get all approved art pieces that the user did not submit and have not been sent to them
-    art_pieces = ArtPiece.objects.filter(
+    art_pieces = ArtPiece.active.filter(
         approved_status=True
     ).exclude(
         user=user
     ).exclude(
-        id__in=SentArtPiece.objects.filter(
+        id__in=SentArtPiece.active.filter(
             user=user).values_list('art_piece_id', flat=True)
     )
 

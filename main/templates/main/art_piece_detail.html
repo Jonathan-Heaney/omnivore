@@ -18,6 +18,13 @@
   <section id="art-{{ piece.public_id }}"
            class="piece {% if mode == 'recipient' %}piece--received{% else %}piece--shared{% endif %}">
 
+      {% if piece.is_deleted %}
+        <div class="alert alert-warning mb-3">
+          <strong>This piece was deleted by the original sharer.</strong>
+          <div class="small text-muted">You can still view your conversation below.</div>
+        </div>
+      {% endif %}
+
     {# ---------- Header ---------- #}
     {% if mode == "recipient" %}
       {# mirror My Received header: title/artist on left, "Shared by ..." on right #}
@@ -39,72 +46,70 @@
     {% endif %}
 
     {# ---------- Body ---------- #}
-    <div class="piece__body">
-      <p class="piece__description">{{ piece.piece_description|linebreaksbr }}</p>
+        <div class="piece__body">
+          {% if piece.is_deleted %}
+            <p class="text-muted"><em>Details are no longer available.</em></p>
+          {% else %}
+            <p class="piece__description">{{ piece.piece_description|linebreaksbr }}</p>
 
-      {% if piece.link %}
-        {% if mode == "recipient" %}
-          {# green like Received #}
-          <a class="btn btn-outline-success btn-sm received-card__source"
-             href="{{ piece.link }}" target="_blank" rel="noopener"
-             aria-label="Open source for {{ piece.piece_name }}">
-            View source <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
-          </a>
-        {% endif %}
-      {% endif %}
-    </div>
-
-    {# ---------- Meta / likes strip (matches list pages) ---------- #}
-    {% if mode == "recipient" %}
-      <div class="likes-container">
-        {% include 'main/heart_button.html' with piece=piece is_liked=is_liked %}
-      </div>
-    {% else %}
-      {% with users=likes_dict|dict_get:piece %}
-        {% if users %}
-          <div class="likes">
-            {% include 'main/likes_display.html' with piece=piece likes_dict=likes_dict %}
-          </div>
-        {% endif %}
-      {% endwith %}
-
-      <footer class="shared-card__meta">
-        <span class="shared-card__date">Shared {{ piece.created_at|date:"F j, Y" }}</span>
-
-        <div class="shared-card__actions">
-          <!-- Edit -->
-          <a href="{% url 'edit_art_piece' piece.public_id %}"
-            class="btn btn-outline-secondary btn-sm"
-            aria-label="Edit {{ piece.piece_name }}" title="Edit">
-            <i class="fa-solid fa-pen"></i>
-          </a>
-
-          <!-- Delete -->
-          <form method="post"
-                action="{% url 'delete_art_piece' piece.public_id %}"
-                onsubmit="return confirmDelete();"
-                class="d-inline">
-            {% csrf_token %}
-            <button type="submit"
-                    class="btn btn-outline-danger btn-sm"
-                    aria-label="Delete {{ piece.piece_name }}" title="Delete">
-              <i class="fa-solid fa-trash"></i>
-            </button>
-          </form>
-
-          {% if piece.link %}
-            <a class="btn btn-outline-primary btn-sm"
-              href="{{ piece.link }}" target="_blank" rel="noopener"
-              aria-label="Open source link for {{ piece.piece_name }}" title="Open source">
-              <i class="fa-solid fa-up-right-from-square"></i>
-            </a>
+            {% if piece.link and mode == "recipient" %}
+              <a class="btn btn-outline-success btn-sm received-card__source"
+                href="{{ piece.link }}" target="_blank" rel="noopener"
+                aria-label="Open source for {{ piece.piece_name }}">
+                View source <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
+              </a>
+            {% endif %}
           {% endif %}
         </div>
-      </footer>
-    {% endif %}
 
-       {# end of the ART CARD — do not put conversations below this line #}
-    </section>  {# /.piece #}
+        {% if mode == "recipient" %}
+          {% if not piece.is_deleted %}
+            <div class="likes-container">
+              {% include 'main/heart_button.html' with piece=piece is_liked=is_liked %}
+            </div>
+          {% endif %}
+        {% else %}
+          {% if not piece.is_deleted %}
+            {% with users=likes_dict|dict_get:piece %}
+              {% if users %}
+                <div class="likes">
+                  {% include 'main/likes_display.html' with piece=piece likes_dict=likes_dict %}
+                </div>
+              {% endif %}
+            {% endwith %}
+          {% endif %}
+
+          <footer class="shared-card__meta">
+            <span class="shared-card__date">Shared {{ piece.created_at|date:"F j, Y" }}</span>
+
+            <div class="shared-card__actions">
+              {% if not piece.is_deleted %}
+                <a href="{% url 'edit_art_piece' piece.public_id %}" class="btn btn-outline-secondary btn-sm"
+                  aria-label="Edit {{ piece.piece_name }}" title="Edit">
+                  <i class="fa-solid fa-pen"></i>
+                </a>
+                <form method="post" action="{% url 'delete_art_piece' piece.public_id %}"
+                      onsubmit="return confirmDelete();" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-outline-danger btn-sm"
+                          aria-label="Delete {{ piece.piece_name }}" title="Delete">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </form>
+                {% if piece.link %}
+                  <a class="btn btn-outline-primary btn-sm" href="{{ piece.link }}" target="_blank" rel="noopener"
+                    aria-label="Open source link for {{ piece.piece_name }}" title="Open source">
+                    <i class="fa-solid fa-up-right-from-square"></i>
+                  </a>
+                {% endif %}
+              {% endif %}
+            </div>
+          </footer>
+        {% endif %}
+      </section>
+
+            {# end of the ART CARD — do not put conversations below this line #}
+          {# /.piece #}
 
     {# ---------- Conversations section (separate from art card) ---------- #}
     {% if mode == "recipient" %}
