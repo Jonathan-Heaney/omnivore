@@ -489,6 +489,8 @@ def art_piece_detail(request, public_id):
     focus = request.GET.get("focus")            # "piece" | "thread" | None
     focus_other = request.GET.get("other")      # user id as str or None
 
+    can_reply = not piece.is_deleted
+
     if is_owner:
         # Fetch *all* comments where owner is a participant, chronological
         qs = (
@@ -537,6 +539,7 @@ def art_piece_detail(request, public_id):
             "likes_dict": likes_dict,
             "focus": focus,
             "focus_other": focus_other,
+            "can_reply": can_reply,
         }
         return render(request, "main/art_piece_detail.html", context)
 
@@ -554,7 +557,9 @@ def art_piece_detail(request, public_id):
         "thread": list(qs),
         "is_liked": Like.objects.filter(user=user, art_piece=piece).exists(),
         "likes_dict": likes_dict,  # not used in recipient view, but harmless
-        "autofocus_reply": (focus != "piece"),
+        # no autofocus if deleted
+        "autofocus_reply": (focus != "piece") and can_reply,
+        "can_reply": can_reply,
     }
     return render(request, "main/art_piece_detail.html", context)
 
@@ -585,6 +590,13 @@ def comments_create(request):
     piece = get_object_or_404(
         ArtPiece.objects.select_related("user"), id=art_piece_id)
     owner = piece.user
+
+    if piece.is_deleted:
+        # For HTMX, 409 (Conflict) is a nice “closed thread” signal
+        return JsonResponse(
+            {"ok": False, "error": "This conversation is closed because the piece was removed."},
+            status=409
+        )
 
     # Participant check
     is_owner = (owner_id := owner.id) == user.id

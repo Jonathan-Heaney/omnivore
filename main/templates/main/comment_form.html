@@ -1,3 +1,9 @@
+{% if piece.is_deleted %}
+  <div class="alert alert-secondary mb-0 small">
+    Replies are disabled because this piece was removed.
+  </div>
+
+{% else %}
 {% url 'comments_create' as create_url %}
 {% with pid=piece.id|stringformat:"s" %}
   {% with fallback_target_id="comments-"|add:pid|add:"-container" %}
@@ -31,3 +37,4 @@
 </form>
   {% endwith %}
 {% endwith %}
+{% endif %}

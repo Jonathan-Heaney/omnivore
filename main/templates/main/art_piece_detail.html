@@ -172,7 +172,13 @@
                 </div>
 
                 <div id="reply" class="thread__form">
-                  {% include "main/comment_form.html" with reply_recipient=piece.user.first_name piece=piece post_url=request.path target_id=tgt_id autofocus=autofocus_reply %}
+                  {% if can_reply %}
+                    {% include "main/comment_form.html" with reply_recipient=piece.user.first_name piece=piece post_url=request.path target_id=tgt_id autofocus=autofocus_reply %}
+                  {% else %}
+                    <div class="alert alert-secondary mb-0 small">
+                      Replies are disabled because this piece was removed.
+                    </div>
+                  {% endif %}
                 </div>
               </div>
             {% endwith %}
@@ -251,7 +257,13 @@
                         {% endfor %}
                       </div>
                       <div class="thread__form">
-                        {% include "main/reply_form.html" with reply_recipient=recipient.first_name top_level_comment=conversation.0 piece=piece recipient=recipient post_url=request.path target_id=tgt_id %}
+                        {% if can_reply %}
+                          {% include "main/reply_form.html" with reply_recipient=recipient.first_name top_level_comment=conversation.0 piece=piece recipient=recipient post_url=request.path target_id=tgt_id %}
+                        {% else %}
+                          <div class="alert alert-secondary mb-0 small">
+                            Replies are disabled because this piece was removed.
+                          </div>
+                        {% endif %}
                       </div>
                     {% endwith %}
                   {% endwith %}
