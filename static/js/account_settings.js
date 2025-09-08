@@ -55,7 +55,10 @@
     const formData = new FormData(form);
     const resp = await fetch(form.action, {
       method: 'POST',
-      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        Accept: 'application/json', // 👈 add
+      },
       body: formData,
     });
     const contentType = resp.headers.get('content-type') || '';
@@ -92,8 +95,17 @@
           msg.innerHTML = `<ul class="messages"><li class="alert alert-success">Account information updated.</li></ul>`;
           refreshBaseline();
         } else {
+          // Expect Django form errors serialized under "errors"
+          const errors = data?.errors || {};
+          // Build a simple error list; you can embellish if you want per-field placement
+          const items =
+            Object.values(errors)
+              .flat()
+              .map((err) => `<li class="alert alert-danger mb-2">${err}</li>`)
+              .join('') ||
+            '<li class="alert alert-danger mb-2">Could not save changes.</li>';
+          msg.innerHTML = `<ul class="messages">${items}</ul>`;
           saveBtn.disabled = false;
-          msg.innerHTML = `<div class="alert alert-danger">Something went wrong. Please try again.</div>`;
         }
       } catch (err) {
         saveBtn.disabled = false;

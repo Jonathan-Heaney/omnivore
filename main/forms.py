@@ -136,15 +136,15 @@ class AccountInfoForm(forms.ModelForm):
             'username': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
-        def clean_email(self):
-            email = (self.cleaned_data.get("email") or "").strip().lower()
-            qs = CustomUser.objects.filter(email=email)
-            if self.instance.pk:
-                qs = qs.exclude(pk=self.instance.pk)
-            if qs.exists():
-                raise forms.ValidationError(
-                    "Another account is already using this email.")
-            return email
+    def clean_email(self):
+        email = (self.cleaned_data.get("email") or "").strip().lower()
+        qs = CustomUser.objects.filter(email=email)
+        if self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise forms.ValidationError(
+                "Another account is already using this email.")
+        return email
 
 
 class ArtDeliveryForm(forms.ModelForm):

@@ -899,6 +899,10 @@ def account_info_settings(request):
             messages.success(
                 request, "Account information updated.", extra_tags="account")
             return redirect(reverse('account_info_settings') + '#account-info')
+        else:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'errors': form.errors}, status=400)
+
     else:
         form = AccountInfoForm(instance=request.user)
 
@@ -916,11 +920,6 @@ def account_info_settings(request):
 
 @login_required
 def art_delivery_settings(request):
-    """
-    Handles the single toggle 'receive_art_paused' with the same AJAX pattern:
-    - On AJAX: return JSON { message: ... }
-    - On non-AJAX: use messages framework and redirect to #art-delivery
-    """
     if request.method == 'POST':
         form = ArtDeliveryForm(request.POST, instance=request.user)
         if form.is_valid():
@@ -932,8 +931,11 @@ def art_delivery_settings(request):
             messages.success(
                 request, "Art delivery preference updated.", extra_tags="artdelivery")
             return redirect(reverse('art_delivery_settings') + '#art-delivery')
+        else:
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return JsonResponse({"errors": form.errors}, status=400)
 
-    # GET or invalid POST (non-AJAX): render full page with all sections
+    # GET or invalid POST (non-AJAX) -> render full page
     account_form = AccountInfoForm(instance=request.user)
     art_delivery_form = ArtDeliveryForm(instance=request.user)
     email_form = EmailPreferencesForm(instance=request.user)
@@ -954,12 +956,13 @@ def email_pref_settings(request):
         if form.is_valid():
             form.save()
             if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-                return JsonResponse({
-                    "message": "Email preferences updated."
-                })
+                return JsonResponse({"message": "Email preferences updated."})
             messages.success(
                 request, "Email preferences updated.", extra_tags="email")
             return redirect(reverse('email_pref_settings') + '#email-prefs')
+        else:
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return JsonResponse({"errors": form.errors}, status=400)
     else:
         form = EmailPreferencesForm(instance=request.user)
 
