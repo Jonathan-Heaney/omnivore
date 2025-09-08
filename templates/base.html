@@ -199,6 +199,39 @@
       </div>
     </main>
 
+    <!-- Delete confirm modal -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-3">
+          <div class="modal-header">
+            <h5 class="modal-title">Delete this post?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <div class="modal-body">
+            <p class="mb-0">
+              <strong id="delete-item-title"></strong>
+            </p>
+            <p class="text-muted mt-2 mb-0">
+              This can’t be undone. Past recipients will see a “Removed” placeholder, but details will no longer be visible.
+            </p>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+
+            <!-- This form will be populated dynamically with the correct action -->
+            <form id="deleteConfirmForm" method="post">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger">
+                <i class="fa-solid fa-trash me-1"></i> Delete
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- FOOTER -->
     <footer class="site-footer mt-auto">
       <div class="container py-4">

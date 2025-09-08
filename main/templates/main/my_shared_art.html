@@ -41,15 +41,14 @@
           </a>
 
           <!-- Delete -->
-          <form method="post"
+          <form class="js-delete-form d-inline"
                 action="{% url 'delete_art_piece' piece.public_id %}"
-                onsubmit="return confirmDelete();"
-                class="d-inline">
+                method="post">
             {% csrf_token %}
-            <button type="submit"
-                    class="btn btn-outline-danger btn-sm"
-                    aria-label="Delete {{ piece.piece_name }}"
-                    title="Delete">
+            <button type="button"
+                    class="btn btn-outline-danger btn-sm js-open-delete"
+                    data-delete-url="{% url 'delete_art_piece' piece.public_id %}"
+                    data-delete-title="{{ piece.piece_name|escape }}">
               <i class="fa-solid fa-trash"></i>
             </button>
           </form>

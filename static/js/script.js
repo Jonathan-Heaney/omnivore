@@ -279,11 +279,32 @@ function clearForm(form) {
   button.disabled = true;
 }
 
-function confirmDelete() {
-  return confirm(
-    'Are you sure you want to delete this post? This cannot be undone.'
-  );
-}
+document.addEventListener('DOMContentLoaded', () => {
+  const modalEl = document.getElementById('deleteConfirmModal');
+  if (!modalEl) return;
+
+  // Bootstrap Modal instance
+  const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+
+  const titleEl = document.getElementById('delete-item-title');
+  const formEl = document.getElementById('deleteConfirmForm');
+
+  // Delegate clicks from any delete button
+  document.body.addEventListener('click', (e) => {
+    const btn = e.target.closest('.js-open-delete');
+    if (!btn) return;
+
+    const url = btn.getAttribute('data-delete-url');
+    const title = btn.getAttribute('data-delete-title') || 'this post';
+
+    // Populate modal
+    titleEl.textContent = title;
+    formEl.setAttribute('action', url);
+
+    // Show modal
+    modal.show();
+  });
+});
 
 // Modal handling
 document.addEventListener('DOMContentLoaded', function () {

@@ -230,7 +230,7 @@ def my_shared_art(request):
       - new_convo_count   : threads opened since last visit (no owner reply, all unread)
     """
     user = request.user
-    my_pieces = ArtPiece.objects.filter(user=user).order_by('-created_at')
+    my_pieces = ArtPiece.active.filter(user=user).order_by('-created_at')
     piece_ids = list(my_pieces.values_list('id', flat=True))
 
     # Legacy support: mark read if older links still point here with ?n=
@@ -782,7 +782,7 @@ def choose_art_piece(user):
     ).exclude(
         user=user
     ).exclude(
-        id__in=SentArtPiece.active.filter(
+        id__in=SentArtPiece.objects.filter(
             user=user).values_list('art_piece_id', flat=True)
     )
 
