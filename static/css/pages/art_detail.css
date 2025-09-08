@@ -297,9 +297,9 @@
 }
 
 /* Roomier header */
-.thread__header {
+/* .thread__header {
   padding: var(--thread-pad-y) var(--thread-pad-x);
-}
+} */
 
 /* Roomier body with comfy bottom padding for the input */
 .thread__body {
@@ -1096,3 +1096,23 @@
 .thread {
   scroll-margin-top: 16px;
 } /* or the height of your fixed header */
+
+/* === Fix vertical centering in the single-thread header (desktop) === */
+
+/* 1) Guarantee the row has at least the avatar’s height and centers its cells */
+.thread--single .thread__header > .imrow {
+  min-height: 40px; /* a hair taller than the 36px avatar */
+  align-items: center; /* center all three grid cells vertically */
+}
+
+/* 2) Make the time cell use a flex line box so it centers reliably */
+.thread--single .imrow__when {
+  display: inline-flex; /* replaces inline flow, keeps width natural */
+  align-items: center; /* vertical center the <time> text */
+}
+
+/* 3) Normalize line-height so text doesn’t sit high on its baseline */
+.thread--single .imrow__name,
+.thread--single .imrow__when time {
+  line-height: 1; /* removes baseline “float” */
+}
