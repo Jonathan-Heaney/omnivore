@@ -319,3 +319,16 @@ class Notification(models.Model):
 
     def __str__(self):
         return f'{self.sender} -> {self.recipient} ({self.notification_type})'
+
+
+class Feedback(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL
+    )
+    page = models.URLField(max_length=1024, blank=True)
+    user_agent = models.TextField(blank=True)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [models.Index(fields=["created_at"])]

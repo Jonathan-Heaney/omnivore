@@ -22,11 +22,12 @@ from django.utils import timezone
 from datetime import timedelta
 from django.views.decorators.http import require_POST
 from django.views.decorators.cache import never_cache
-from .models import ArtPiece, SentArtPiece, CustomUser, Comment, Like, Notification, ReciprocalGrant, WelcomeGrant
+from .models import ArtPiece, SentArtPiece, CustomUser, Comment, Like, Notification, ReciprocalGrant, WelcomeGrant, Feedback
 from main.utils.email_unsub import load_unsub_token
 import json
 from django.utils.http import url_has_allowed_host_and_scheme
 from zoneinfo import ZoneInfo
+from django.conf import settings
 
 
 def home(request):
@@ -1092,3 +1093,35 @@ def tz_debug(request):
         "user_tz": getattr(getattr(request.user, "profile", None), "timezone", None) or getattr(request.user, "timezone", None),
         "current_tz": str(timezone.get_current_timezone()),
     })
+
+
+@require_POST
+@login_required  # or remove if you want to allow signed-out users
+def feedback_report(request):
+    msg = (request.POST.get("message") or "").strip()
+    page = request.POST.get("page") or request.META.get("HTTP_REFERER") or ""
+    if not msg:
+        return JsonResponse({"ok": False, "error": "Empty message."}, status=400)
+
+    ua = request.META.get("HTTP_USER_AGENT", "")
+    fb = Feedback.objects.create(
+        user=request.user if request.user.is_authenticated else None,
+        page=page[:1024],
+        user_agent=ua,
+        message=msg,
+    )
+
+    # Email you a copy
+    try:
+        send_mail(
+            subject="Omnivore: Problem report",
+            message=f"From: {request.user.email if request.user.is_authenticated else 'Anonymous'}\n"
+                    f"Page: {page}\nUA: {ua}\n\n{msg}",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=["support@omnivorearts.com"],
+            fail_silently=True,
+        )
+    except Exception:
+        pass
+
+    return JsonResponse({"ok": True, "message": "Thanks — we got your report!"})

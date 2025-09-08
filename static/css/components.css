@@ -579,3 +579,35 @@ select:focus {
   border-radius: 8px;
   padding: 12px;
 }
+
+/* Stronger, branded toast style */
+.custom-toast {
+  background: var(--brand-600, #1884bd);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  opacity: 0.95;
+}
+
+/* Icon to make it instantly recognizable */
+.custom-toast .toast-icon {
+  font-size: 1.25rem;
+  color: #fff;
+}
+
+/* Hover/focus states for dismiss button */
+.custom-toast .btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+  opacity: 0.8;
+}
+.custom-toast .btn-close:hover {
+  opacity: 1;
+}
+
+/* Slightly larger container padding for breathing room */
+.toast-container {
+  z-index: 2000; /* stay above modals */
+}

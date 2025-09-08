@@ -54,4 +54,5 @@ urlpatterns = [
     path("u/<str:token>/", views.unsubscribe_email, name="email_unsubscribe"),
     path("account/set-timezone/", views.set_timezone, name="set_timezone"),
     path("tz-debug", views.tz_debug, name="tz_debug"),
+    path("feedback", views.feedback_report, name="feedback_report"),
 ]
