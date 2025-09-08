@@ -47,6 +47,13 @@ class RegisterForm(UserCreationForm):
         fields = ["first_name", "last_name", "username",
                   "email", "password1", "password2"]
 
+    def clean_email(self):
+        email = (self.cleaned_data.get("email") or "").strip().lower()
+        if CustomUser.objects.filter(email=email).exists():
+            raise forms.ValidationError(
+                "An account with this email already exists.")
+        return email
+
     def clean(self):
         cleaned = super().clean()
         p1 = cleaned.get("password1")
@@ -86,6 +93,11 @@ class RegisterForm(UserCreationForm):
 
 
 class CustomAuthenticationForm(AuthenticationForm):
+    error_messages = AuthenticationForm.error_messages | {
+        # Replace default "Note that both fields may be case-sensitive."
+        "invalid_login": "Please enter a correct email and password.",
+    }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -103,6 +115,15 @@ class CustomAuthenticationForm(AuthenticationForm):
             "placeholder": "Password",
         })
 
+    # Normalize the “username” (which is actually the email)
+    def clean_username(self):
+        u = self.cleaned_data.get("username") or ""
+        return u.strip().lower()
+
+    def clean(self):
+        # call parent to run the actual authentication
+        return super().clean()
+
 
 class AccountInfoForm(forms.ModelForm):
     class Meta:
@@ -114,6 +135,16 @@ class AccountInfoForm(forms.ModelForm):
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'username': forms.TextInput(attrs={'class': 'form-control'}),
         }
+
+        def clean_email(self):
+            email = (self.cleaned_data.get("email") or "").strip().lower()
+            qs = CustomUser.objects.filter(email=email)
+            if self.instance.pk:
+                qs = qs.exclude(pk=self.instance.pk)
+            if qs.exists():
+                raise forms.ValidationError(
+                    "Another account is already using this email.")
+            return email
 
 
 class ArtDeliveryForm(forms.ModelForm):

@@ -7,6 +7,7 @@ from django.db.models import Q, UniqueConstraint
 from urllib.parse import urlencode
 import uuid
 from django.utils import timezone
+from django.db.models.functions import Lower
 
 
 class CustomUser(AbstractUser):
@@ -46,12 +47,26 @@ class CustomUser(AbstractUser):
     )
 
     def save(self, *args, **kwargs):
-        self.first_name = self.first_name.strip()
-        self.last_name = self.last_name.strip()
+        # Normalize
+        if self.email:
+            self.email = self.email.strip().lower()
+        if self.first_name:
+            self.first_name = self.first_name.strip()
+        if self.last_name:
+            self.last_name = self.last_name.strip()
         super().save(*args, **kwargs)
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
+
+    class Meta:
+        constraints = [
+            # Enforce case-insensitive uniqueness at DB level (Postgres)
+            models.UniqueConstraint(
+                Lower('email'),
+                name='uniq_user_email_lower'
+            )
+        ]
 
 
 class NotDeletedManager(models.Manager):
