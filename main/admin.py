@@ -3,9 +3,9 @@ from .models import ArtPiece, SentArtPiece, CustomUser, Comment, Like, Notificat
 
 
 class ArtPieceAdmin(admin.ModelAdmin):
-    list_filter = ("user", "approved_status", "welcome_eligible")
+    list_filter = ("user", "approved_status", "welcome_eligible", "is_deleted")
     list_display = ("piece_name", "artist_name", "link", "user",
-                    "approved_status", "welcome_eligible", "welcome_weight", "created_at")
+                    "approved_status", "welcome_eligible", "welcome_weight", "is_deleted", "created_at")
     search_fields = ("piece_name", "artist_name",
                      "user__first_name", "user__last_name")
 
