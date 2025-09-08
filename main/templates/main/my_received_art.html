@@ -34,18 +34,18 @@
   <div class="shared-list">
     {% for received in received_pieces %}
       {% with piece=received.art_piece %}
-      <section id="art-{{ piece.public_id }}" class="received-card {% if piece.is_deleted %}received-card--deleted{% endif %}">
+          <section id="art-{{ piece.public_id }}" class="received-card {% if piece.is_deleted %}received-card--deleted{% endif %}">
         <!-- Header -->
         <header class="received-card__header">
           <div class="received-card__titlewrap">
-            <a class="received-card__title" href="{% url 'art_detail' piece.public_id %}">
-              {% if piece.is_deleted %}
+            {% if piece.is_deleted %}
+              <span class="received-deleted-title">
                 <strong>[Deleted piece]</strong>
-              {% else %}
+              </span>
+            {% else %}
+              <a class="received-card__title" href="{% url 'art_detail' piece.public_id %}">
                 <strong>{{ piece.piece_name }}</strong>
-              {% endif %}
-            </a>
-            {% if not piece.is_deleted %}
+              </a>
               <span class="received-card__by">({{ piece.artist_name }})</span>
             {% endif %}
           </div>
@@ -64,7 +64,11 @@
           {% if piece.is_deleted %}
             <div class="tombstone">
               <p class="mb-2"><em>This piece was deleted by the original sharer.</em></p>
-              <p class="text-muted mb-0">Your conversation is still available below.</p>
+              {% with pv=previews|dict_get:piece.id %}
+                {% if pv.thread_exists %}
+                  <p class="text-muted mb-0">Your conversation is still available below.</p>
+                {% endif %}
+              {% endwith %}
             </div>
           {% else %}
             <p class="received-card__description">{{ piece.piece_description|linebreaksbr }}</p>
@@ -90,55 +94,87 @@
         <!-- Conversation preview strip -->
         {% with pv=previews|dict_get:piece.id %}
           <div class="preview {% if piece.is_deleted %}preview--deleted{% endif %}">
-            {% if pv.unread_count and pv.unread_count|add:0 > 0 %}
-              <div class="preview__left">
-                <span class="preview__badge" aria-label="{{ pv.unread_count }} new messages">
-                  {{ pv.unread_count }} new message{% if pv.unread_count != 1 %}s{% endif %}
-                </span>
-              </div>
-              <div class="preview__right">
-                <a href="{% url 'art_detail' piece.public_id %}"
-                  class="btn btn-cta btn-cta--amber btn-sm"
-                  aria-label="View conversation for {{ piece.piece_name }}">
-                  <i class="fa-regular fa-comments me-1" aria-hidden="true"></i>
-                  View conversation
-                </a>
-              </div>
-
-            {% elif pv.thread_exists %}
-              <div class="preview__left">
-                <span class="preview__label">Last message</span>
-                {% with m=pv.last %}
-                  <span class="preview__text">
-                    <strong>{{ m.sender.first_name }} {{ m.sender.last_name }}</strong> — {{ m.text|truncatechars:120 }}
-                  </span>
-                {% endwith %}
-              </div>
-              <div class="preview__right">
-                <a href="{% url 'art_detail' piece.public_id %}"
-                  class="btn btn-cta btn-cta--amber btn-sm"
-                  aria-label="View conversation for {{ piece.piece_name }}">
-                  <i class="fa-regular fa-comments me-1" aria-hidden="true"></i>
-                  View conversation
-                </a>
-              </div>
-
-            {% else %}
-              <div class="preview__left">
-                {% if piece.is_deleted %}
-                  <span class="preview__hint text-muted">No conversation yet.</span>
+            {% if piece.is_deleted %}
+              {% if pv.thread_exists %}
+                {% if pv.unread_count and pv.unread_count|add:0 > 0 %}
+                  <div class="preview__left">
+                    <span class="preview__badge" aria-label="{{ pv.unread_count }} new messages">
+                      {{ pv.unread_count }} new message{% if pv.unread_count != 1 %}s{% endif %}
+                    </span>
+                  </div>
                 {% else %}
-                  <span class="preview__hint">No messages yet — say hi to {{ piece.user.first_name }}!</span>
+                  <div class="preview__left">
+                    <span class="preview__label">Last message</span>
+                    {% with m=pv.last %}
+                      <span class="preview__text">
+                        <strong>{{ m.sender.first_name }} {{ m.sender.last_name }}</strong> — {{ m.text|truncatechars:120 }}
+                      </span>
+                    {% endwith %}
+                  </div>
                 {% endif %}
-              </div>
-              <div class="preview__right">
-                <a href="{% url 'art_detail' piece.public_id %}#reply"
-                  class="btn btn-cta btn-sm"
-                  aria-label="Start a conversation about {{ piece.piece_name }}">
-                  <i class="fa-regular fa-paper-plane me-1" aria-hidden="true"></i>
-                  {% if piece.is_deleted %}Open conversation{% else %}Start a conversation{% endif %}
-                </a>
-              </div>
+
+                <div class="preview__right">
+                  <a href="{% url 'art_detail' piece.public_id %}"
+                    class="btn btn-cta btn-cta--amber btn-sm"
+                    aria-label="View conversation for {{ piece.piece_name }}">
+                    <i class="fa-regular fa-comments me-1" aria-hidden="true"></i>
+                    View conversation
+                  </a>
+                </div>
+              {% else %}
+                {# Deleted + no conversation → no button, just a hint #}
+                <div class="preview__left">
+                  <span class="preview__hint text-muted">No conversation.</span>
+                </div>
+              {% endif %}
+            {% else %}
+              {# Normal (not deleted) behavior #}
+              {% if pv.unread_count and pv.unread_count|add:0 > 0 %}
+                <div class="preview__left">
+                  <span class="preview__badge" aria-label="{{ pv.unread_count }} new messages">
+                    {{ pv.unread_count }} new message{% if pv.unread_count != 1 %}s{% endif %}
+                  </span>
+                </div>
+                <div class="preview__right">
+                  <a href="{% url 'art_detail' piece.public_id %}"
+                    class="btn btn-cta btn-cta--amber btn-sm"
+                    aria-label="View conversation for {{ piece.piece_name }}">
+                    <i class="fa-regular fa-comments me-1" aria-hidden="true"></i>
+                    View conversation
+                  </a>
+                </div>
+
+              {% elif pv.thread_exists %}
+                <div class="preview__left">
+                  <span class="preview__label">Last message</span>
+                  {% with m=pv.last %}
+                    <span class="preview__text">
+                      <strong>{{ m.sender.first_name }} {{ m.sender.last_name }}</strong> — {{ m.text|truncatechars:120 }}
+                    </span>
+                  {% endwith %}
+                </div>
+                <div class="preview__right">
+                  <a href="{% url 'art_detail' piece.public_id %}"
+                    class="btn btn-cta btn-cta--amber btn-sm"
+                    aria-label="View conversation for {{ piece.piece_name }}">
+                    <i class="fa-regular fa-comments me-1" aria-hidden="true"></i>
+                    View conversation
+                  </a>
+                </div>
+
+              {% else %}
+                <div class="preview__left">
+                  <span class="preview__hint">No messages yet — say hi to {{ piece.user.first_name }}!</span>
+                </div>
+                <div class="preview__right">
+                  <a href="{% url 'art_detail' piece.public_id %}#reply"
+                    class="btn btn-cta btn-sm"
+                    aria-label="Start a conversation about {{ piece.piece_name }}">
+                    <i class="fa-regular fa-paper-plane me-1" aria-hidden="true"></i>
+                    Start a conversation
+                  </a>
+                </div>
+              {% endif %}
             {% endif %}
           </div>
         {% endwith %}

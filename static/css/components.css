@@ -565,6 +565,10 @@ select:focus {
 .received-card--deleted .received-card__title {
   color: #64748b;
 }
+.received-deleted-title {
+  color: #64748b;
+}
+
 .preview--deleted .preview__badge,
 .preview--deleted .preview__label {
   opacity: 0.8;
