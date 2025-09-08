@@ -42,16 +42,17 @@
 
           <!-- Delete -->
           <form class="js-delete-form d-inline"
-                action="{% url 'delete_art_piece' piece.public_id %}"
-                method="post">
-            {% csrf_token %}
-            <button type="button"
-                    class="btn btn-outline-danger btn-sm js-open-delete"
-                    data-delete-url="{% url 'delete_art_piece' piece.public_id %}"
-                    data-delete-title="{{ piece.piece_name|escape }}">
-              <i class="fa-solid fa-trash"></i>
-            </button>
-          </form>
+              action="{% url 'delete_art_piece' piece.public_id %}"
+              method="post">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button type="button"
+                  class="btn btn-outline-danger btn-sm js-open-delete"
+                  data-delete-url="{% url 'delete_art_piece' piece.public_id %}"
+                  data-delete-title="{{ piece.piece_name|escape }}">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </form>
 
           {% if piece.link %}
             <a class="btn btn-outline-primary btn-sm"

@@ -283,11 +283,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalEl = document.getElementById('deleteConfirmModal');
   if (!modalEl) return;
 
-  // Bootstrap Modal instance
   const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-
   const titleEl = document.getElementById('delete-item-title');
   const formEl = document.getElementById('deleteConfirmForm');
+  const confirmBtn = formEl?.querySelector('[type="submit"]');
+
+  // Ensure the modal form has a dedicated hidden next input (create if missing)
+  let nextInput = formEl.querySelector('input[name="next"]');
+  if (!nextInput) {
+    nextInput = document.createElement('input');
+    nextInput.type = 'hidden';
+    nextInput.name = 'next';
+    nextInput.id = 'deleteModalNext';
+    formEl.appendChild(nextInput);
+  }
 
   // Delegate clicks from any delete button
   document.body.addEventListener('click', (e) => {
@@ -297,12 +306,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const url = btn.getAttribute('data-delete-url');
     const title = btn.getAttribute('data-delete-title') || 'this post';
 
-    // Populate modal
-    titleEl.textContent = title;
+    // 1) Point the modal form at the right endpoint
     formEl.setAttribute('action', url);
+
+    // 2) Resolve the "next" target (prefer inline form's value)
+    const inlineForm = btn.closest('form');
+    const inlineNext = inlineForm?.querySelector('input[name="next"]')?.value;
+    const dataNext = btn.getAttribute('data-next');
+    const fallback = location.pathname + location.search;
+
+    nextInput.value = inlineNext || dataNext || fallback;
+
+    // 3) Populate title text
+    titleEl.textContent = title;
+
+    // 4) Enable submit (in case a previous submit disabled it)
+    if (confirmBtn) {
+      confirmBtn.disabled = false;
+      confirmBtn.removeAttribute('data-submitting');
+    }
 
     // Show modal
     modal.show();
+  });
+
+  // Optional: guard against double-submits
+  formEl.addEventListener('submit', () => {
+    if (!confirmBtn) return;
+    if (confirmBtn.getAttribute('data-submitting') === '1') return;
+    confirmBtn.setAttribute('data-submitting', '1');
+    confirmBtn.disabled = true;
   });
 });
 

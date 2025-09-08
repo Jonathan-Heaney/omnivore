@@ -25,6 +25,7 @@ from django.views.decorators.cache import never_cache
 from .models import ArtPiece, SentArtPiece, CustomUser, Comment, Like, Notification, ReciprocalGrant, WelcomeGrant
 from main.utils.email_unsub import load_unsub_token
 import json
+from django.utils.http import url_has_allowed_host_and_scheme
 from zoneinfo import ZoneInfo
 
 
@@ -216,8 +217,16 @@ def delete_art_piece(request, public_id):
     piece.soft_delete(user=request.user, reason='user-initiated')
     piece.approved_status = False
     piece.save(update_fields=['approved_status'])
+
     messages.success(
         request, "Your piece was deleted. Past recipients will see it as removed.")
+
+    # Figure out where to go next (passed from the page where the user clicked delete)
+    next_url = request.POST.get("next")
+    if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+        return redirect(next_url)
+
+    # Fallback: owner’s list
     return redirect("my_shared_art")
 
 

@@ -12,14 +12,6 @@
     </p>
   </header>
 
-  {% if messages %}
-    <div class="mb-3">
-      {% for message in messages %}
-        <div class="alert alert-success mb-2">{{ message }}</div>
-      {% endfor %}
-    </div>
-  {% endif %}
-
   <div class="form-card">
     <form method="post" novalidate>
       {% csrf_token %}

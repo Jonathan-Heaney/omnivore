@@ -20,8 +20,19 @@
 
       {% if piece.is_deleted %}
         <div class="alert alert-warning mb-3">
-          <strong>This piece was deleted by the original sharer.</strong>
-          <div class="small text-muted">You can still view your conversation below.</div>
+          {% if mode == "recipient" %}
+            <strong>This piece was deleted by the original sharer.</strong>
+            {% if thread and thread|length %}
+              <div class="small text-muted">You can still view your conversation below.</div>
+            {% endif %}
+          {% else %}
+            <strong>You deleted this piece.</strong>
+            {% if conversations and conversations|length %}
+              <div class="small text-muted">
+                You can still view your conversation{% if conversations|length > 1 %}s{% endif %} below.
+              </div>
+            {% endif %}
+          {% endif %}
         </div>
       {% endif %}
 
@@ -90,16 +101,17 @@
                 </a>
                 <!-- Delete -->
                 <form class="js-delete-form d-inline"
-                      action="{% url 'delete_art_piece' piece.public_id %}"
-                      method="post">
-                  {% csrf_token %}
-                  <button type="button"
-                          class="btn btn-outline-danger btn-sm js-open-delete"
-                          data-delete-url="{% url 'delete_art_piece' piece.public_id %}"
-                          data-delete-title="{{ piece.piece_name|escape }}">
-                    <i class="fa-solid fa-trash"></i>
-                  </button>
-                </form>
+                    action="{% url 'delete_art_piece' piece.public_id %}"
+                    method="post">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                <button type="button"
+                        class="btn btn-outline-danger btn-sm js-open-delete"
+                        data-delete-url="{% url 'delete_art_piece' piece.public_id %}"
+                        data-delete-title="{{ piece.piece_name|escape }}">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </form>
                 {% if piece.link %}
                   <a class="btn btn-outline-primary btn-sm" href="{{ piece.link }}" target="_blank" rel="noopener"
                     aria-label="Open source link for {{ piece.piece_name }}" title="Open source">
