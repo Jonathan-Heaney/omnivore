@@ -193,6 +193,23 @@ hr {
   text-decoration: underline;
 }
 
+.footer-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.footer-heading {
+  font-size: 1rem;
+}
+
+/* Prevent long links from blowing up mobile width */
+.site-footer .footer-link {
+  word-break: break-word; /* break at arbitrary points if needed */
+  overflow-wrap: anywhere; /* let the browser wrap long strings */
+  line-break: anywhere;
+}
+
 /* Anchors don’t hide under sticky nav */
 section[id],
 [id^='art-'] {
