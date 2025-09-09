@@ -611,3 +611,8 @@ select:focus {
 .toast-container {
   z-index: 2000; /* stay above modals */
 }
+
+.form-check-input:checked {
+  background-color: var(--brand);
+  border-color: var(--brand);
+}
