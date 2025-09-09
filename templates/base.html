@@ -44,7 +44,7 @@
     <!-- NAV -->
     <header class="site-header">
       <nav class="navbar navbar-expand-lg navbar-light site-nav">
-        <div class="container">
+        <div class="container-xl">
           <a id="navbar-brand" class="navbar-brand d-flex align-items-center gap-2" href="{% url 'home' %}">
             <img src="{% static 'images/oliver.png' %}" alt="Oliver the Omnivore" class="navbar-oliver" />
             <span class="brand-text">Omnivore Arts</span>
@@ -157,32 +157,32 @@
 
     <!-- FOOTER -->
     <footer class="site-footer mt-auto">
-      <div class="container py-4">
-        <div class="row gy-4 align-items-start">
+      <div class="container-xl py-4">
+        <div class="footer-inner">
           <!-- Brand / ownership -->
-          <div class="col-12 col-lg-4">
+          <div class="footer-brandcol">
             <div class="footer-brand">Omnivore Arts</div>
             <div class="text-muted small mb-2">© 2025 Omnivore Arts</div>
           </div>
 
-          <!-- About (moved from navbar) -->
-          <div class="col-6 col-lg-4">
+          <!-- About -->
+          <nav class="footer-col">
             <h3 class="footer-heading">About</h3>
             <ul class="footer-list">
               <li><a class="footer-link" href="/how-it-works">How It Works</a></li>
               <li><a class="footer-link" href="/faq">FAQ</a></li>
               <li><a class="footer-link" href="/submission-guidelines">Submission Guidelines</a></li>
             </ul>
-          </div>
+          </nav>
 
-          <!-- Support / Contact -->
-          <div class="col-6 col-lg-4">
+          <!-- Support -->
+          <nav class="footer-col">
             <h3 class="footer-heading">Support</h3>
             <ul class="footer-list">
               <li><a class="footer-link" href="#" id="open-report">Report a problem</a></li>
               <li><a class="footer-link" href="mailto:jonathan@omnivorearts.com">Email Jonathan</a></li>
             </ul>
-          </div>
+          </nav>
         </div>
       </div>
     </footer>

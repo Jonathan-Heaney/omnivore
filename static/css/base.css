@@ -185,10 +185,16 @@ hr {
   font-family: var(--font-brand);
   font-size: 1.05rem;
 }
+
+/* Prevent long links from blowing up mobile width */
 .site-footer .footer-link {
   font-weight: 600;
   color: var(--brand);
+  word-break: break-word; /* break at arbitrary points if needed */
+  overflow-wrap: anywhere; /* let the browser wrap long strings */
+  line-break: anywhere;
 }
+
 .site-footer .footer-link:hover {
   text-decoration: underline;
 }
@@ -203,11 +209,54 @@ hr {
   font-size: 1rem;
 }
 
-/* Prevent long links from blowing up mobile width */
-.site-footer .footer-link {
-  word-break: break-word; /* break at arbitrary points if needed */
-  overflow-wrap: anywhere; /* let the browser wrap long strings */
-  line-break: anywhere;
+/* Footer layout that mirrors the header’s edge-to-edge feel */
+.footer-inner {
+  display: flex;
+  justify-content: space-between; /* pushes left and right sections to edges */
+  align-items: flex-start;
+  gap: clamp(16px, 4vw, 48px);
+}
+
+/* Let middle column grow a bit if needed, but keep brand/support snug */
+.footer-brandcol,
+.footer-col:last-child {
+  flex: 0 0 auto;
+}
+.footer-col {
+  min-width: 180px;
+}
+
+/* Stack on mobile/tablet for readability */
+/* Stack on mobile/tablet for readability */
+@media (max-width: 640px) {
+  .footer-inner {
+    flex-direction: column;
+    align-items: center; /* center the column blocks themselves */
+    gap: 18px;
+  }
+
+  /* Center the content inside each column */
+  .footer-brandcol,
+  .footer-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* centers headings + list */
+    text-align: center; /* centers link text */
+    /* width: 100%;  <-- remove this so columns don't stretch full-width */
+  }
+
+  /* (optional) tighter vertical rhythm on the lists */
+  .footer-list li + li {
+    margin-top: 6px;
+  }
+}
+
+@media (min-width: 992px) {
+  .site-footer .row > [class*='col-'] {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
 }
 
 /* Anchors don’t hide under sticky nav */
