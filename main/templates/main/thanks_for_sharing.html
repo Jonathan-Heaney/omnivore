@@ -1,10 +1,16 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Thank You{% endblock %}
+{% block title %}Thanks for Sharing{% endblock %}
+
+{% block css_files %}
+  {{ block.super }}
+  {# Reuse the exact styles from My Received so cards match visually #}
+  <link rel="stylesheet" href="{% static 'css/pages/my_received.css' %}">
+{% endblock %}
 
 {% block content %}
-<section class="container max-w-700 py-4">
+<div class="container-narrow py-4">
   <header class="mb-4 text-center">
     <h1 class="page-title">Thanks for sharing!</h1>
   </header>
@@ -26,33 +32,45 @@
 
   {% else %}
     {% if reciprocal_piece %}
-      <p class="lead text-muted">We really appreciate you sharing this work of art with our community! Omnivore Arts is made possible by these gifts from people like you.</p>
-      <p class="lead text-muted"> As a token of our gratitude, here’s something for you:</p>
+      <p class="lead text-muted">
+        We really appreciate you sharing this work of art with our community! Omnivore Arts is made possible by these gifts from people like you.
+      </p>
+      <p class="lead text-muted">As a token of our gratitude, here’s something for you:</p>
+      <br>
+      <!-- Match My Received card look, minus likes & conversation preview -->
+      <section id="art-{{ reciprocal_piece.public_id }}" class="received-card">
+        <!-- Header -->
+        <header class="received-card__header">
+          <div class="received-card__titlewrap">
+            <a class="received-card__title" href="{% url 'art_detail' reciprocal_piece.public_id %}">
+              <strong>{{ reciprocal_piece.piece_name }}</strong>
+            </a>
+            <span class="received-card__by">({{ reciprocal_piece.artist_name }})</span>
+          </div>
 
-      <div id="art-{{ reciprocal_piece.public_id }}" class="card art-piece mb-3">
-        <div class="card-header">
-          <strong>
-            {% if reciprocal_piece.link %}
-              <a href="{{ reciprocal_piece.link }}" target="_blank" rel="noopener">
-                <span class="card-title">{{ reciprocal_piece.piece_name }}</span>
-              </a>
-            {% else %}
-              <span class="card-title">{{ reciprocal_piece.piece_name }}</span>
-            {% endif %}
-          </strong>
-          <span>({{ reciprocal_piece.artist_name }})</span>
+          <div class="received-card__from">
+            Shared by <strong>{{ reciprocal_piece.user.first_name }} {{ reciprocal_piece.user.last_name }}</strong>
+          </div>
+        </header>
+
+        <!-- Body -->
+        <div class="received-card__body">
+          <p class="received-card__description">
+            {{ reciprocal_piece.piece_description|linebreaksbr }}
+          </p>
+
+          {% if reciprocal_piece.link %}
+            <a class="btn btn-outline-success btn-sm received-card__source"
+               href="{{ reciprocal_piece.link }}" target="_blank" rel="noopener"
+               aria-label="Open source for {{ reciprocal_piece.piece_name }}">
+              View source
+              <i class="fa-solid fa-up-right-from-square ms-1" aria-hidden="true"></i>
+            </a>
+          {% endif %}
         </div>
+      </section>
 
-        <div class="card-body">
-          <p>{{ reciprocal_piece.piece_description|linebreaksbr }}</p>
-        </div>
-
-        <div class="card-footer text-muted">
-          Shared by <strong>{{ reciprocal_piece.user.first_name }} {{ reciprocal_piece.user.last_name }}</strong>
-        </div>
-      </div>
-
-      <p class="small text-muted">
+      <p class="small text-muted mt-2">
         This gift has also been added to your
         <a href="{% url 'my_received_art' %}#art-{{ reciprocal_piece.public_id }}">My Received Art</a>
         so you can revisit it later.
@@ -70,8 +88,11 @@
     {% endif %}
   {% endif %}
 
+
+  <br><br>
+    <p class="lead text-muted center">Have more to share?</p>
   <div class="text-center mt-4">
     <a href="{% url 'share_art' %}" class="btn btn-cta px-4">Share another piece</a>
   </div>
-</section>
+</div>
 {% endblock %}

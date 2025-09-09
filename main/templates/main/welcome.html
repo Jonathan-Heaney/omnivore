@@ -4,47 +4,65 @@
 
 {% block title %}Welcome{% endblock %}
 
+{% block css_files %}
+  {{ block.super }}
+  {# Reuse My Received styles so the card looks identical #}
+  <link rel="stylesheet" href="{% static 'css/pages/my_received.css' %}">
+{% endblock %}
+
 {% block content %}
-<section class="container max-w-700 py-4">
+<div class="container-narrow py-4">
   <header class="mb-4 text-center">
     <h1 class="page-title">Welcome to Omnivore!</h1>
   </header>
 
   {% if welcome_piece %}
-    <p class="lead text-muted">As a gift from our community, here’s something to start your journey:</p>
+    <p class="lead text-muted">We're so glad you're here! We hope you enjoy this welcome gift from our community.</p><br>
 
-    <div id="art-{{ welcome_piece.public_id }}" class="card art-piece mb-3">
-      <div class="card-header">
-        <strong>
-          {% if welcome_piece.link %}
-            <a href="{{ welcome_piece.link }}" target="_blank" rel="noopener">
-              <span class="card-title">{{ welcome_piece.piece_name }}</span>
-            </a>
-          {% else %}
-            <span class="card-title">{{ welcome_piece.piece_name }}</span>
-          {% endif %}
-        </strong>
-        <span>({{ welcome_piece.artist_name }})</span>
+    <!-- Same structure/classes as My Received, minus likes & conversation preview -->
+    <section id="art-{{ welcome_piece.public_id }}" class="received-card">
+      <!-- Header -->
+      <header class="received-card__header">
+        <div class="received-card__titlewrap">
+          <a class="received-card__title" href="{% url 'art_detail' welcome_piece.public_id %}">
+            <strong>{{ welcome_piece.piece_name }}</strong>
+          </a>
+          <span class="received-card__by">({{ welcome_piece.artist_name }})</span>
+        </div>
+
+        <div class="received-card__from">
+          Shared by <strong>{{ welcome_piece.user.first_name }} {{ welcome_piece.user.last_name }}</strong>
+        </div>
+      </header>
+
+      <!-- Body -->
+      <div class="received-card__body">
+        <p class="received-card__description">
+          {{ welcome_piece.piece_description|linebreaksbr }}
+        </p>
+
+        {% if welcome_piece.link %}
+          <a class="btn btn-outline-success btn-sm received-card__source"
+             href="{{ welcome_piece.link }}" target="_blank" rel="noopener"
+             aria-label="Open source for {{ welcome_piece.piece_name }}">
+            View source
+            <i class="fa-solid fa-up-right-from-square ms-1" aria-hidden="true"></i>
+          </a>
+        {% endif %}
       </div>
+    </section>
 
-      <div class="card-body">
-        <p>{{ welcome_piece.piece_description|linebreaksbr }}</p>
-      </div>
-
-      <div class="card-footer text-muted">
-        Shared by <strong>{{ welcome_piece.user.first_name }} {{ welcome_piece.user.last_name }}</strong>
-      </div>
-    </div>
-
-    <p class="small text-muted">
+    <p class="small text-muted mt-2">
       This gift has also been added to your
       <a href="{% url 'my_received_art' %}#art-{{ welcome_piece.public_id }}">My Received Art</a>
       so you can revisit it later.
     </p>
 
+    <br><br>
+    <p class="lead text-muted center">Ready to share something you love?</p>
+
     <div class="text-center mt-4 d-flex gap-2 justify-content-center">
       <a href="{% url 'share_art' %}" class="btn btn-cta px-4">Share a piece now</a>
-      <a href="{% url 'my_received_art' %}" class="btn btn-outline-secondary px-4">Go to My Received Art</a>
     </div>
 
   {% else %}
@@ -57,5 +75,5 @@
       </p>
     </div>
   {% endif %}
-</section>
+</div>
 {% endblock %}
