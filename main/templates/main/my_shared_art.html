@@ -2,7 +2,7 @@
 {% load static %}
 {% load custom_filters %}
 
-{% block title %}My Shared Art{% endblock %}
+{% block title %}My Shared{% endblock %}
 
 {% block css_files %}
   {{ block.super }}
@@ -12,7 +12,7 @@
 {% block content %}
 
 <div class="container-narrow py-4">
-  <h1 class="page-title">My Shared Art</h1>
+  <h1 class="page-title">My Shared</h1>
 
   <div class="shared-list">
   {% for piece in pieces %}
