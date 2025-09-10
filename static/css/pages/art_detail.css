@@ -1281,3 +1281,22 @@
 .comment-input:has(textarea:placeholder-shown) {
   gap: 0;
 }
+
+/* Fallback alignment when parent isn't grid */
+.msg--mine {
+  margin-left: auto;
+} /* stick to the right */
+.msg--theirs {
+  margin-right: auto;
+} /* stick to the left  */
+
+/* Ensure rows shrink to content even in block layout */
+.msg {
+  width: fit-content;
+  max-width: min(75%, 520px);
+}
+
+/* Bubble still fills the row's width (content-sized now) */
+.msg__bubble {
+  display: block;
+}
