@@ -151,13 +151,6 @@ hr {
   margin: 6px 0;
 }
 
-/* Mobile: avoid overflow off the screen in the collapsed nav */
-@media (max-width: 991.98px) {
-  .site-nav .dropdown-menu {
-    max-width: 90vw; /* keep within viewport */
-  }
-}
-
 /* Notifications bell */
 
 #notification-link .fa-bell {
@@ -274,7 +267,7 @@ section[id],
 }
 
 /* Mobile nav alignment */
-@media (max-width: 991.98px) {
+@media (max-width: 575.98px) {
   .navbar-nav .nav-item {
     text-align: center;
   }
