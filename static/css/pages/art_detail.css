@@ -167,6 +167,26 @@
   align-items: center;
 }
 
+/* iOS Safari: strip native button tinting and lock text color */
+.like-button {
+  -webkit-appearance: none;
+  appearance: none;
+  background-clip: padding-box; /* keeps borders clean on iOS */
+  color: var(--text) !important;
+}
+
+.like-button .like-text {
+  color: inherit !important; /* ensure it follows the button */
+  -webkit-text-fill-color: currentColor; /* iOS sometimes ignores `color` */
+}
+
+/* Keep the same color through focus/active */
+.like-button:focus,
+.like-button:active,
+.like-button:focus-visible {
+  color: var(--text) !important;
+}
+
 /* ---------- Conversation section shell ---------- */
 .conv-section {
   margin-top: clamp(24px, 4vw, 40px);
