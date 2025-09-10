@@ -395,3 +395,27 @@ section[id],
   color: #fff;
   background: #dc3545; /* FB-style blue; use #dc3545 if you prefer red */
 }
+
+/* Keep mobile password dots from looking huge on iOS */
+input[type='password'].form-control,
+input[type='password'] {
+  font-size: 16px; /* 16–18px is a good target */
+  line-height: 1.25; /* avoid very tall lines */
+  height: auto; /* don’t force tall boxes */
+  padding: 10px 12px; /* control height with padding instead */
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+/* If you have global input sizing that inflates things on small screens,
+   keep it modest for form controls */
+@media (max-width: 640px) {
+  .form-control {
+    font-size: 16px;
+    line-height: 1.25;
+  }
+}
+
+/* Prevent iOS from oddly scaling text */
+html {
+  -webkit-text-size-adjust: 100%;
+}
