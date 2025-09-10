@@ -189,7 +189,7 @@
 
 /* ---------- Conversation section shell ---------- */
 .conv-section {
-  margin-top: clamp(24px, 4vw, 40px);
+  margin-top: clamp(50px, 6vw, 70px);
 }
 
 .conv-section__header {
@@ -1223,4 +1223,61 @@
     top: -16px; /* tuck closer */
     box-shadow: none; /* less visual noise */
   }
+}
+
+/* Fix send button styling */
+/* Let the input own the row */
+.comment-input {
+  display: flex; /* you already have this */
+  align-items: center;
+  gap: 8px;
+}
+.comment-input .replyTextArea {
+  flex: 1 1 auto; /* grow to fill space */
+}
+
+/* Send button: compact by default */
+.comment-input .sendButton {
+  width: 36px;
+  height: 36px;
+  padding: 0; /* no extra padding */
+  border-radius: 10px; /* softer than full pill */
+  display: inline-grid;
+  place-items: center;
+}
+.comment-input .sendButton svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* MOBILE: make it even smaller and give more room to the textarea */
+@media (max-width: 575.98px) {
+  .comment-input {
+    gap: 6px;
+  }
+
+  .comment-input .sendButton {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+  }
+  .comment-input .sendButton svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* --- Hide the send button until there's text --- */
+/* Works because your <textarea> has a placeholder. */
+.comment-input textarea:placeholder-shown + .sendButton {
+  opacity: 0;
+  pointer-events: none;
+  width: 0; /* collapses the button */
+  padding: 0;
+  margin: 0;
+}
+
+/* Optional: remove the inter-item gap while empty for a seamless look */
+.comment-input:has(textarea:placeholder-shown) {
+  gap: 0;
 }
