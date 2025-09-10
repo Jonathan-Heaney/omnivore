@@ -236,7 +236,6 @@
   display: grid;
   margin-top: 0.5rem;
   gap: clamp(40px, 6vw, 64px); /* was 1.1rem */
-  padding: 0 1.25rem 1.25rem;
 }
 .thread {
   border: 1px solid #eef2f7;
@@ -301,9 +300,42 @@
     padding-top: 1.35rem;
     padding-bottom: 1.35rem;
   }
+
+  .thread,
   .thread--single {
-    margin-left: 1.25rem;
-    margin-right: 1.25rem;
+    border-radius: 0; /* lose card rounding */
+    margin: 0; /* flush with viewport */
+    border-left: none;
+    border-right: none;
+    box-shadow: none; /* drop desktop shadow */
+  }
+
+  .thread__body {
+    padding: 12px 16px; /* roomy but not cramped */
+    border-radius: 0;
+  }
+
+  .msg__bubble {
+    font-size: 0.9rem; /* down from ~1rem */
+    line-height: 1.35; /* tighter rhythm */
+    padding: 8px 12px;
+  }
+  .msg {
+    max-width: 85%; /* feels less “narrow” */
+  }
+
+  .thread__messages {
+    gap: 6px; /* instead of 12px+ */
+  }
+  .msg {
+    margin-top: 8px;
+  }
+  .msg__time {
+    font-size: 0.65rem;
+    padding: 1px 6px;
+    top: -16px; /* tuck closer */
+    box-shadow: none; /* less visual noise */
+    background: transparent; /* transparent on mobile */
   }
 }
 
@@ -1151,4 +1183,44 @@
 .thread--single .imrow__name,
 .thread--single .imrow__when time {
   line-height: 1.5; /* removes baseline “float” */
+}
+
+/* === Fix mobile cards to match message apps=== */
+
+@media (max-width: 575.98px) {
+  .thread,
+  .thread--single {
+    border-radius: 0; /* lose card rounding */
+    margin: 0; /* flush with viewport */
+    border-left: none;
+    border-right: none;
+    box-shadow: none; /* drop desktop shadow */
+  }
+
+  .thread__body {
+    padding: 12px 16px; /* roomy but not cramped */
+    border-radius: 0;
+  }
+
+  .msg__bubble {
+    font-size: 0.9rem; /* down from ~1rem */
+    line-height: 1.35; /* tighter rhythm */
+    padding: 8px 12px;
+  }
+  .msg {
+    max-width: 85%; /* feels less “narrow” */
+  }
+
+  .thread__messages {
+    gap: 6px; /* instead of 12px+ */
+  }
+  .msg {
+    margin-top: 8px;
+  }
+  .msg__time {
+    font-size: 0.65rem;
+    padding: 1px 6px;
+    top: -16px; /* tuck closer */
+    box-shadow: none; /* less visual noise */
+  }
 }
