@@ -21,9 +21,18 @@
         <input type="hidden" name="next" value="{{ next }}">
       {% endif %}
 
-      <div class="d-flex gap-2 mt-3 align-items-center">
-        <button type="submit" class="btn btn-cta">Log in</button>
-        <a href="{% url 'password_reset' %}" class="btn btn-outline-secondary">Forgot password?</a>
+      <div class="auth-actions mt-3">
+        <button type="submit" class="btn btn-cta auth-primary">Log in</button>
+
+        <!-- Desktop/tablet: button -->
+        <a href="{% url 'password_reset' %}" class="btn btn-outline-secondary d-none d-sm-inline-block">
+          Forgot password?
+        </a>
+
+        <!-- Mobile: simple link -->
+        <a href="{% url 'password_reset' %}" class="auth-forgot-link d-sm-none">
+          Forgot password?
+        </a>
       </div>
 
       <p class="small text-muted mt-3 mb-0">

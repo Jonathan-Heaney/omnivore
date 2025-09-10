@@ -648,3 +648,34 @@ input[type='password'].form-control {
     -webkit-text-size-adjust: 100%;
   }
 }
+
+/* Auth action row */
+.auth-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap; /* allows graceful wrap on mid-widths */
+}
+
+/* Keep the primary from wrapping and turning circular */
+.auth-actions .auth-primary {
+  white-space: nowrap; /* prevent “Log” / “in” split */
+  border-radius: var(--radius); /* softer than 999px on forms */
+  padding-block: 10px; /* consistent height */
+}
+
+/* Mobile: stack, make primary full-width, use link for “Forgot?” */
+@media (max-width: 575.98px) {
+  .auth-actions {
+    flex-direction: column;
+  }
+
+  .auth-forgot-link {
+    display: inline-block;
+    text-align: center;
+    font-weight: 600;
+    color: var(--brand);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+}
