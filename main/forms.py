@@ -203,10 +203,10 @@ class ArtPieceForm(forms.ModelForm):
         model = ArtPiece
         fields = ["piece_name", "artist_name", "piece_description", "link"]
         labels = {
-            "artist_name": "Who is the artist/creator(s)?",
-            "piece_name": "What is the name of the artwork?",
+            "artist_name": "Who is the artist/creator? ",
+            "piece_name": "What is the name of the artwork? ",
             "link": "Include a link to view the piece online, if applicable.",
-            "piece_description": "Tell us a bit about the piece and what it means to you. Why are you sharing it? What should people know about it? "
+            "piece_description": "Tell us about the piece and what it means to you. What do you love about it? "
         }
 
         widgets = {
