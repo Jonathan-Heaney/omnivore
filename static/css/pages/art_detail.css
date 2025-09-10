@@ -617,10 +617,6 @@
   background: color-mix(in srgb, var(--brand) 15%, #eef2f7);
   color: #0c2233;
 }
-.imrow__name {
-  font-weight: 700;
-  line-height: 1.1;
-}
 
 .imrow__main {
   min-width: 0; /* allows ellipsis to work */
@@ -751,6 +747,9 @@
   margin-left: 12px;
 }
 
+.imrow__name {
+  font-weight: 700;
+}
 /* Received page: single conversation is always open; header is not a toggle */
 .thread--single .thread__header {
   cursor: default;
@@ -997,8 +996,7 @@
 
   /* Name can wrap if needed, but stays truncated to one line */
   .imrow__name {
-    font-weight: 800;
-    line-height: 1.1;
+    font-weight: 700;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1114,5 +1112,5 @@
 /* 3) Normalize line-height so text doesn’t sit high on its baseline */
 .thread--single .imrow__name,
 .thread--single .imrow__when time {
-  line-height: 1; /* removes baseline “float” */
+  line-height: 1.5; /* removes baseline “float” */
 }
