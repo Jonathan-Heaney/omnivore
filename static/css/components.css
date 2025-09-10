@@ -616,3 +616,35 @@ select:focus {
   background-color: var(--brand);
   border-color: var(--brand);
 }
+
+/* --- Password input sizing sanity (iOS + Bootstrap harmony) --- */
+
+/* Ensure Bootstrap’s baseline metrics are intact */
+.form-control {
+  font-size: 1rem; /* 16px */
+  line-height: 1.5; /* Bootstrap default */
+}
+
+/* Make Safari/iOS stop inflating password glyphs by tying height to the baseline */
+input[type='password'].form-control {
+  /* Bootstrap’s default explicit height (calc for line-height + padding + border) */
+  height: calc(1.5em + 0.75rem + 2px);
+  font-size: 16px; /* iOS stays happy at 16px, avoids “zoom” behavior */
+}
+
+/* Keep space for the eye without changing overall height */
+.pw-field .form-control {
+  padding-right: 2.25rem; /* you already had this; keep it */
+}
+
+/* Nudge the eye slightly so any 1–2px rounding differences don’t look like a jump */
+.pw-field .pw-toggle {
+  right: 0.65rem; /* tiny visual tweak; optional */
+}
+
+/* iOS-specific: don’t upscale text inside inputs */
+@supports (-webkit-touch-callout: none) {
+  input[type='password'].form-control {
+    -webkit-text-size-adjust: 100%;
+  }
+}
