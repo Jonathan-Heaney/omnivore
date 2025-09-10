@@ -213,7 +213,8 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost',
     'http://127.0.0.1',
     'http://localhost:8001',
-    'http://127.0.0.1:8001'
+    'http://127.0.0.1:8001',
+    'http://192.168.1.237:8000'
 ]
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
