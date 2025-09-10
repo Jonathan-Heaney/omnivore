@@ -247,8 +247,7 @@
                     {% with tgt_id="comments-"|add:pid|add:"-"|add:rid|add:"-container" %}
                       <!-- Privacy chip -->
                       <div class="conv-privacy" id="privacy-{{ piece.id }}-{{ recipient.id }}">
-                        <i class="fa-solid fa-lock" aria-hidden="true"></i>
-                        <span>Private — only you and {{ recipient.first_name }} can see this</span>
+                        <span><i class="fa-solid fa-lock" aria-hidden="true"></i> Private — only you and {{ recipient.first_name }} can see this</span>
                       </div>
 
                       <div id="{{ tgt_id }}" class="thread__messages msgs--time-above">

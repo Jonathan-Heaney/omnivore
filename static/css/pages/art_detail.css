@@ -1045,24 +1045,42 @@
   }
 }
 
-/* privacy chip — always centered */
+/* Privacy chip: snug on desktop, wraps on small screens */
 .conv-privacy {
-  display: flex; /* block-level, not inline */
+  display: flex; /* shrink to content width */
   align-items: center;
+  justify-content: center;
   gap: 8px;
 
-  width: max-content; /* shrink to fit text */
-  margin: 8px auto 12px; /* <-- centers the chip */
+  width: max-content; /* 👈 keeps it tight on desktop */
+  margin: 8px auto 12px;
 
+  padding: 4px 12px; /* back to the tighter padding */
   font-size: 0.9rem;
   color: var(--muted);
   background: #fff;
   border: 1px solid var(--soft-stroke);
   border-radius: 999px;
-  padding: 4px 12px;
 }
-.conv-privacy i {
-  font-size: 0.9em;
+
+.conv-privacy span {
+  /* text lives here (with the lock) */
+  display: inline; /* natural flow */
+  white-space: nowrap; /* default: single line on roomy screens */
+}
+
+/* Small screens: allow wrapping and prevent overflow */
+@media (max-width: 600px) {
+  .conv-privacy {
+    width: auto; /* let the container shrink */
+    max-width: calc(100% - 24px); /* side padding guard */
+    text-align: center;
+  }
+  .conv-privacy span {
+    white-space: normal; /* allow line breaks on mobile */
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
 }
 
 /* screen-reader only label */
@@ -1078,12 +1096,12 @@
   border: 0;
 }
 
-/* Optional: hide chip on very small screens if space is tight */
+/* Optional: hide chip on very small screens if space is tight
 @media (max-width: 380px) {
   .conv-privacy {
     display: none;
   }
-}
+} */
 
 /* unread state in thread headers */
 .thread__header--unread {
