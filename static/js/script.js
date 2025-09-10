@@ -460,3 +460,54 @@ document.body.addEventListener('htmx:afterSwap', () => {
   document.addEventListener('DOMContentLoaded', focusReply);
   window.addEventListener('pageshow', focusReply); // handles back/forward bfcache
 })();
+
+// iOS fixer to navigate directly to reply box from Received Art
+(function () {
+  // Only when we actually intend to land at the reply box.
+  var params = new URLSearchParams(location.search);
+  if (!params.has('focus')) return;
+
+  // iOS WebKit (all iPhone/iPad browsers)
+  var ua = navigator.userAgent || '';
+  var isIOS = /iPad|iPhone|iPod/.test(ua);
+  if (!isIOS) return;
+
+  var reply = document.getElementById('reply');
+  if (!reply) return;
+
+  var ta = reply.querySelector('textarea');
+  if (ta) {
+    try {
+      ta.focus({ preventScroll: true });
+    } catch (e) {
+      ta.focus();
+    }
+  }
+
+  // Ensure the reply area is actually visible once, without smooth scrolling.
+  requestAnimationFrame(function () {
+    var rect = reply.getBoundingClientRect();
+    var headerOffset =
+      parseInt(
+        getComputedStyle(document.documentElement).getPropertyValue(
+          '--nav-offset'
+        )
+      ) || 50;
+
+    // If clipped above or below viewport, nudge it into view.
+    var topNeeded = rect.top - headerOffset - 8; // keep a little air
+    var clippedAbove = rect.top - headerOffset < 0;
+    var clippedBelow = rect.bottom > window.innerHeight;
+
+    if (clippedAbove || clippedBelow) {
+      window.scrollBy({ top: topNeeded, left: 0, behavior: 'auto' });
+    }
+  });
+
+  // Optional: clean the URL so refreshes don’t re-run the nudge
+  try {
+    var clean = new URL(location.href);
+    clean.searchParams.delete('focus');
+    history.replaceState(null, '', clean);
+  } catch (_) {}
+})();
