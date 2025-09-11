@@ -22,35 +22,16 @@
   </div>
 
   <div class="welcome-oliver-wrap">
-    <picture>
-      <source
-        type="image/avif"
-        srcset="
-          {% static 'images/oliver-no-bg-240.avif' %} 240w,
-          {% static 'images/oliver-no-bg-360.avif' %} 360w,
-          {% static 'images/oliver-no-bg-480.avif' %} 480w,
-          {% static 'images/oliver-no-bg-720.avif' %} 720w
-        "
-        sizes="(max-width: 576px) 44vw, (max-width: 992px) 32vw, 360px"
-      />
-      <source
-        type="image/webp"
-        srcset="
-          {% static 'images/oliver-no-bg-240.webp' %} 240w,
-          {% static 'images/oliver-no-bg-360.webp' %} 360w,
-          {% static 'images/oliver-no-bg-480.webp' %} 480w,
-          {% static 'images/oliver-no-bg-720.webp' %} 720w
-        "
-        sizes="(max-width: 576px) 44vw, (max-width: 992px) 32vw, 360px"
-      />
-      <img
-        class="welcome-oliver"
-        src="{% static 'images/oliver-no-bg-360.png' %}"
-        alt="Oliver the Omnivore mascot"
-        width="360" height="360"
-        loading="eager" decoding="async" fetchpriority="high"
-      />
-    </picture>
+    <img class="welcome-oliver"
+          src="{% static 'images/oliver-no-bg-720.png' %}"
+          srcset="
+            {% static 'images/oliver-no-bg-360.png' %} 360w,
+            {% static 'images/oliver-no-bg-720.png' %} 720w,
+            {% static 'images/oliver-no-bg-900.png' %} 900w,
+            {% static 'images/oliver-no-bg-1080.png' %} 1080w"
+          sizes="(max-width: 576px) 220px, (max-width: 992px) 320px, 360px"
+          alt="Oliver the Omnivore mascot"
+          loading="eager" decoding="async" fetchpriority="high" />
     <div class="welcome-caption">Oliver the Omnivore</div>
   </div>
 </div>
