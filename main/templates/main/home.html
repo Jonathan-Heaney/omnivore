@@ -30,12 +30,47 @@
 
     <div class="col-12 col-lg-6 text-center">
       <div class="oliver-wrap">
-        <img
-          class="oliver-hero"
-          src="{% static 'images/oliver-no-bg.png' %}"
-          alt="Oliver the Omnivore mascot"
-          width="360" height="360" loading="lazy"
-        />
+        <picture>
+          <source
+            type="image/avif"
+            srcset="
+              {% static 'images/oliver-no-bg-160.avif' %} 160w,
+              {% static 'images/oliver-no-bg-240.avif' %} 240w,
+              {% static 'images/oliver-no-bg-360.avif' %} 360w,
+              {% static 'images/oliver-no-bg-480.avif' %} 480w,
+              {% static 'images/oliver-no-bg-720.avif' %} 720w
+            "
+            sizes="(max-width: 576px) 220px, (max-width: 992px) 320px, 360px"
+          />
+          <source
+            type="image/webp"
+            srcset="
+              {% static 'images/oliver-no-bg-160.webp' %} 160w,
+              {% static 'images/oliver-no-bg-240.webp' %} 240w,
+              {% static 'images/oliver-no-bg-360.webp' %} 360w,
+              {% static 'images/oliver-no-bg-480.webp' %} 480w,
+              {% static 'images/oliver-no-bg-720.webp' %} 720w
+            "
+            sizes="(max-width: 576px) 220px, (max-width: 992px) 320px, 360px"
+          />
+          <img
+            class="oliver-hero"
+            src="{% static 'images/oliver-no-bg-360.png' %}"
+            srcset="
+              {% static 'images/oliver-no-bg-160.png' %} 160w,
+              {% static 'images/oliver-no-bg-240.png' %} 240w,
+              {% static 'images/oliver-no-bg-360.png' %} 360w,
+              {% static 'images/oliver-no-bg-480.png' %} 480w,
+              {% static 'images/oliver-no-bg-720.png' %} 720w
+            "
+            sizes="(max-width: 576px) 220px, (max-width: 992px) 320px, 360px"
+            alt="Oliver the Omnivore mascot"
+            width="360" height="360"
+            loading="eager"
+            decoding="async"
+            fetchpriority="high"
+          />
+        </picture>
         <span class="oliver-bubble" aria-hidden="true">hi, i’m oliver!</span>
         <div class="oliver-caption">Oliver the Omnivore</div>
       </div>
