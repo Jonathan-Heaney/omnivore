@@ -465,7 +465,8 @@ document.body.addEventListener('htmx:afterSwap', () => {
 (function () {
   // Only when we actually intend to land at the reply box.
   var params = new URLSearchParams(location.search);
-  if (!params.has('focus')) return;
+  var focus = params.get('focus');
+  if (focus !== 'thread') return; // <- ignore focus=piece and no focus
 
   // iOS WebKit (all iPhone/iPad browsers)
   var ua = navigator.userAgent || '';
