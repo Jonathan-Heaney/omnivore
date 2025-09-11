@@ -36,3 +36,8 @@
   font-size: 0.9rem;
   box-shadow: 0 4px 14px -6px rgba(16, 24, 40, 0.08);
 }
+
+.value-header {
+  color: var(--brand-600);
+  font-weight: 700;
+}
