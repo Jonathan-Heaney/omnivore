@@ -9,13 +9,16 @@ import uuid
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models.functions import Lower
+from main.utils.username import _clean_base, generate_unique_username
 
 
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
+    # Make username optional at the model level; we’ll fill it in automatically.
+    username = models.CharField(max_length=150, unique=True, blank=True)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
+    REQUIRED_FIELDS = ['first_name', 'last_name']
 
     email_on_art_shared = models.BooleanField(default=True)
     email_on_comment = models.BooleanField(default=True)
@@ -55,10 +58,17 @@ class CustomUser(AbstractUser):
             self.first_name = self.first_name.strip()
         if self.last_name:
             self.last_name = self.last_name.strip()
-        super().save(*args, **kwargs)
 
-    def __str__(self):
-        return f'{self.first_name} {self.last_name}'
+        # Auto-assign a unique handle if missing
+        if not self.username:
+            self.username = generate_unique_username(
+                self.first_name or '',
+                self.last_name or '',
+                self.email or '',
+                Model=type(self),
+            )
+
+        super().save(*args, **kwargs)
 
     class Meta:
         constraints = [
@@ -66,8 +76,14 @@ class CustomUser(AbstractUser):
             models.UniqueConstraint(
                 Lower('email'),
                 name='uniq_user_email_lower'
-            )
+            ),
+            models.UniqueConstraint(
+                Lower('username'), name='uniq_username_lower'),
         ]
+
+    def __str__(self):
+        full = f'{self.first_name} {self.last_name}'.strip()
+        return full or self.email
 
 
 class NotDeletedManager(models.Manager):

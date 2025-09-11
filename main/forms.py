@@ -25,12 +25,6 @@ class RegisterForm(UserCreationForm):
         attrs={"autocomplete": "family-name"}))
     email = forms.EmailField(required=True, widget=forms.EmailInput(
         attrs={"autocomplete": "email"}))
-    username = forms.CharField(
-        required=True,
-        validators=[validate_username],
-        help_text="Choose a unique username (not your email).",
-        widget=forms.TextInput(attrs={"autocomplete": "username"})
-    )
     password1 = forms.CharField(
         label="Password",
         widget=forms.PasswordInput(
@@ -44,12 +38,12 @@ class RegisterForm(UserCreationForm):
 
     class Meta:
         model = CustomUser
-        fields = ["first_name", "last_name", "username",
+        fields = ["first_name", "last_name",
                   "email", "password1", "password2"]
 
     def clean_email(self):
         email = (self.cleaned_data.get("email") or "").strip().lower()
-        if CustomUser.objects.filter(email=email).exists():
+        if CustomUser.objects.filter(email__iexact=email).exists():
             raise forms.ValidationError(
                 "An account with this email already exists.")
         return email
@@ -77,7 +71,6 @@ class RegisterForm(UserCreationForm):
             Field("first_name"),
             Field("last_name"),
             Field("email"),
-            Field("username"),
             Field("password1"),
             Field("password2"),
             HTML(
@@ -128,12 +121,11 @@ class CustomAuthenticationForm(AuthenticationForm):
 class AccountInfoForm(forms.ModelForm):
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'email', 'username']
+        fields = ['first_name', 'last_name', 'email']
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-control'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
-            'username': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
     def clean_email(self):

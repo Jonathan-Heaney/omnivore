@@ -160,6 +160,12 @@ STORAGES = {
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "OPTIONS": {
+            # which user fields to compare against
+            "user_attributes": ("email", "first_name", "last_name"),
+            # be a bit less strict than default 0.7
+            "max_similarity": 0.9,
+        },
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
