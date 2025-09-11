@@ -412,3 +412,16 @@ input[type='password'] {
 html {
   -webkit-text-size-adjust: 100%;
 }
+
+/* Fix navbar gap widths */
+/* Default: mobile (collapsed menu) */
+.nav-gap {
+  gap: 0; /* ~Bootstrap gap-2 */
+}
+
+/* Medium and up (desktop nav) */
+@media (min-width: 575.98px) {
+  .nav-gap {
+    gap: 1.25rem; /* a little more breathing room */
+  }
+}
