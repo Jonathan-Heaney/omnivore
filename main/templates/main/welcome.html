@@ -17,7 +17,12 @@
   </header>
 
   {% if welcome_piece %}
-    <p class="lead text-muted">We're so glad you're here! We hope you enjoy this welcome gift from our community.</p><br>
+    <p>Hello! This is Jonathan, the creator of Omnivore Arts. I’m so glad you’re here! My hope is that Omnivore feels like a place where you can share what you love, discover something unexpected, and have meaningful conversations about art.
+
+    <p>Each Friday you’ll receive a new piece of art, drawn at random from what the community has shared. Until then, I’d like to offer this first piece as a small token of my gratitude. Omnivore wouldn’t be the same without you—I can’t wait to see what you’ll share!</p>
+
+    <p>Talk soon, <br>
+      Jonathan</p> <br>
 
     <!-- Same structure/classes as My Received, minus likes & conversation preview -->
     <section id="art-{{ welcome_piece.public_id }}" class="received-card">
@@ -53,7 +58,7 @@
     </section>
 
     <p class="small text-muted mt-2">
-      This gift has also been added to your
+      This piece has also been added to your
       <a href="{% url 'my_received_art' %}#art-{{ welcome_piece.public_id }}">My Received Art</a>
       so you can revisit it later.
     </p>
