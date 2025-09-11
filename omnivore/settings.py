@@ -187,6 +187,8 @@ USE_I18N = True
 
 FORMS_URLFIELD_ASSUME_HTTPS = True
 
+NEW_BADGE_WINDOW_DAYS = 30
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 

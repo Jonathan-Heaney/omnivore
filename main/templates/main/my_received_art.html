@@ -54,7 +54,7 @@
             Shared by <strong>{{ piece.user.first_name }} {{ piece.user.last_name }}</strong>
           </div>
 
-          {% if not received.seen_at %}
+          {% if received.is_new %}
             <span class="badge-new" title="New">New</span>
           {% endif %}
         </header>

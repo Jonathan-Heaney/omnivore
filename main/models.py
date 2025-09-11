@@ -7,6 +7,7 @@ from django.db.models import Q, UniqueConstraint
 from urllib.parse import urlencode
 import uuid
 from django.utils import timezone
+from datetime import timedelta
 from django.db.models.functions import Lower
 
 
@@ -152,6 +153,13 @@ class SentArtPiece(models.Model):
 
     source = models.CharField(
         max_length=20, choices=SOURCE_CHOICES, default="weekly")
+
+    @property
+    def is_new(self) -> bool:
+        if self.seen_at is not None:
+            return False
+        window = getattr(settings, "NEW_BADGE_WINDOW_DAYS", 30)
+        return self.sent_time >= timezone.now() - timedelta(days=window)
 
     class Meta:
         unique_together = ('user', 'art_piece')
