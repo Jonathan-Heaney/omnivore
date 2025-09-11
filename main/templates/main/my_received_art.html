@@ -12,7 +12,50 @@
 {% block content %}
 
 <div class="container-narrow py-4">
-<h1 class="page-title">My Received Art</h1>
+
+<!-- Welcome hero -->
+<div class="welcome-hero">
+  <div class="welcome-bubble" aria-hidden="true">
+    <strong>Welcome!</strong>
+    This is your home for discovering new art. Everything you’ve received lives below.
+    Come back every Friday for a new piece!
+  </div>
+
+  <div class="welcome-oliver-wrap">
+    <picture>
+      <source
+        type="image/avif"
+        srcset="
+          {% static 'images/oliver-no-bg-240.avif' %} 240w,
+          {% static 'images/oliver-no-bg-360.avif' %} 360w,
+          {% static 'images/oliver-no-bg-480.avif' %} 480w,
+          {% static 'images/oliver-no-bg-720.avif' %} 720w
+        "
+        sizes="(max-width: 576px) 44vw, (max-width: 992px) 32vw, 360px"
+      />
+      <source
+        type="image/webp"
+        srcset="
+          {% static 'images/oliver-no-bg-240.webp' %} 240w,
+          {% static 'images/oliver-no-bg-360.webp' %} 360w,
+          {% static 'images/oliver-no-bg-480.webp' %} 480w,
+          {% static 'images/oliver-no-bg-720.webp' %} 720w
+        "
+        sizes="(max-width: 576px) 44vw, (max-width: 992px) 32vw, 360px"
+      />
+      <img
+        class="welcome-oliver"
+        src="{% static 'images/oliver-no-bg-360.png' %}"
+        alt="Oliver the Omnivore mascot"
+        width="360" height="360"
+        loading="eager" decoding="async" fetchpriority="high"
+      />
+    </picture>
+    <div class="welcome-caption">Oliver the Omnivore</div>
+  </div>
+</div>
+
+<h1 class="page-title">Gallery</h1>
 
 {% if request.user.is_authenticated and request.user.receive_art_paused %}
 <div class='container-narrow'>
