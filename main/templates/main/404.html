@@ -10,7 +10,9 @@
 {% endblock %}
 
 {% block content %}
-  <h1 class="header">Oops! Page Not Found</h1>
+<div class="container-narrow py-4">
+  <h1 class="page-title">Oops! Page Not Found</h1>
   <p>Sorry, the page you were looking for doesn’t exist.</p>
   <a href="{% url 'home' %}" class="btn-fallback">Back to Home</a>
+</div>
 {% endblock %}
