@@ -19,7 +19,7 @@
   {% if welcome_piece %}
     <p>Hello! This is Jonathan, the creator of Omnivore Arts. I’m so glad you’re here! My hope is that Omnivore feels like a place where you can share what you love, discover something unexpected, and have meaningful conversations about art.
 
-    <p>Each Friday you’ll receive a new piece of art, drawn at random from what the community has shared. Until then, I’d like to offer this first piece as a small token of my gratitude. Omnivore wouldn’t be the same without you—I can’t wait to see what you’ll share!</p>
+    <p>Each Friday you’ll receive a new piece of art, drawn at random from what the community has shared. Until then, I’d like to offer this first piece as a small welcome gift. Omnivore wouldn’t be the same without you—I can’t wait to see what you’ll share!</p>
 
     <p>Talk soon, <br>
       Jonathan</p> <br>
@@ -29,7 +29,7 @@
       <!-- Header -->
       <header class="received-card__header">
         <div class="received-card__titlewrap">
-          <a class="received-card__title" href="{% url 'art_detail' welcome_piece.public_id %}">
+          <a class="received-card__title" href="{% url 'art_detail' welcome_piece.public_id %}?focus=piece">
             <strong>{{ welcome_piece.piece_name }}</strong>
           </a>
           <span class="received-card__by">({{ welcome_piece.artist_name }})</span>

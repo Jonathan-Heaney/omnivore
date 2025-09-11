@@ -558,7 +558,7 @@ def art_piece_detail(request, public_id):
         "is_liked": Like.objects.filter(user=user, art_piece=piece).exists(),
         "likes_dict": likes_dict,  # not used in recipient view, but harmless
         # no autofocus if deleted
-        "autofocus_reply": (focus != "piece") and can_reply,
+        "autofocus_reply": (focus == "thread") and can_reply,
         "can_reply": can_reply,
     }
     return render(request, "main/art_piece_detail.html", context)

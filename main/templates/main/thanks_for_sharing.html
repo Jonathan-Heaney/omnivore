@@ -35,14 +35,14 @@
       <p class="lead text-muted">
         We really appreciate you sharing this work of art with our community! Omnivore Arts is made possible by these gifts from people like you.
       </p>
-      <p class="lead text-muted">As a token of our gratitude, here’s something for you:</p>
+      <p class="lead text-muted">As a small token of our gratitude, here’s something for you:</p>
       <br>
       <!-- Match My Received card look, minus likes & conversation preview -->
       <section id="art-{{ reciprocal_piece.public_id }}" class="received-card">
         <!-- Header -->
         <header class="received-card__header">
           <div class="received-card__titlewrap">
-            <a class="received-card__title" href="{% url 'art_detail' reciprocal_piece.public_id %}">
+            <a class="received-card__title" href="{% url 'art_detail' reciprocal_piece.public_id %}?focus=piece">
               <strong>{{ reciprocal_piece.piece_name }}</strong>
             </a>
             <span class="received-card__by">({{ reciprocal_piece.artist_name }})</span>
