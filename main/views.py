@@ -72,7 +72,6 @@ def welcome_page(request):
 
 def choose_welcome_piece_weighted(user):
     qs = ArtPiece.active.filter(
-        approved_status=True,
         welcome_eligible=True,
     ).exclude(
         user=user
