@@ -109,11 +109,15 @@ def send_shared_art_email(*, recipient, sender, art_piece, notification_id=None)
     cta_url = _abs_url(
         settings.SITE_URL, f"{reverse('art_detail', args=[art_piece.public_id])}?{urlencode(params)}")
 
+    share_url = _abs_url(
+        settings.SITE_URL, f"{reverse('share_art')}")
+
     context = {
         "recipient": recipient,
         "sender": sender,
         "art_piece": art_piece,
         "cta_url": cta_url,
+        "share_url": share_url,
         "unsubscribe_url": unsubscribe_url,
     }
 

@@ -416,7 +416,7 @@ html {
 /* Fix navbar gap widths */
 /* Default: mobile (collapsed menu) */
 .nav-gap {
-  gap: 0; /* ~Bootstrap gap-2 */
+  gap: 0.25rem; /* ~Bootstrap gap-2 */
 }
 
 /* Medium and up (desktop nav) */
