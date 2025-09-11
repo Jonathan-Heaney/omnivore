@@ -1,41 +1,15 @@
-{# heart_button.html #}
 {# Decide initial liked state. Prefer explicit is_liked, else fall back to liked_pieces. #}
 
 {% if is_liked is not None %}
   {% with initial_liked=is_liked %}
-    <button
-      type="button"
-      class="like-button{% if initial_liked %} liked{% endif %}"
-      data-piece-id="{{ piece.id }}"
-      aria-pressed="{% if initial_liked %}true{% else %}false{% endif %}">
-      <span class="heart-icon">{% if initial_liked %}❤️{% else %}♡{% endif %}</span>
-      <span class="like-text">{% if initial_liked %}Loved{% else %}Love{% endif %}</span>
-    </button>
+    {% include "main/_heart_button_inner.html" %}
   {% endwith %}
-
+{% elif liked_pieces and piece.id in liked_pieces %}
+  {% with initial_liked=True %}
+    {% include "main/_heart_button_inner.html" %}
+  {% endwith %}
 {% else %}
-  {# No explicit is_liked provided. Fall back to liked_pieces if available. #}
-  {% if liked_pieces and piece.id in liked_pieces %}
-    {% with initial_liked=True %}
-      <button
-        type="button"
-        class="like-button liked"
-        data-piece-id="{{ piece.id }}"
-        aria-pressed="true">
-        <span class="heart-icon">❤️</span>
-        <span class="like-text">Loved</span>
-      </button>
-    {% endwith %}
-  {% else %}
-    {% with initial_liked=False %}
-      <button
-        type="button"
-        class="like-button"
-        data-piece-id="{{ piece.id }}"
-        aria-pressed="false">
-        <span class="heart-icon">♡</span>
-        <span class="like-text">Love</span>
-      </button>
-    {% endwith %}
-  {% endif %}
+  {% with initial_liked=False %}
+    {% include "main/_heart_button_inner.html" %}
+  {% endwith %}
 {% endif %}

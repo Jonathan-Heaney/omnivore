@@ -4,7 +4,11 @@ from django.db import models
 from django.conf import settings
 from django.urls import reverse
 from django.db.models import Q, UniqueConstraint
+from urllib.parse import urlencode
 import uuid
+from django.utils import timezone
+from datetime import timedelta
+from django.db.models.functions import Lower
 
 
 class CustomUser(AbstractUser):
@@ -23,6 +27,10 @@ class CustomUser(AbstractUser):
     # So you don't have to query SentArtPiece each time
     last_art_sent_at = models.DateTimeField(null=True, blank=True)
 
+    # Store IANA tz name, e.g. "America/New_York"
+    timezone = models.CharField(
+        max_length=64, null=True, blank=True)
+
     groups = models.ManyToManyField(
         'auth.Group',
         related_name='customuser_set',
@@ -40,12 +48,31 @@ class CustomUser(AbstractUser):
     )
 
     def save(self, *args, **kwargs):
-        self.first_name = self.first_name.strip()
-        self.last_name = self.last_name.strip()
+        # Normalize
+        if self.email:
+            self.email = self.email.strip().lower()
+        if self.first_name:
+            self.first_name = self.first_name.strip()
+        if self.last_name:
+            self.last_name = self.last_name.strip()
         super().save(*args, **kwargs)
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
+
+    class Meta:
+        constraints = [
+            # Enforce case-insensitive uniqueness at DB level (Postgres)
+            models.UniqueConstraint(
+                Lower('email'),
+                name='uniq_user_email_lower'
+            )
+        ]
+
+
+class NotDeletedManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_deleted=False)
 
 
 class ArtPiece(models.Model):
@@ -66,6 +93,41 @@ class ArtPiece(models.Model):
         editable=False,
         db_index=True,
     )
+
+    is_deleted = models.BooleanField(default=False, db_index=True)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+    deleted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='deleted_artpieces'
+    )
+    delete_reason = models.CharField(max_length=200, blank=True)
+
+    objects = models.Manager()        # all rows
+    active = NotDeletedManager()      # only not-deleted
+
+    def soft_delete(self, *, user=None, reason=''):
+        if self.is_deleted:
+            return
+        self.is_deleted = True
+        self.deleted_at = timezone.now()
+        self.deleted_by = user
+        self.delete_reason = reason[:200]
+        self.approved_status = False
+        self.save(update_fields=['is_deleted',
+                  'deleted_at', 'deleted_by', 'delete_reason'])
+
+    # optional: undelete for admin
+    def restore(self):
+        if not self.is_deleted:
+            return
+        self.is_deleted = False
+        self.deleted_at = None
+        self.deleted_by = None
+        self.delete_reason = ''
+        self.save(update_fields=['is_deleted',
+                  'deleted_at', 'deleted_by', 'delete_reason'])
 
     def get_absolute_url(self):
         from django.urls import reverse
@@ -91,6 +153,13 @@ class SentArtPiece(models.Model):
 
     source = models.CharField(
         max_length=20, choices=SOURCE_CHOICES, default="weekly")
+
+    @property
+    def is_new(self) -> bool:
+        if self.seen_at is not None:
+            return False
+        window = getattr(settings, "NEW_BADGE_WINDOW_DAYS", 30)
+        return self.sent_time >= timezone.now() - timedelta(days=window)
 
     class Meta:
         unique_together = ('user', 'art_piece')
@@ -239,19 +308,35 @@ class Notification(models.Model):
     from django.urls import reverse
 
     def get_redirect_url(self):
-        """
-        Always deep-link to the art detail page.
-        Include ?n=<id> so the landing view (or redirect view) can mark it read.
-        """
-        # Fallback: notifications list if somehow no piece is attached
         if not self.art_piece_id:
             return reverse("notifications")
 
-        # Always go to the art detail page (owner/recipient view is handled server-side)
         url = reverse("art_detail", args=[self.art_piece.public_id])
 
-        # Preserve the "n" param so clicks from the notifications page also mark as read
-        return f"{url}?n={self.id}"
+        params = {"n": self.id}
+
+        # Where should the detail page land/focus?
+        if self.notification_type == "comment":
+            # owner will have many threads; sender is the "other" to open
+            # recipient has only one thread — still fine to say "thread"
+            params.update({"focus": "thread", "other": self.sender_id})
+        elif self.notification_type in ("like", "shared_art"):
+            params.update({"focus": "piece"})  # don't open/focus any thread
+
+        return f"{url}?{urlencode(params)}"
 
     def __str__(self):
         return f'{self.sender} -> {self.recipient} ({self.notification_type})'
+
+
+class Feedback(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL
+    )
+    page = models.URLField(max_length=1024, blank=True)
+    user_agent = models.TextField(blank=True)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [models.Index(fields=["created_at"])]

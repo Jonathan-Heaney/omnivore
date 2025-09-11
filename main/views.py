@@ -4,26 +4,30 @@ from django.db.models import Q, Count
 from django.http import Http404
 from django.http import JsonResponse, Http404
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import RegisterForm, ArtPieceForm, CommentForm, AccountInfoForm, ArtDeliveryForm, EmailPreferencesForm, CustomPasswordChangeForm
+from .forms import RegisterForm, ArtPieceForm, CommentForm, AccountInfoForm, ArtDeliveryForm, EmailPreferencesForm, CustomPasswordChangeForm, CustomSetPasswordForm
 from django.contrib import messages
 from django.contrib.auth import login, logout, update_session_auth_hash, authenticate, views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.utils.html import strip_tags
 from django.core.mail import send_mail
-from django.urls import reverse
-from django.db import transaction
+from django.urls import reverse, reverse_lazy
+from django.db import IntegrityError, transaction
 import random
 from collections import defaultdict
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
-from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
+from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.core.signing import BadSignature, SignatureExpired
 from django.utils import timezone
 from datetime import timedelta
 from django.views.decorators.http import require_POST
 from django.views.decorators.cache import never_cache
-from .models import ArtPiece, SentArtPiece, CustomUser, Comment, Like, Notification, ReciprocalGrant, WelcomeGrant
+from .models import ArtPiece, SentArtPiece, CustomUser, Comment, Like, Notification, ReciprocalGrant, WelcomeGrant, Feedback
 from main.utils.email_unsub import load_unsub_token
+import json
+from django.utils.http import url_has_allowed_host_and_scheme
+from zoneinfo import ZoneInfo
+from django.conf import settings
 
 
 def home(request):
@@ -67,7 +71,7 @@ def welcome_page(request):
 
 
 def choose_welcome_piece_weighted(user):
-    qs = ArtPiece.objects.filter(
+    qs = ArtPiece.active.filter(
         approved_status=True,
         welcome_eligible=True,
     ).exclude(
@@ -210,34 +214,55 @@ def edit_art_piece(request, public_id):
 @login_required(login_url="/login")
 @require_POST
 def delete_art_piece(request, public_id):
-    art_piece = get_object_or_404(
-        ArtPiece, public_id=public_id, user=request.user)
-    art_piece.delete()
+    piece = get_object_or_404(ArtPiece, public_id=public_id, user=request.user)
+    piece.soft_delete(user=request.user, reason='user-initiated')
+    piece.approved_status = False
+    piece.save(update_fields=['approved_status'])
+
+    messages.success(
+        request, "Your piece was deleted. Past recipients will see it as removed.")
+
+    # Figure out where to go next (passed from the page where the user clicked delete)
+    next_url = request.POST.get("next")
+    if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+        return redirect(next_url)
+
+    # Fallback: owner’s list
     return redirect("my_shared_art")
 
 
 @login_required(login_url="/login")
 def my_shared_art(request):
+    """
+    Owner’s list: show piece cards + conversation summary:
+      - conv_count        : number of distinct 1:1 threads
+      - unread_msg_count  : total unread comment notifications
+      - new_convo_count   : threads opened since last visit (no owner reply, all unread)
+    """
     user = request.user
-    my_pieces = ArtPiece.objects.filter(user=user).order_by('-created_at')
+    my_pieces = ArtPiece.active.filter(user=user).order_by('-created_at')
+    piece_ids = list(my_pieces.values_list('id', flat=True))
 
-    # Keep legacy mark-as-read support for links that still point here
+    # Legacy support: mark read if older links still point here with ?n=
     n_id = request.GET.get("n")
     if n_id:
         Notification.objects.filter(
-            id=n_id, recipient=request.user, is_read=False
+            id=n_id, recipient=user, is_read=False
         ).update(is_read=True)
 
-    # Summaries instead of full threads
-    comments_qs = (Comment.objects
-                   .filter(art_piece__in=my_pieces)
-                   .select_related('sender', 'recipient', 'art_piece')
-                   .order_by('created_at'))
+    # ---------- Build conversation basics (conv_count, last) ----------
+    comments_qs = (
+        Comment.objects
+        .filter(art_piece_id__in=piece_ids)
+        .select_related('sender', 'recipient', 'art_piece')
+        .order_by('created_at')  # chronological for "last" picking
+    )
 
     conv_set_by_piece = defaultdict(set)   # piece_id -> set(other_user_id)
     last_comment_by_piece = {}             # piece_id -> latest Comment
 
     for c in comments_qs:
+        # "other" relative to owner
         other = c.recipient if c.sender_id == user.id else c.sender
         pid = c.art_piece_id
         conv_set_by_piece[pid].add(other.id)
@@ -245,31 +270,69 @@ def my_shared_art(request):
         if prev is None or c.created_at > prev.created_at:
             last_comment_by_piece[pid] = c
 
-    unread_counts = {
-        row['art_piece_id']: row['cnt']
-        for row in (Notification.objects
-                    .filter(recipient=user,
-                            is_read=False,
-                            notification_type='comment',
-                            art_piece__in=my_pieces)
-                    .values('art_piece_id')
-                    .annotate(cnt=Count('id')))
-    }
+    # ---------- Unread messages & NEW conversation logic ----------
+    # Aggregate comment notifications by (piece, sender, is_read)
+    notif_rows = (
+        Notification.objects
+        .filter(
+            recipient=user,
+            notification_type='comment',
+            art_piece_id__in=piece_ids,
+        )
+        .values('art_piece_id', 'sender_id', 'is_read')
+        .annotate(cnt=Count('id'))
+    )
 
+    # piece_id -> total unread message count
+    new_msg_counts = defaultdict(int)
+    # (piece_id, other_id) -> counts
+    pair_counts = defaultdict(lambda: {'unread': 0, 'read': 0})
+
+    for r in notif_rows:
+        pid = r['art_piece_id']
+        sender_id = r['sender_id']
+        if r['is_read']:
+            pair_counts[(pid, sender_id)]['read'] = r['cnt']
+        else:
+            pair_counts[(pid, sender_id)]['unread'] = r['cnt']
+            new_msg_counts[pid] += r['cnt']
+
+    # Has owner replied in a given (piece, other) thread?
+    # (Owners can't start threads; any owner message will be a reply = parent_comment not null)
+    owner_reply_pairs = set(
+        Comment.objects
+        .filter(art_piece_id__in=piece_ids, sender=user, parent_comment__isnull=False)
+        .values_list('art_piece_id', 'recipient_id')
+        .distinct()
+    )
+
+    # Count NEW conversations: unread>0 AND read==0 AND owner hasn't replied yet
+    new_conv_counts = defaultdict(int)
+    for (pid, other_id), counts in pair_counts.items():
+        if counts['unread'] > 0 and counts['read'] == 0 and (pid, other_id) not in owner_reply_pairs:
+            new_conv_counts[pid] += 1
+
+    # ---------- Likes (unchanged) ----------
     likes_by_piece = defaultdict(list)
-    likes = (Like.objects
-             .filter(art_piece__in=my_pieces)
-             .select_related('user', 'art_piece'))
+    likes = (
+        Like.objects
+        .filter(art_piece_id__in=piece_ids)
+        .select_related('user', 'art_piece')
+        .order_by('-created_at')
+    )
     for like in likes:
-        likes_by_piece[like.art_piece].append(like.user)
+        likes_by_piece[like.art_piece].append(like.user)  # newest→oldest
 
+    # ---------- Summaries per piece ----------
     summaries = {}
     for piece in my_pieces:
         pid = piece.id
         summaries[pid] = {
             'conv_count': len(conv_set_by_piece.get(pid, set())),
-            'unread_count': unread_counts.get(pid, 0),
-            'last': last_comment_by_piece.get(pid),  # may be None
+            'new_msg_count': new_msg_counts.get(pid, 0),
+            'new_conv_count': new_conv_counts.get(pid, 0),
+            # kept for possible future use
+            'last': last_comment_by_piece.get(pid),
         }
 
     context = {
@@ -283,6 +346,10 @@ def my_shared_art(request):
 @never_cache
 @login_required(login_url="/login")
 def my_received_art(request):
+    """
+    Recipient’s home: show received pieces in reverse-chronological order,
+    with a compact conversation preview per piece (if any).
+    """
     user = request.user
     received_qs = (
         SentArtPiece.objects
@@ -291,28 +358,18 @@ def my_received_art(request):
         .order_by('-sent_time')
     )
 
-    # Preserve old behavior: mark a specific notification as read if ?n=...
+    # Legacy support: mark read if older links still point here with ?n=
     n_id = request.GET.get("n")
     if n_id:
         Notification.objects.filter(
-            id=n_id, recipient=request.user, is_read=False
+            id=n_id, recipient=user, is_read=False
         ).update(is_read=True)
 
-    # All pieces user has received
     pieces = [sap.art_piece for sap in received_qs]
     piece_ids = [p.id for p in pieces]
     sharer_ids_by_piece = {p.id: p.user_id for p in pieces}
 
-    # 1:1 comments between user and the sharer for all received pieces (bulk)
-    thread_qs = (
-        Comment.objects
-        .filter(art_piece_id__in=piece_ids)
-        .filter(
-            Q(sender=user, recipient_id__in=[
-              sharer_ids_by_piece[c.art_piece_id] for c in []])  # placeholder, see below
-        )
-    )
-    # ^^ The placeholder above isn't valid. Replace with the explicit ORs using the piece ↔ sharer mapping:
+    # 1:1 threads (recipient <-> sharer), chronological
     thread_qs = (
         Comment.objects
         .filter(art_piece_id__in=piece_ids)
@@ -324,17 +381,12 @@ def my_received_art(request):
         .order_by("created_at")
     )
 
-    # Group comments by art_piece_id (only user↔sharer)
-    threads_by_piece: dict[int, list[Comment]] = defaultdict(list)
+    threads_by_piece = defaultdict(list)
     for c in thread_qs:
         sharer_id = sharer_ids_by_piece.get(c.art_piece_id)
-        if sharer_id is None:
-            continue
-        # Keep only true 1:1 with the sharer
-        if {c.sender_id, c.recipient_id} == {user.id, sharer_id}:
+        if sharer_id and {c.sender_id, c.recipient_id} == {user.id, sharer_id}:
             threads_by_piece[c.art_piece_id].append(c)
 
-    # Optional: unread comment count per piece
     unread_by_piece = dict(
         Notification.objects
         .filter(
@@ -348,7 +400,6 @@ def my_received_art(request):
         .values_list("art_piece_id", "cnt")
     )
 
-    # Build previews
     previews = {}
     for p in pieces:
         t = threads_by_piece.get(p.id, [])
@@ -358,7 +409,6 @@ def my_received_art(request):
             "unread_count": unread_by_piece.get(p.id, 0),
         }
 
-    # Likes (unchanged)
     liked_pieces = set(
         Like.objects.filter(user=user, art_piece_id__in=piece_ids)
         .values_list('art_piece_id', flat=True)
@@ -374,163 +424,312 @@ def my_received_art(request):
 
 @login_required(login_url="/login")
 def art_piece_detail(request, public_id):
+    """
+    Read-only detail page that:
+      - marks relevant notifications read on GET,
+      - marks SentArtPiece.seen_at for recipients,
+      - shows likes,
+      - shows either:
+          * recipient view: single thread (chronological),
+          * owner view: many threads, ordered by most recent activity DESC,
+            with each thread’s messages chronological.
+    """
     piece = get_object_or_404(ArtPiece, public_id=public_id)
     user = request.user
+
+    n_id = request.GET.get("n")
+    if n_id:
+        Notification.objects.filter(
+            id=n_id,
+            recipient=user,
+            is_read=False,
+        ).update(is_read=True)
 
     is_owner = (piece.user_id == user.id)
     has_received = SentArtPiece.objects.filter(
         user=user, art_piece=piece).exists()
-    is_liked = False
-    if not is_owner:
-        is_liked = Like.objects.filter(user=user, art_piece=piece).exists()
+
     if not (is_owner or has_received):
         raise Http404("Not found")
 
-    # --- PIECE-LEVEL AUTO-READ ---
+    # Mark notifications for this piece as read (GET only)
     if request.method == "GET":
+        # 1) Everyone: likes are considered "seen" when you view the piece
         Notification.objects.filter(
             recipient=user,
             art_piece=piece,
             is_read=False,
-            notification_type__in=["like", "comment", "shared_art"],
+            notification_type="like",
         ).update(is_read=True)
 
-    # Mark the SentArtPiece as seen (only recipients, on GET) ---
+        # 2) Recipients only: comments & the shared_art ping are read on open
+        if not is_owner:
+            Notification.objects.filter(
+                recipient=user,
+                art_piece=piece,
+                is_read=False,
+                notification_type__in=["comment", "shared_art"],
+            ).update(is_read=True)
+
+    # Mark the SentArtPiece as seen (recipients only; GET)
     if request.method == "GET" and has_received and not is_owner:
         SentArtPiece.objects.filter(
             user=user, art_piece=piece, seen_at__isnull=True
         ).update(seen_at=timezone.now())
 
-    # Fetch likes for each piece
+    # Likes (for both modes; you use it differently in template)
     likes_dict = {}
-    likes = Like.objects.filter(art_piece=piece).select_related('user')
-    users = [like.user for like in likes]
-    likes_dict[piece] = users
+    likes = (
+        Like.objects
+        .filter(art_piece=piece)
+        .select_related('user')
+        .order_by('-created_at')  # 👈 force recency
+    )
+    likes_dict[piece] = [like.user for like in likes]  # newest→oldest
 
-    # --- HTMX POST handling (both modes) ---
-    is_htmx = request.headers.get(
-        "HX-Request") == "true" or "hx-request" in request.headers
-    if request.method == "POST" and is_htmx:
-        # OWNER replying in a specific 1:1 thread (reply_form posts comment_id)
-        if is_owner and "comment_id" in request.POST:
-            comment_id = request.POST.get("comment_id")
-            current_comment = get_object_or_404(
-                Comment.objects.select_related(
-                    "sender", "recipient", "art_piece"),
-                id=comment_id,
-                art_piece=piece,
-            )
-            # Walk up to top-level thread starter
-            while current_comment.parent_comment:
-                current_comment = current_comment.parent_comment
-            top = current_comment
+    focus = request.GET.get("focus")            # "piece" | "thread" | None
+    focus_other = request.GET.get("other")      # user id as str or None
 
-            form = CommentForm(request.POST)
-            if form.is_valid():
-                reply = form.save(commit=False)
-                reply.sender = user
-                # reply goes to the *other* participant of that thread
-                reply.recipient = top.sender if top.sender_id != user.id else top.recipient
-                reply.art_piece = piece
-                reply.parent_comment = top
-                reply.save()
+    can_reply = not piece.is_deleted
 
-                html = render_to_string(
-                    "main/comment_text.html", {"comment": reply}, request=request)
-                return HttpResponse(html)
-
-            return JsonResponse({"ok": False, "errors": form.errors}, status=400)
-
-        # RECIPIENT sending a new message to the sharer (comment_form posts art_piece_id)
-        if not is_owner and "add_comment" in request.POST:
-            # extra guard: ensure the viewer is part of this 1:1 with the sharer
-            if not has_received:
-                return JsonResponse({"ok": False, "error": "Not allowed"}, status=403)
-
-            # If a top-level thread already exists for (piece, sender=user, recipient=owner),
-            # fold this message into that thread as a reply.
-            top = (Comment.objects
-                   .filter(
-                       art_piece=piece,
-                       sender=user,
-                       recipient=piece.user,
-                       parent_comment__isnull=True,
-                   )
-                   .first())
-
-            form = CommentForm(request.POST)
-            if form.is_valid():
-                c = form.save(commit=False)
-                c.sender = user
-                c.recipient = piece.user
-                c.art_piece = piece
-                if top:
-                    c.parent_comment = top  # already have a thread → make this a reply
-                c.save()
-
-                html = render_to_string(
-                    "main/comment_text.html", {"comment": c}, request=request
-                )
-                return HttpResponse(html)
-
-            return JsonResponse({"ok": False, "errors": form.errors}, status=400)
-
-        # If we got here, the POST shape didn't match what we expect
-        return JsonResponse({"ok": False, "error": "Unsupported operation"}, status=400)
-
-   # --- GET rendering ---
     if is_owner:
+        # Fetch *all* comments where owner is a participant, chronological
         qs = (
             Comment.objects
             .filter(art_piece=piece)
             .filter(Q(sender=user) | Q(recipient=user))
             .select_related("sender", "recipient")
-            # keep messages chronological inside each thread
             .order_by("created_at")
         )
 
-        conversations = defaultdict(list)  # {other_user: [comments...]}
-        last_ts = {}                       # {other_user: latest_created_at}
-
+        # Group by the "other" participant
+        conversations = defaultdict(list)   # other_user -> [comments...]
+        last_ts = {}                        # other_user -> latest created_at
         for c in qs:
             other = c.recipient if c.sender_id == user.id else c.sender
-            # messages already oldest→newest
-            conversations[other].append(c)
-            # ends up as the thread's latest ts
+            conversations[other].append(c)        # messages oldest→newest
+            # ends up as latest per thread
             last_ts[other] = c.created_at
 
-        # Order threads by most-recent activity DESC
-        # conversations_list: list of (recipient_user, [comments...]) tuples
+        # Order threads by most recent activity (DESC)
         conversations_list = sorted(
-            conversations.items(),
+            conversations.items(),               # (other_user, [comments...])
             key=lambda kv: last_ts[kv[0]],
             reverse=True,
+        )
+
+        # map[other_user_id] -> unread count (comments sent by `other` to `user`)
+        unread_by_other = dict(
+            Notification.objects.filter(
+                recipient=user,
+                art_piece=piece,
+                notification_type="comment",
+                is_read=False,
+            )
+            .values_list("sender_id")
+            .annotate(cnt=Count("id"))
+            .values_list("sender_id", "cnt")
         )
 
         context = {
             "piece": piece,
             "mode": "owner",
-            "conversations": conversations_list,  # NOTE: now a list, not a dict
+            "conversations": conversations_list,   # list, not dict
+            "unread_by_other": unread_by_other,
             "is_liked": False,
             "likes_dict": likes_dict,
+            "focus": focus,
+            "focus_other": focus_other,
+            "can_reply": can_reply,
         }
         return render(request, "main/art_piece_detail.html", context)
 
-    else:
-        qs = (
-            Comment.objects
-            .filter(art_piece=piece)
-            .filter(Q(sender=user, recipient=piece.user) | Q(sender=piece.user, recipient=user))
-            .select_related("sender", "recipient")
-            .order_by("created_at")
+    # Recipient view: single 1:1 thread (chronological)
+    qs = (
+        Comment.objects
+        .filter(art_piece=piece)
+        .filter(Q(sender=user, recipient=piece.user) | Q(sender=piece.user, recipient=user))
+        .select_related("sender", "recipient")
+        .order_by("created_at")
+    )
+    context = {
+        "piece": piece,
+        "mode": "recipient",
+        "thread": list(qs),
+        "is_liked": Like.objects.filter(user=user, art_piece=piece).exists(),
+        "likes_dict": likes_dict,  # not used in recipient view, but harmless
+        # no autofocus if deleted
+        "autofocus_reply": (focus != "piece") and can_reply,
+        "can_reply": can_reply,
+    }
+    return render(request, "main/art_piece_detail.html", context)
+
+
+@require_POST
+@login_required(login_url="/login")
+def comments_create(request):
+    """
+    Unified endpoint for creating a Comment.
+    Accepts:
+      - art_piece_id (required)
+      - text (required)
+      - top_level_comment_id (optional)  -> when present, create a reply in that thread
+    Rules:
+      - Only the piece owner OR a recipient of that piece may post here.
+      - Only RECIPIENTS can start a new thread (no top_level_comment_id).
+      - Enforce "one thread per pair": coalesce new first message into existing top-level if it exists.
+    Returns the rendered 'main/comment_text.html' for HTMX swap.
+    """
+    user = request.user
+    art_piece_id = request.POST.get("art_piece_id")
+    text = (request.POST.get("text") or "").strip()
+    top_id = request.POST.get("top_level_comment_id")
+
+    if not art_piece_id or not text:
+        return JsonResponse({"ok": False, "error": "Missing fields"}, status=400)
+
+    piece = get_object_or_404(
+        ArtPiece.objects.select_related("user"), id=art_piece_id)
+    owner = piece.user
+
+    if piece.is_deleted:
+        # For HTMX, 409 (Conflict) is a nice “closed thread” signal
+        return JsonResponse(
+            {"ok": False, "error": "This conversation is closed because the piece was removed."},
+            status=409
         )
-        context = {
-            "piece": piece,
-            "mode": "recipient",
-            "thread": list(qs),
-            "is_liked": is_liked,
-        }
-        return render(request, "main/art_piece_detail.html", context)
+
+    # Participant check
+    is_owner = (owner_id := owner.id) == user.id
+    has_received = SentArtPiece.objects.filter(
+        user=user, art_piece=piece).exists()
+    if not (is_owner or has_received):
+        return JsonResponse({"ok": False, "error": "Not allowed"}, status=403)
+
+    # If replying to an existing thread
+    if top_id:
+        top = get_object_or_404(
+            Comment.objects.select_related("sender", "recipient", "art_piece"),
+            id=top_id,
+            art_piece=piece,
+            parent_comment__isnull=True,
+        )
+        # Must be a participant in that 1:1
+        if user.id not in {top.sender_id, top.recipient_id}:
+            return JsonResponse({"ok": False, "error": "Not allowed"}, status=403)
+
+        # Determine recipient: reply goes to the "other" participant
+        recipient = top.sender if top.sender_id != user.id else top.recipient
+
+        form = CommentForm(request.POST)
+        if not form.is_valid():
+            return JsonResponse({"ok": False, "errors": form.errors}, status=400)
+
+        reply = form.save(commit=False)
+        reply.sender = user
+        reply.recipient = recipient
+        reply.art_piece = piece
+        reply.parent_comment = top
+        reply.save()
+
+        html = render_to_string("main/comment_text.html",
+                                {"comment": reply}, request=request)
+        return HttpResponse(html)
+
+    # Else: starting (or adding to) a top-level thread
+    # Only recipients can start; owners must reply to an existing thread
+    if is_owner:
+        return JsonResponse({"ok": False, "error": "Owners can only reply to existing threads."}, status=403)
+
+    # Coalesce into existing top-level if present (one thread per pair)
+    top = (
+        Comment.objects
+        .filter(
+            art_piece=piece,
+            sender=user,
+            recipient=owner,
+            parent_comment__isnull=True,
+        )
+        .first()
+    )
+
+    form = CommentForm(request.POST)
+    if not form.is_valid():
+        return JsonResponse({"ok": False, "errors": form.errors}, status=400)
+
+    try:
+        with transaction.atomic():
+            c = form.save(commit=False)
+            c.sender = user
+            c.recipient = owner
+            c.art_piece = piece
+            if top:
+                c.parent_comment = top  # fold into existing thread
+            c.save()
+    except IntegrityError:
+        # Race against the unique partial index for top-level. Re-fetch and attach.
+        top = (
+            Comment.objects
+            .filter(
+                art_piece=piece,
+                sender=user,
+                recipient=owner,
+                parent_comment__isnull=True,
+            )
+            .first()
+        )
+        c = Comment(
+            sender=user,
+            recipient=owner,
+            art_piece=piece,
+            text=text,
+            parent_comment=top if top else None,
+        )
+        c.save()
+
+    html = render_to_string("main/comment_text.html",
+                            {"comment": c}, request=request)
+    return HttpResponse(html)
+
+
+@require_POST
+@login_required
+def mark_thread_read(request):
+    """
+    Owner opens a thread with 'other' for a given piece: mark only those
+    comment notifications as read. Respond with how many were cleared and
+    the user's remaining unread total (all notification types).
+    """
+    piece_public = request.POST.get("piece")
+    other_id = request.POST.get("other")
+
+    if not piece_public or not other_id:
+        return JsonResponse({"ok": False, "error": "missing params"}, status=400)
+
+    piece = get_object_or_404(ArtPiece, public_id=piece_public)
+
+    # Only the owner should hit this; recipients get auto-read on open.
+    if piece.user_id != request.user.id:
+        return JsonResponse({"ok": False, "error": "forbidden"}, status=403)
+
+    qs = Notification.objects.filter(
+        recipient=request.user,
+        art_piece=piece,
+        sender_id=other_id,
+        notification_type="comment",
+        is_read=False,
+    )
+    cleared = qs.count()
+    if cleared:
+        qs.update(is_read=True)
+
+    # Remaining unread (all types) for the bell
+    unread_total = Notification.objects.filter(
+        recipient=request.user,
+        is_read=False,
+    ).count()
+
+    return JsonResponse({"ok": True, "cleared": cleared, "unread_total": unread_total})
 
 
 @login_required
@@ -600,7 +799,7 @@ def LogOut(request):
 
 def choose_art_piece(user):
     # Get all approved art pieces that the user did not submit and have not been sent to them
-    art_pieces = ArtPiece.objects.filter(
+    art_pieces = ArtPiece.active.filter(
         approved_status=True
     ).exclude(
         user=user
@@ -640,11 +839,21 @@ def custom_404(request, exception):
 
 
 def custom_500(request):
-    return render(request, 'main/404.html', status=500)
+    return render(request, 'main/500.html', status=500)
 
 
 class CustomPasswordResetView(auth_views.PasswordResetView):
     email_template_name = 'registration/password_reset_email.html'
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        # Gentle UX hints
+        form.fields['email'].widget.attrs.update({
+            'autofocus': 'autofocus',
+            'autocomplete': 'email',
+            'placeholder': 'you@example.com',
+        })
+        return form
 
     def send_mail(self, subject_template_name, email_template_name,
                   context, from_email, to_email, html_email_template_name=None):
@@ -674,6 +883,12 @@ class CustomPasswordResetView(auth_views.PasswordResetView):
         return super(auth_views.PasswordResetView, self).form_valid(form)
 
 
+class CustomPasswordResetConfirmView(auth_views.PasswordResetConfirmView):
+    form_class = CustomSetPasswordForm
+    template_name = "registration/password_reset_confirm.html"
+    success_url = reverse_lazy("password_reset_complete")
+
+
 @login_required
 def account_info_settings(request):
     if request.method == 'POST':
@@ -685,6 +900,10 @@ def account_info_settings(request):
             messages.success(
                 request, "Account information updated.", extra_tags="account")
             return redirect(reverse('account_info_settings') + '#account-info')
+        else:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'errors': form.errors}, status=400)
+
     else:
         form = AccountInfoForm(instance=request.user)
 
@@ -702,11 +921,6 @@ def account_info_settings(request):
 
 @login_required
 def art_delivery_settings(request):
-    """
-    Handles the single toggle 'receive_art_paused' with the same AJAX pattern:
-    - On AJAX: return JSON { message: ... }
-    - On non-AJAX: use messages framework and redirect to #art-delivery
-    """
     if request.method == 'POST':
         form = ArtDeliveryForm(request.POST, instance=request.user)
         if form.is_valid():
@@ -718,8 +932,11 @@ def art_delivery_settings(request):
             messages.success(
                 request, "Art delivery preference updated.", extra_tags="artdelivery")
             return redirect(reverse('art_delivery_settings') + '#art-delivery')
+        else:
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return JsonResponse({"errors": form.errors}, status=400)
 
-    # GET or invalid POST (non-AJAX): render full page with all sections
+    # GET or invalid POST (non-AJAX) -> render full page
     account_form = AccountInfoForm(instance=request.user)
     art_delivery_form = ArtDeliveryForm(instance=request.user)
     email_form = EmailPreferencesForm(instance=request.user)
@@ -740,12 +957,13 @@ def email_pref_settings(request):
         if form.is_valid():
             form.save()
             if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-                return JsonResponse({
-                    "message": "Email preferences updated."
-                })
+                return JsonResponse({"message": "Email preferences updated."})
             messages.success(
                 request, "Email preferences updated.", extra_tags="email")
             return redirect(reverse('email_pref_settings') + '#email-prefs')
+        else:
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return JsonResponse({"errors": form.errors}, status=400)
     else:
         form = EmailPreferencesForm(instance=request.user)
 
@@ -852,3 +1070,58 @@ def unsubscribe_email(request, token: str):
         "main/unsubscribe_result.html",
         {"ok": True, "category_label": KIND_LABELS.get(kind, "these emails")},
     )
+
+
+@login_required
+@require_POST
+def set_timezone(request):
+    try:
+        payload = json.loads(request.body or "{}")
+        tz = payload.get("timezone")
+        ZoneInfo(tz)  # validate
+    except Exception:
+        return HttpResponseBadRequest("Invalid timezone")
+
+    request.user.timezone = tz
+    request.user.save(update_fields=["timezone"])
+    return JsonResponse({"ok": True})
+
+
+def tz_debug(request):
+    return JsonResponse({
+        "cookie_tz": request.COOKIES.get("tz"),
+        "user_tz": getattr(getattr(request.user, "profile", None), "timezone", None) or getattr(request.user, "timezone", None),
+        "current_tz": str(timezone.get_current_timezone()),
+    })
+
+
+@require_POST
+@login_required  # or remove if you want to allow signed-out users
+def feedback_report(request):
+    msg = (request.POST.get("message") or "").strip()
+    page = request.POST.get("page") or request.META.get("HTTP_REFERER") or ""
+    if not msg:
+        return JsonResponse({"ok": False, "error": "Empty message."}, status=400)
+
+    ua = request.META.get("HTTP_USER_AGENT", "")
+    fb = Feedback.objects.create(
+        user=request.user if request.user.is_authenticated else None,
+        page=page[:1024],
+        user_agent=ua,
+        message=msg,
+    )
+
+    # Email you a copy
+    try:
+        send_mail(
+            subject="Omnivore: Problem report",
+            message=f"From: {request.user.email if request.user.is_authenticated else 'Anonymous'}\n"
+                    f"Page: {page}\nUA: {ua}\n\n{msg}",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=["support@omnivorearts.com"],
+            fail_silently=True,
+        )
+    except Exception:
+        pass
+
+    return JsonResponse({"ok": True, "message": "Thanks — we got your report!"})

@@ -1,27 +1,59 @@
 {% load custom_filters %}
 
-<div id="likes-{{ piece.id }}-container">
-    {% with users=likes_dict|dict_get:piece %}
-        {% if users %}
-            {% if users|length == 1 %}
-            ❤️  {{ users.0.get_full_name }}
-            {% elif users|length == 2 %}
-            ❤️  {{ users.0.get_full_name }}, {{ users.1.get_full_name }}
-            {% elif users|length > 2 %}
-            ❤️  {{ users.0.get_full_name }}, {{ users.1.get_full_name }}, and
-            <a href="#" class="open-modal" data-modal-id="likesModal-{{ piece.id }}">more</a>
-            <!-- Modal for more users -->
-            <div class="modal" id="likesModal-{{ piece.id }}">
-                <div class="modal-content">
-                    <span class="close" data-modal-id="likesModal-{{ piece.id }}">&times;</span>
-                    <ul>
-                        {% for user in users %}
-                            <li>{{ user.get_full_name }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
+{% with users=likes_dict|dict_get:piece %}
+  {% if users and users|length > 0 %}
+    {% with total=users|length %}
+      <div class="likes-inline">
+        <span class="likes-heart" aria-hidden="true">❤️</span>
+
+        {# Inline preview: up to two names, no counts #}
+        {% if total == 1 %}
+          <span class="likes-names">{{ users.0.get_full_name }}</span>
+        {% elif total == 2 %}
+          <span class="likes-names">{{ users.0.get_full_name }}, {{ users.1.get_full_name }}</span>
+        {% else %}
+          <span class="likes-names">{{ users.0.get_full_name }}, {{ users.1.get_full_name }}</span>
+          <button
+            type="button"
+            class="link-button likes-more"
+            data-modal-id="likesModal-{{ piece.id }}"
+            aria-haspopup="dialog"
+            aria-controls="likesModal-{{ piece.id }}"
+            aria-expanded="false"
+          >and others
+          </button>
+
+          {# Modal #}
+          <div
+            class="likes-modal"
+            id="likesModal-{{ piece.id }}"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="likesModalTitle-{{ piece.id }}"
+            aria-hidden="true"
+          >
+            <div class="likes-modal__backdrop" data-close-modal></div>
+            <div class="likes-modal__dialog" role="document" tabindex="-1">
+              <div class="likes-modal__header">
+                <h3 class="likes-modal__title" id="likesModalTitle-{{ piece.id }}">Liked by</h3>
+                <button type="button" class="likes-modal__close" data-close-modal aria-label="Close">
+                  &times;
+                </button>
+              </div>
+              <div class="likes-modal__body">
+                <ul class="likes-list">
+                  {% for user in users %}
+                    <li class="likes-list__item">
+                      <span class="likes-list__icon" aria-hidden="true">❤️</span>
+                      <span class="likes-list__name">{{ user.get_full_name }}</span>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
             </div>
-            {% endif %}
+          </div>
         {% endif %}
+      </div>
     {% endwith %}
-</div>
+  {% endif %}
+{% endwith %}

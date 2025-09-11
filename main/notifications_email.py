@@ -2,6 +2,7 @@ from django.conf import settings
 from django.urls import reverse
 from main.utils.email_unsub import make_unsub_token
 from .mail import send_templated_email
+from urllib.parse import urlencode
 
 
 def _abs_url(base, path):
@@ -21,15 +22,21 @@ def send_comment_email(*, recipient, comment, notification_id=None):
     sender = comment.sender
     sender_full_name = sender.get_full_name()
 
-    # Deep link to art detail, carry ?n=<id> for read tracking
-    q = f"?n={notification_id}" if notification_id else ""
-    target_url = _abs_url(settings.SITE_URL, reverse(
-        "art_detail", args=[art_piece.public_id]) + q)
-
+    params = {}
+    # mark which thread to open
+    params["focus"] = "thread"
     if art_piece.user_id == recipient.id:
-        body_text = f"{sender_full_name} sent you a message on your piece:"
+        # recipient is the owner; open the thread with the sender
+        params["other"] = str(sender.id)
+        body_text = f"<strong>{sender_full_name}</strong> sent you a message on your piece:"
     else:
-        body_text = f"{sender_full_name} replied to your message on:"
+        body_text = f"<strong>{sender_full_name}</strong> replied to your message on:"
+
+    if notification_id:
+        params["n"] = str(notification_id)
+
+    cta_path = reverse("art_detail", args=[art_piece.public_id])
+    cta_url = _abs_url(settings.SITE_URL, f"{cta_path}?{urlencode(params)}")
 
     subject = f"{sender_full_name} sent you a message!"
 
@@ -38,7 +45,7 @@ def send_comment_email(*, recipient, comment, notification_id=None):
         "sender": sender,
         "art_piece": art_piece,
         "comment": comment,
-        "target_url": target_url,
+        "cta_url": cta_url,
         "unsubscribe_url": unsubscribe_url,
         "body_text": body_text,
     }
@@ -61,9 +68,11 @@ def send_like_email(*, recipient, liker, art_piece, notification_id=None):
     unsubscribe_url = _abs_url(settings.SITE_URL,
                                reverse("email_unsubscribe", args=[token]))
 
-    q = f"?n={notification_id}" if notification_id else ""
-    cta_url = _abs_url(settings.SITE_URL, reverse(
-        "art_detail", args=[art_piece.public_id]) + q)
+    params = {"focus": "piece"}
+    if notification_id:
+        params["n"] = str(notification_id)
+    cta_url = _abs_url(
+        settings.SITE_URL, f"{reverse('art_detail', args=[art_piece.public_id])}?{urlencode(params)}")
 
     context = {
         "recipient": recipient,
@@ -94,17 +103,24 @@ def send_shared_art_email(*, recipient, sender, art_piece, notification_id=None)
         settings.SITE_URL, reverse("email_unsubscribe", args=[token])
     )
 
-    q = f"?n={notification_id}" if notification_id else ""
-    cta_url = _abs_url(settings.SITE_URL, reverse(
-        "art_detail", args=[art_piece.public_id]) + q)
+    params = {"focus": "piece"}
+    if notification_id:
+        params["n"] = str(notification_id)
+    cta_url = _abs_url(
+        settings.SITE_URL, f"{reverse('art_detail', args=[art_piece.public_id])}?{urlencode(params)}")
+
+    share_url = _abs_url(
+        settings.SITE_URL, f"{reverse('share_art')}")
 
     context = {
         "recipient": recipient,
         "sender": sender,
         "art_piece": art_piece,
         "cta_url": cta_url,
+        "share_url": share_url,
         "unsubscribe_url": unsubscribe_url,
     }
 
     subject = f"{sender.get_full_name()} shared some art with you!"
+    subject = f"You have new art from {sender.get_full_name()}!"
     send_templated_email(recipient, subject, "emails/shared_art", context)

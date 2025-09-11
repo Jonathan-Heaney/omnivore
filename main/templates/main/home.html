@@ -1,31 +1,167 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %} Home Page {% endblock %}
+{% block title_tag %}
+  <title>Omnivore Arts</title>
+{% endblock %}
+
 {% block css_files %}
-  <link rel="stylesheet" href="{% static "css/styles.css" %}">
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/pages/landing.css' %}">
 {% endblock %}
 
 {% block content %}
-<h1 class="header text-center">Welcome to Omnivore Arts!</h1>
-<div class="container">
-    <div class="row home-container">
-        <div class="col-md-6 text-center oliver-container">
-            <img class="oliver img-fluid" src="{% static 'images/oliver-no-bg.png' %}" alt="Oliver the Omnivore">
-            <p class="oliver-caption">Oliver the Omnivore</p>
-        </div>
-        <div class="col-md-6 text-center">
-            <h1 class='tagline'>Share and discover art, music, and culture.</h1>
-        </div>
+
+<!-- HERO -->
+<section class="hero container py-5">
+  <div class="row align-items-center g-5">
+    <div class="col-12 col-lg-6 text-center text-lg-start">
+      <h1 class="display-5 fw-bold mb-3">
+        A surprise piece of art, every week.
+      </h1>
+      <p class="lead text-muted mb-4">
+        Omnivore is your new home for discovering music, literature, film, paintings, and more.
+      </p>
+      <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start">
+        <a href="{% url 'sign_up' %}" class="btn btn-cta btn-lg px-4" aria-label="Create your Omnivore account">Create your account</a>
+        <a href="#how-it-works" class="btn btn-outline-secondary btn-lg px-4">See how it works</a>
+      </div>
     </div>
-    <div class="row cta-container">
-        <div class="col-12 text-center">
-            {% if user.is_authenticated %}
-            <h4>Our first round is open for submissions - share a piece of art <a href="/share-art">here</a>!</h4>
-            {% else %}
-            <h4>Our first round is open - <a href="/sign-up">join us</a>!</h4>
-            {% endif %}
-        </div>
+
+    <div class="col-12 col-lg-6 text-center">
+      <div class="oliver-wrap">
+        <img
+          class="oliver-hero"
+          src="{% static 'images/oliver-no-bg.png' %}"
+          alt="Oliver the Omnivore mascot"
+          width="360" height="360" loading="lazy"
+        />
+        <span class="oliver-bubble" aria-hidden="true">hi, i’m oliver!</span>
+        <div class="oliver-caption">Oliver the Omnivore</div>
+      </div>
     </div>
-</div>
+  </div>
+</section>
+
+<!-- “ALL THE ARTS” SIGNAL -->
+<section class="container py-4">
+  <div class="row text-center g-3 g-md-4">
+    <div class="col-6 col-md">
+      <div class="pill"><span aria-hidden="true">🎨</span> Painting</div>
+    </div>
+    <div class="col-6 col-md">
+      <div class="pill"><span aria-hidden="true">🎶</span> Music</div>
+    </div>
+    <div class="col-6 col-md">
+      <div class="pill"><span aria-hidden="true">🎬</span> Film &amp; TV</div>
+    </div>
+    <div class="col-6 col-md">
+      <div class="pill"><span aria-hidden="true">📚</span> Literature</div>
+    </div>
+    <div class="col-12 col-md">
+      <div class="pill"><span aria-hidden="true">🎭</span> Performing Arts</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how-it-works" class="container py-5">
+  <header class="text-center mb-3">
+    <h2 class="h3 fw-semibold mb-1">How it works</h2>
+  </header>
+
+  <div class="row g-4 align-items-stretch">
+    <div class="col-md-4">
+      <div class="card step h-100">
+        <div class="card-body">
+          <h3 class="h5 mb-2">Share art you love</h3>
+          <p class="text-muted mb-0">Submit any piece that moves you — a song, a sculpture, a play, a poem. What do you love that you wish more people knew about?</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card step h-100">
+        <div class="card-body">
+          <h3 class="h5 mb-2">Receive gifts from others</h3>
+          <p class="text-muted mb-0">Once a week, check out a new piece of art, chosen at random from our collection of community contributions.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card step h-100">
+        <div class="card-body">
+          <h3 class="h5 mb-2">Have tiny conversations</h3>
+          <p class="text-muted mb-0">Send a private message to the person who shared the piece. Ask a question, share your reaction, or just say thanks!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VALUES -->
+<section class="container py-5 ">
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="value h-100">
+        <h4 class="h6 text-uppercase mb-2 value-header">Broad Horizons</h4>
+        <p class="mb-0">From fiction to film, poetry to painting—Omnivore is for <em>all</em> the arts.</p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="value h-100">
+        <h4 class="h6 text-uppercase mb-2 value-header">Serendipity &amp; Surprise</h4>
+        <p class="mb-0">Omnivore is designed to surprise you, not to predict you. Who knows what your next piece of art will be?</p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="value h-100">
+        <h4 class="h6 text-uppercase mb-2 value-header">People First</h4>
+        <p class="mb-0">No algorithms, no AI, no ads. Just great art and private conversations.</p>
+      </div>
+    </div>
+    {% comment %} <div class="col-md-4">
+      <div class="value h-100">
+        <h4 class="h6 text-uppercase mb-2 value-header">Gift Economy</h4>
+        <p class="mb-0">That piece you love could become someone's new favorite thing. Why not make someone's day?</p>
+      </div>
+    </div>
+    
+
+    <div class="col-md-4">
+      <div class="value h-100">
+        <h4 class="h6 text-uppercase mb-2 value-header">Connection Through Art</h4>
+        <p class="mb-0">Omnivore is a small community of art lovers.</p>
+      </div>
+    </div>
+  </div> {% endcomment %}
+</section>
+
+<!-- CTA FOOTER -->
+<section class="container py-5 text-center">
+  <h2 class="h3 fw-semibold mb-3">Ready to discover something new?
+</h2>
+  <a href="{% url 'sign_up' %}" class="btn btn-cta btn-lg px-5">Join Omnivore</a>
+  <p class="text-muted mt-3 small">
+    Already have an account? <a href="{% url 'login' %}">Log in</a>.
+  </p>
+</section>
+
+<!-- ABOUT / FOUNDER NOTE -->
+<section class="container py-5 about-founder text-center">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <p class="text-muted mb-4">
+        Hi, I’m Jonathan! I'm a classical pianist and solo developer. I'm building Omnivore as a more human alternative to recommendation algorithms. 
+        I hope this is a place where you can connect with others through art, and discover things you would have never found on your own.
+      </p>
+      <p class="text-muted mb-4">
+        This is just the beginning - if you have questions or ideas, I’d love to hear from you.
+      </p>
+      <a href="mailto:jonathan@omnivorearts.com" class="btn btn-outline-secondary btn-sm">Email Jonathan</a>
+    </div>
+  </div>
+</section>
+
 {% endblock %}

@@ -1,22 +1,24 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static crispy_forms_tags %}
 
-{% block title %}Share Your Art{% endblock%}
-{% block css_files %}
-  <link rel="stylesheet" href="{% static "css/styles.css" %}">
-{% endblock %}
+{% block title %}Share Art{% endblock %}
 
-{% load crispy_forms_tags %}
+{% block content %}
+<section class="container-narrow py-4">
+  <header class="mb-3">
+    <h1 class="page-title">Share a piece of art you love!</h1>
+  </header>
 
-{% block content %} 
+  <div class="form-card">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {{ form|crispy }}
 
-<h1 class="header">Share a piece of art you love!</h1>
-
-<p>Unsure of what to submit? Check out our <a href="/submission-guidelines">submission guidelines</a>.</p>
-
-<form action="" method="post">
-    {% csrf_token %}{{ form|crispy }}
-    <button type="submit" class="btn btn-success">Share</button>
-</form>
-
+      <div class="d-flex gap-2 mt-3">
+        <button type="submit" class="btn btn-cta">Share</button>
+        <a href="{% url 'my_shared_art' %}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</section>
 {% endblock %}

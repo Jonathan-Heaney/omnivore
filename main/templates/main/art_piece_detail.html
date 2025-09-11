@@ -1,112 +1,279 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load custom_filters %}
+{% load tz %}
 
-{% block title %}{{ piece.piece_name }} · Omnivore{% endblock %}
+{% block title %}{{ piece.piece_name }}{% endblock %}
+
 {% block css_files %}
-  <link rel="stylesheet" href="{% static "css/styles.css" %}">
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/pages/art_detail.css' %}">
 {% endblock %}
 
 {% block content %}
 
-<h1 class="header">{{ piece.piece_name }}</h1>
+<div class="container-narrow">
 
-<div id="art-{{ piece.public_id }}" class="card mt-2 art-piece">
-  <div class="card-header">
-    <strong>{{ piece.piece_name }}</strong> ({{ piece.artist_name }})
-  </div>
+  {# card accent & header layout change by mode #}
+  <section id="art-{{ piece.public_id }}"
+           class="piece {% if mode == 'recipient' %}piece--received{% else %}piece--shared{% endif %}">
 
-  <div class="card-body">
-    <p>{{ piece.piece_description|linebreaksbr }}</p>
+      {% if piece.is_deleted %}
+        <div class="alert alert-warning mb-3">
+          {% if mode == "recipient" %}
+            <strong>This piece was deleted by the original sharer.</strong>
+            {% if thread and thread|length %}
+              <div class="small text-muted">You can still view your conversation below.</div>
+            {% endif %}
+          {% else %}
+            <strong>You deleted this piece.</strong>
+            {% if conversations and conversations|length %}
+              <div class="small text-muted">
+                You can still view your conversation{% if conversations|length > 1 %}s{% endif %} below.
+              </div>
+            {% endif %}
+          {% endif %}
+        </div>
+      {% endif %}
 
-    {% if piece.link %}
-      <a class="btn btn-sm btn-outline-secondary mt-2" href="{{ piece.link }}" target="_blank" rel="noopener">
-        Source
-      </a>
+    {# ---------- Header ---------- #}
+    {% if mode == "recipient" %}
+      {# mirror My Received header: title/artist on left, "Shared by ..." on right #}
+      <header class="piece__header piece__header--received">
+        <div class="piece__titlewrap">
+            <strong>{{ piece.piece_name }}</strong>
+          <span class="piece__by">({{ piece.artist_name }})</span>
+        </div>
+        <div class="piece__from">
+          Shared by <strong>{{ piece.user.first_name }} {{ piece.user.last_name }}</strong>
+        </div>
+      </header>
+    {% else %}
+      {# mirror My Shared header: title + (artist) inline #}
+      <header class="piece__header">
+          <strong>{{ piece.piece_name }}</strong>
+        <span class="piece__by">({{ piece.artist_name }})</span>
+      </header>
     {% endif %}
-  </div>
 
-  <div class="card-footer text-muted">
-    Shared by <strong>{{ piece.user.first_name }} {{ piece.user.last_name }}</strong> ·
-    {{ piece.created_at|date:"F j, Y" }}
-  </div>
+    {# ---------- Body ---------- #}
+        <div class="piece__body">
+          {% if piece.is_deleted %}
+            <p class="text-muted"><em>Details are no longer available.</em></p>
+          {% else %}
+            <p class="piece__description">{{ piece.piece_description|linebreaksbr }}</p>
 
-  {% if request.user != piece.user %}
-      <div class="likes-container" id="heart-{{ piece.id }}-container">
-        {% include 'main/heart_button.html' with piece=piece is_liked=is_liked %}
-      </div>
-
-  {% elif request.user == piece.user %}
-      {% with users=likes_dict|dict_get:piece %}
-        {% if users %}
-          <div class="likes-container" id="likes-{{ piece.id }}-container">
-            {% include 'main/likes_display.html' with piece=piece likes_dict=likes_dict %}
-          </div>
-        {% endif %}
-    {% endwith %}
-  {% endif %}
-
-  {# --- RECIPIENT VIEW: single 1:1 DM thread with the sharer --- #}
-{% if mode == "recipient" %}
-  <div class="received-comments-section">
-    {% with pid=piece.id|stringformat:"s" %}
-      {% with tgt_id="comments-"|add:pid|add:"-container" %}
-        <div id="{{ tgt_id }}">
-          {% for comment in thread %}
-            {% include 'main/comment_text.html' with comment=comment %}
-          {% endfor %}
+            {% if piece.link and mode == "recipient" %}
+              <a class="btn btn-outline-success btn-sm received-card__source"
+                href="{{ piece.link }}" target="_blank" rel="noopener"
+                aria-label="Open source for {{ piece.piece_name }}">
+                View source <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
+              </a>
+            {% endif %}
+          {% endif %}
         </div>
 
-        <div id="reply">
-          {% include "main/comment_form.html" with reply_recipient=piece.user.first_name piece=piece post_url=request.path target_id=tgt_id autofocus=1 %}
-        </div>
-      {% endwith %}
-    {% endwith %}
-  </div>
-
-
-{# --- OWNER VIEW: multi-conversation DM threads --- #}
-{% elif mode == "owner" %}
-  {% if conversations %}
-    <div class="comments-section">
-      {# conversations is now a list of (recipient, conversation) tuples, ordered by latest activity #}
-      {% for recipient, conversation in conversations %}
-        <div class="card">
-          <div class="card-header conversation-header d-flex align-items-center justify-content-between">
-            <div>
-              Conversation with <strong>{{ recipient.first_name }} {{ recipient.last_name }}</strong>
+        {% if mode == "recipient" %}
+          {% if not piece.is_deleted %}
+            <div class="likes-container">
+              {% include 'main/heart_button.html' with piece=piece is_liked=is_liked %}
             </div>
-            {% with pid=piece.id|stringformat:"s" rid=recipient.id|stringformat:"s" %}
-              <button
-                class="toggle-comment-btn"
-                id="toggle-button-{{ pid }}-{{ rid }}"
-                onclick="toggleComments({{ piece.id }}, {{ recipient.id }})"
-                aria-controls="comments-{{ pid }}-{{ rid }}-container"
-                aria-expanded="true"
-              >
-                <i class="fa-solid fa-minus"></i>
-              </button>
+          {% endif %}
+        {% else %}
+          {% if not piece.is_deleted %}
+            {% with users=likes_dict|dict_get:piece %}
+              {% if users %}
+                <div class="likes">
+                  {% include 'main/likes_display.html' with piece=piece likes_dict=likes_dict %}
+                </div>
+              {% endif %}
             {% endwith %}
-          </div>
+          {% endif %}
 
-          <div class="conversation">
-            {% with pid=piece.id|stringformat:"s" rid=recipient.id|stringformat:"s" %}
-              {% with tgt_id="comments-"|add:pid|add:"-"|add:rid|add:"-container" %}
-                <div id="{{ tgt_id }}">
-                  {% for comment in conversation %}
+          <footer class="shared-card__meta">
+            <span class="shared-card__date">Shared {{ piece.created_at|date:"F j, Y" }}</span>
+
+            <div class="shared-card__actions">
+              {% if not piece.is_deleted %}
+                <a href="{% url 'edit_art_piece' piece.public_id %}" class="btn btn-outline-secondary btn-sm"
+                  aria-label="Edit {{ piece.piece_name }}" title="Edit">
+                  <i class="fa-solid fa-pen"></i>
+                </a>
+                <!-- Delete -->
+                <form class="js-delete-form d-inline"
+                    action="{% url 'delete_art_piece' piece.public_id %}"
+                    method="post">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                <button type="button"
+                        class="btn btn-outline-danger btn-sm js-open-delete"
+                        data-delete-url="{% url 'delete_art_piece' piece.public_id %}"
+                        data-delete-title="{{ piece.piece_name|escape }}">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </form>
+                {% if piece.link %}
+                  <a class="btn btn-outline-primary btn-sm" href="{{ piece.link }}" target="_blank" rel="noopener"
+                    aria-label="Open source link for {{ piece.piece_name }}" title="Open source">
+                    <i class="fa-solid fa-up-right-from-square"></i>
+                  </a>
+                {% endif %}
+              {% endif %}
+            </div>
+          </footer>
+        {% endif %}
+      </section>
+
+            {# end of the ART CARD — do not put conversations below this line #}
+          {# /.piece #}
+
+    {# ---------- Conversations section (separate from art card) ---------- #}
+    {% if mode == "recipient" %}
+      <section id="conversations" class="conv-section">
+        <header class="conv-section__header">
+          <h2 class="conv-section__title">Conversation</h2>
+        </header>
+
+        <article class="thread thread--single">
+          {% with last=thread|last %}
+            <header class="thread__header">
+              <div class="imrow">
+                <!-- initials of the SHARER (piece.user) -->
+                <div class="imrow__avatar" aria-hidden="true">
+                  {{ piece.user.first_name|slice:":1" }}{{ piece.user.last_name|slice:":1" }}
+                </div>
+
+                <div class="imrow__main">
+                  <div class="imrow__name">{{ piece.user.first_name }} {{ piece.user.last_name }}</div>
+                </div>
+
+                <div class="imrow__when">
+                  {% if last %}
+                    <time datetime="{{ last.created_at|date:'c' }}">{{ last.created_at|recency_stamp }}</time>
+                  {% endif %}
+                </div>
+              </div>
+            </header>
+          {% endwith %}
+
+          {% with pid=piece.id|stringformat:"s" %}
+            {% with tgt_id="comments-"|add:pid|add:"-container" %}
+              <div class="thread__body">
+                <!-- Privacy chip -->
+                <div class="conv-privacy" id="privacy-{{ piece.id }}">
+                  <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                  <span>Private — only you and {{ piece.user.first_name }} can see this</span>
+                </div>
+
+                <div id="{{ tgt_id }}" class="thread__messages">
+                  {% for comment in thread %}
                     {% include 'main/comment_text.html' with comment=comment %}
                   {% endfor %}
                 </div>
 
-                {% include "main/reply_form.html" with reply_recipient=recipient.first_name top_level_comment=conversation.0 piece=piece recipient=recipient post_url=request.path target_id=tgt_id %}
-              {% endwith %}
+                <div id="reply" class="thread__form">
+                  {% if can_reply %}
+                    {% include "main/comment_form.html" with reply_recipient=piece.user.first_name piece=piece post_url=request.path target_id=tgt_id autofocus=autofocus_reply %}
+                  {% else %}
+                    <div class="alert alert-secondary mb-0 small">
+                      Replies are disabled because this piece was removed.
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
             {% endwith %}
+          {% endwith %}
+        </article>
+      </section>
+
+    {% else %}
+      {% if conversations %}
+        <section id="conversations" class="conv-section">
+          <header class="conv-section__header">
+            <h2 class="conv-section__title">Conversations</h2>
+            <span class="conv-section__count">{{ conversations|length }}</span>
+          </header>
+
+          <div class="threads">
+            {% for recipient, conversation in conversations %}
+              <article class="thread" id="thread-{{ piece.id }}-{{ recipient.id }}">
+                <header
+                  class="thread__header is-toggle {% if unread_by_other|dict_get:recipient.id %}thread__header--unread{% endif %}"
+                  id="toggle-header-{{ piece.id }}-{{ recipient.id }}"
+                  role="button"
+                  tabindex="0"
+                  aria-controls="comments-{{ piece.id }}-{{ recipient.id }}-container"
+                  aria-expanded="false"
+                  data-art="{{ piece.public_id }}"
+                  data-recipient="{{ recipient.id }}"
+                  data-mark-url="{% url 'mark_thread_read' %}"
+                >
+                {% with last=conversation|last %}
+                  <div class="imrow">
+                    <div class="imrow__avatar" aria-hidden="true">
+                      {{ recipient.first_name|slice:":1" }}{{ recipient.last_name|slice:":1" }}
+                    </div>
+
+                    <div class="imrow__main">
+                      <div class="imrow__name">{{ recipient.first_name }} {{ recipient.last_name }}</div>
+                      <div class="imrow__snippet">
+                        {% if last %}{{ last.text|truncatechars:140 }}{% else %}<em>No messages yet</em>{% endif %}
+                      </div>
+                    </div>
+
+                    <div class="imrow__when">
+                      {% if last %}<time datetime="{{ last.created_at|date:'c' }}">{{ last.created_at|recency_stamp }}</time>{% endif %}
+                      {% with u=unread_by_other|dict_get:recipient.id %}
+                        {% if u and u|add:0 > 0 %}
+                          <span class="unread-badge" aria-label="{{ u }} unread message{{ u|pluralize }}">
+                            {{ u }}
+                          </span>
+                        {% endif %}
+                      {% endwith %}
+                    </div>
+                  </div>
+                {% endwith %}
+
+                <span class="thread__chevron" aria-hidden="true">
+                  <!-- chevron icon (down) that will rotate on expand -->
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </header>
+
+                <div class="thread__body" hidden>
+                  {% with pid=piece.id|stringformat:"s" rid=recipient.id|stringformat:"s" %}
+                    {% with tgt_id="comments-"|add:pid|add:"-"|add:rid|add:"-container" %}
+                      <!-- Privacy chip -->
+                      <div class="conv-privacy" id="privacy-{{ piece.id }}-{{ recipient.id }}">
+                        <span><i class="fa-solid fa-lock" aria-hidden="true"></i> Private — only you and {{ recipient.first_name }} can see this</span>
+                      </div>
+
+                      <div id="{{ tgt_id }}" class="thread__messages msgs--time-above">
+                        {% for comment in conversation %}
+                          {% include 'main/comment_text.html' with comment=comment %}
+                        {% endfor %}
+                      </div>
+                      <div class="thread__form">
+                        {% if can_reply %}
+                          {% include "main/reply_form.html" with reply_recipient=recipient.first_name top_level_comment=conversation.0 piece=piece recipient=recipient post_url=request.path target_id=tgt_id %}
+                        {% else %}
+                          <div class="alert alert-secondary mb-0 small">
+                            Replies are disabled because this piece was removed.
+                          </div>
+                        {% endif %}
+                      </div>
+                    {% endwith %}
+                  {% endwith %}
+                </div>
+              </article>
+            {% endfor %}
           </div>
-        </div>
-      {% endfor %}
-    </div>
-  {% endif %}
-{% endif %}
+        </section>
+      {% endif %}
+    {% endif %}
+
 </div>
 
 {% endblock %}

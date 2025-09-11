@@ -1,0 +1,1302 @@
+/* Page: Art Detail – match Shared/Received visual language */
+
+.piece {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #fff;
+  box-shadow: var(--shadow-1);
+  overflow: hidden;
+  transition: box-shadow 160ms ease;
+  margin: 0; /* contained by .container-narrow, no extra outer gap */
+}
+.piece:hover {
+  box-shadow: var(--shadow-2);
+}
+
+.piece--shared,
+.piece--received {
+  border-left: 4px solid var(--border);
+}
+
+/* ---------- Header ---------- */
+.piece__header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding: 1.05rem 1.25rem; /* match list cards */
+  background: color-mix(in srgb, var(--brand) var(--tint-brand-pct, 6%), #fff);
+}
+.piece__header--received {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.6rem 0.9rem;
+  align-items: center;
+}
+.piece__titlewrap {
+  min-width: 0;
+}
+.piece__title {
+  color: var(--brand);
+}
+.piece__title:hover {
+  color: var(--brand);
+  filter: brightness(0.9);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.piece__by {
+  color: var(--muted);
+}
+.piece__from {
+  color: color-mix(in srgb, #000 60%, #fff);
+  white-space: nowrap;
+}
+
+@media (max-width: 575.98px) {
+  .piece__header--received {
+    grid-template-columns: 1fr;
+  }
+  .piece__from {
+    justify-self: start;
+  }
+}
+
+/* ---------- Body ---------- */
+.piece__body {
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem 1.25rem;
+}
+.piece__description {
+  margin: 0;
+}
+
+/* reuse the smaller green source pill from Received */
+.received-card__source {
+  align-self: start;
+  width: fit-content;
+  border-radius: 999px;
+}
+
+/* Meta footer + actions (now in footer) */
+.shared-card__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: var(--muted);
+  /* border-top: 1px solid #eef0f2; */
+  background: #fbfcfd;
+}
+.shared-card__date {
+  font-size: 0.95rem;
+}
+
+.shared-card__actions {
+  display: inline-flex;
+  gap: 0.4rem;
+  flex: 0 0 auto;
+}
+.shared-card__actions .btn {
+  padding: 6px 10px;
+  border-radius: 999px;
+  line-height: 1;
+}
+
+/* --- Scoped overrides for the tiny icon buttons in card footer --- */
+.shared-card__actions .btn {
+  padding: 6px 10px;
+  border-radius: 999px;
+  line-height: 1;
+}
+
+/* EDIT (outline-secondary → brand outline, fill on hover) */
+.shared-card__actions .btn-outline-secondary {
+  color: var(--brand-600);
+  background: transparent;
+  border-color: var(--brand-600);
+}
+
+.shared-card__actions .btn-outline-secondary:hover,
+.shared-card__actions .btn-outline-secondary:focus {
+  color: #fff;
+  background: var(--brand-600);
+  border-color: var(--brand-600);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.shared-card__actions .btn-outline-primary {
+  color: var(--success);
+  background: transparent;
+  border-color: var(--success);
+}
+.shared-card__actions .btn-outline-primary:hover,
+.shared-card__actions .btn-outline-primary:focus {
+  color: #fff;
+  background: var(--success);
+  border-color: var(--success);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* DELETE (outline-danger → red on hover, not Bootstrap gray) */
+.shared-card__actions .btn-outline-danger {
+  color: #b42431;
+  background: transparent;
+  border-color: #e7b1b6; /* soft red border */
+}
+.shared-card__actions .btn-outline-danger:hover,
+.shared-card__actions .btn-outline-danger:focus {
+  color: #fff;
+  background: #b42431;
+  border-color: #9f202b;
+  box-shadow: 0 2px 8px rgba(180, 36, 49, 0.25);
+}
+
+/* ---------- Likes strips ---------- */
+.likes {
+  padding: 0.85rem 1.25rem 1rem;
+  background: color-mix(in srgb, var(--danger) var(--tint-like-pct, 3%), #fff);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+.likes-container {
+  padding: 0.85rem 1.25rem 1rem;
+  background: color-mix(in srgb, var(--danger) var(--tint-like-pct, 3%), #fff);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+}
+
+/* iOS Safari: strip native button tinting and lock text color */
+.like-button {
+  -webkit-appearance: none;
+  appearance: none;
+  background-clip: padding-box; /* keeps borders clean on iOS */
+  color: var(--text) !important;
+}
+
+.like-button .like-text {
+  color: inherit !important; /* ensure it follows the button */
+  -webkit-text-fill-color: currentColor; /* iOS sometimes ignores `color` */
+}
+
+/* Keep the same color through focus/active */
+.like-button:focus,
+.like-button:active,
+.like-button:focus-visible {
+  color: var(--text) !important;
+}
+
+/* ---------- Conversation section shell ---------- */
+.conv-section {
+  margin-top: clamp(50px, 6vw, 70px);
+}
+
+.conv-section__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.conv-section__title {
+  margin: 0;
+  font-size: clamp(18px, 2.3vw, 22px);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.conv-section__count {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: var(--fs-sm);
+  background: #fff8e1;
+  color: #7a5a00;
+  border: 1px solid #ffe69c;
+}
+
+.conv-section .thread--single {
+  margin-top: 0.5rem;
+}
+
+/* mobile padding to align with cards */
+@media (max-width: 575.98px) {
+  .conv-section__header {
+    padding-left: 1.35rem;
+    padding-right: 1.35rem;
+  }
+}
+
+/* ---------- Threads (full comments) ---------- */
+.threads {
+  display: grid;
+  margin-top: 0.5rem;
+  gap: clamp(40px, 6vw, 64px); /* was 1.1rem */
+}
+.thread {
+  border: 1px solid #eef2f7;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 8px 24px -18px rgba(16, 24, 40, 0.2);
+}
+.thread--single {
+  margin: 0 1.25rem 1.25rem;
+}
+
+.thread__header {
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f9fafb;
+  border-bottom: 1px solid #eef2f7;
+}
+.thread__title {
+  font-weight: 600;
+}
+
+.toggle-comment-btn {
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  border-radius: 999px;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.toggle-comment-btn:hover {
+  background: #f3f4f6;
+}
+
+.thread__body {
+  padding: 0.9rem 1rem 1rem;
+}
+.thread__messages {
+  display: grid;
+  gap: 0.6rem;
+  margin-bottom: 0.6rem;
+}
+.thread__form {
+  padding-top: 0.35rem;
+}
+
+/* mobile breathing room to match cards */
+@media (max-width: 575.98px) {
+  .piece__header,
+  .piece__body,
+  .likes,
+  .likes-container,
+  .piece__meta {
+    padding-left: 1.35rem;
+    padding-right: 1.35rem;
+  }
+  .piece__body {
+    padding-top: 1.35rem;
+    padding-bottom: 1.35rem;
+  }
+
+  .thread,
+  .thread--single {
+    border-radius: 0; /* lose card rounding */
+    margin: 0; /* flush with viewport */
+    border-left: none;
+    border-right: none;
+    box-shadow: none; /* drop desktop shadow */
+  }
+
+  .thread__body {
+    padding: 12px 16px; /* roomy but not cramped */
+    border-radius: 0;
+  }
+
+  .msg__bubble {
+    font-size: 0.9rem; /* down from ~1rem */
+    line-height: 1.35; /* tighter rhythm */
+    padding: 8px 12px;
+  }
+  .msg {
+    max-width: 85%; /* feels less “narrow” */
+  }
+
+  .thread__messages {
+    gap: 6px; /* instead of 12px+ */
+  }
+  .msg {
+    margin-top: 8px;
+  }
+  .msg__time {
+    font-size: 0.65rem;
+    padding: 1px 6px;
+    top: -16px; /* tuck closer */
+    box-shadow: none; /* less visual noise */
+    background: transparent; /* transparent on mobile */
+  }
+}
+
+/* Responsive spacing tokens just for conversation threads */
+:root {
+  /* inner horizontal & vertical padding for thread header/body */
+  --thread-pad-x: clamp(18px, 3.6vw, 24px);
+  --thread-pad-y: clamp(14px, 3vw, 20px);
+  /* vertical spacing between message bubbles */
+  --thread-gap: clamp(10px, 2.2vw, 16px);
+}
+
+/* Roomier header */
+/* .thread__header {
+  padding: var(--thread-pad-y) var(--thread-pad-x);
+} */
+
+/* Roomier body with comfy bottom padding for the input */
+.thread__body {
+  padding: var(--thread-pad-y) var(--thread-pad-x)
+    calc(var(--thread-pad-y) + 6px);
+}
+
+/* More air between messages */
+.thread__messages {
+  gap: var(--thread-gap);
+  margin-bottom: calc(var(--thread-gap) + 2px);
+}
+
+/* Slightly larger breathing space above the reply form */
+.thread__form {
+  padding-top: calc(var(--thread-gap) - 2px);
+  border-top: 1px solid #f1f5f9; /* keep your existing divider look */
+}
+
+/* Keep single-thread margins consistent with the multi-thread grid spacing */
+.thread--single {
+  margin: 0 var(--thread-pad-x) var(--thread-pad-x);
+}
+
+/* Mobile: keep padding but don’t crowd the input */
+@media (max-width: 575.98px) {
+  .thread__body {
+    padding-bottom: calc(var(--thread-pad-y) + 4px);
+  }
+}
+
+/* ===== Soften the visual noise (drop-in overrides) ===== */
+
+/* 1) Softer default strokes + more separation via space */
+:root {
+  --soft-stroke: color-mix(in srgb, var(--border) 70%, transparent);
+  --soft-surface: color-mix(in srgb, var(--surface) 65%, #fff);
+}
+
+/* 2) Art card: keep the left accent, lighten the outline & shadow */
+.piece {
+  border-color: var(--soft-stroke);
+  box-shadow: 0 4px 24px -20px rgba(0, 0, 0, 0.25);
+}
+
+/* 3) Likes strips: keep the wash, lose the heavy inset line */
+.likes,
+.likes-container {
+  background: color-mix(
+    in srgb,
+    var(--danger) max(1.5%, calc(var(--tint-like-pct, 3%) - 1.5%)),
+    #fff
+  );
+  box-shadow: none; /* remove inset highlight line */
+}
+
+/* 4) Conversation section header: more air, no boxes */
+.conv-section__header {
+  margin-bottom: 0.85rem; /* was 0.5 */
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+/* 5) Thread cards: “soft cards” (less box, more breathing room) */
+.thread {
+  border-color: transparent; /* drop the visible border */
+  background: #fff;
+  box-shadow: 0 10px 30px -22px rgba(0, 0, 0, 0.35); /* lighter shadow */
+  outline: 1px solid transparent; /* prepares for hover ring */
+}
+.thread:hover {
+  outline-color: var(--soft-stroke); /* subtle ring on hover */
+}
+
+/* 6) Thread header: remove hard bar; use a faint underline only */
+.thread__header {
+  background: transparent; /* was #f9fafb */
+  border-bottom: none;
+  box-shadow: inset 0 -1px 0 var(--soft-stroke); /* hairline divider */
+}
+
+/* 7) Thread body: use soft surface, lose seams */
+.thread__body {
+  background: var(--soft-surface); /* gentle tint to separate from page */
+  border-radius: 10px; /* soft inner container */
+}
+
+/* 8) Messages: room to breathe, no extra lines */
+.thread__messages {
+  gap: clamp(12px, 2.2vw, 18px);
+  margin-bottom: clamp(10px, 1.8vw, 16px);
+}
+
+/* 9) Reply area: remove top border line; rely on space instead */
+.thread__form {
+  padding-top: clamp(8px, 1.6vw, 14px);
+  border-top: none;
+}
+
+/* 10) Comment bubbles: softer edge & less contrasty border */
+.comment-bubble {
+  background: #fff;
+  border-color: var(--soft-stroke);
+  box-shadow: none; /* avoid stacked shadows in lists */
+}
+
+/* 11) Toggle button: quieter look */
+.toggle-comment-btn {
+  border-color: var(--soft-stroke);
+  background: #fff;
+}
+.toggle-comment-btn:hover {
+  background: color-mix(in srgb, var(--surface) 80%, #fff);
+}
+
+/* 12) Mobile: preserve softness without crowding the input */
+@media (max-width: 575.98px) {
+  .thread__body {
+    border-radius: 12px;
+    padding-bottom: calc(var(--thread-pad-y, 16px) + 4px);
+  }
+}
+
+/* ===== Pops of color in Conversations (drop-in) ===== */
+
+/* Tunable knobs for comment tints */
+:root {
+  --cmt-brand-tint: 6%; /* brand wash in owner-ish rows */
+  --cmt-success-tint: 6%; /* success wash in recipient-ish rows */
+  --cmt-badge-bg: #fff8e1; /* matches your amber count pill */
+  --cmt-badge-fg: #7a5a00;
+}
+
+/* 1) Color the conversation titles subtly */
+.thread__title strong {
+  color: var(--brand-600);
+}
+
+/* 2) Make author names pop a bit in meta lines */
+.comment-meta strong {
+  color: var(--brand-600);
+}
+
+/* 3) Links inside messages: readable, clearly interactive */
+.prose-comment a {
+  color: var(--brand);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.prose-comment a:hover {
+  filter: brightness(0.9);
+  text-decoration: none;
+}
+
+.thread__messages .comment-item.is-mine .comment-bubble {
+  background: color-mix(in srgb, var(--brand) var(--cmt-brand-tint), #fff);
+  border-color: color-mix(in srgb, var(--brand) 18%, var(--border));
+}
+.thread__messages .comment-item.is-theirs .comment-bubble {
+  background: color-mix(in srgb, var(--success) var(--cmt-success-tint), #fff);
+  border-color: color-mix(in srgb, var(--success) 18%, var(--border));
+}
+
+/* 5) Tiny badges (if you ever render tags/labels in meta text) */
+.comment-meta .badge {
+  background: var(--cmt-badge-bg);
+  color: var(--cmt-badge-fg);
+  border-color: #ffe69c;
+  font-weight: 700;
+}
+
+/* 6) Input focus: a touch more brand when composing */
+.input-pill:focus {
+  border-color: var(--brand-200);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand) 20%, transparent);
+}
+
+/* 7) Send icon & toggle button: on-brand but not shouty */
+.icon-btn {
+  color: var(--brand);
+}
+.icon-btn:hover {
+  color: var(--brand-600);
+}
+.toggle-comment-btn {
+  color: var(--brand-600);
+  border-color: color-mix(
+    in srgb,
+    var(--brand) 28%,
+    var(--soft-stroke, var(--border))
+  );
+}
+.toggle-comment-btn:hover {
+  background: color-mix(in srgb, var(--brand) 8%, #fff);
+}
+
+/* 8) Optional: a gentle colored edge on hover to group each message stack */
+.thread:hover {
+  outline-color: color-mix(
+    in srgb,
+    var(--brand) 18%,
+    var(--soft-stroke, var(--border))
+  );
+}
+
+.thread__header--imsg {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.imsg-head {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: center;
+  min-width: 0; /* allow preview to truncate */
+}
+
+.imsg-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  font-size: 0.9rem;
+  color: #fff;
+  /* brand gradient like iMessage contact circles */
+  background: radial-gradient(circle at 30% 30%, #1da1f2, var(--brand));
+  box-shadow: 0 2px 8px rgba(24, 132, 189, 0.25);
+}
+
+.imsg-meta {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.imsg-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.imsg-name {
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.imsg-ts {
+  color: var(--muted);
+  font-size: 0.86rem;
+  white-space: nowrap;
+}
+
+.imsg-preview {
+  color: color-mix(in srgb, #000 70%, #fff);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.thread.is-collapsed .imsg-preview {
+  display: block;
+}
+.thread:not(.is-collapsed) .imsg-preview {
+  display: none;
+}
+
+/* Tighten the header when collapsed to feel list-like */
+.thread.is-collapsed .thread__header--imsg {
+  padding-bottom: 10px;
+}
+
+/* Make the collapsed card feel tappable */
+.thread.is-collapsed {
+  cursor: pointer;
+}
+.thread.is-collapsed .toggle-comment-btn {
+  pointer-events: auto;
+}
+
+/* Mobile sizing */
+@media (max-width: 575.98px) {
+  .imsg-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
+  }
+  .imsg-ts {
+    font-size: 0.8rem;
+  }
+}
+
+/* Preview row in the thread header */
+.imrow {
+  display: grid;
+  grid-template-columns: 40px 1fr max-content; /* <- fixed right column */
+  align-items: center;
+  gap: 12px;
+}
+
+.imrow__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  background: color-mix(in srgb, var(--brand) 15%, #eef2f7);
+  color: #0c2233;
+}
+
+.imrow__main {
+  min-width: 0; /* allows ellipsis to work */
+}
+
+.imrow__snippet {
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.imrow__when {
+  color: var(--muted);
+  font-size: 0.9rem;
+  white-space: nowrap; /* never wrap */
+  text-align: right; /* anchor to the right */
+  margin-left: 12px; /* tiny breathing room from snippet */
+}
+
+/* Make the preview row fill the header so its right column
+   (the time) sits consistently at the far right edge */
+.thread__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* keep toggle on the far right */
+  gap: 12px; /* breathing room between row and button */
+}
+
+/* The preview row should expand; allow truncation inside */
+.thread__header > .imrow {
+  flex: 1 1 auto; /* <- grow to fill space */
+  min-width: 0; /* <- enables ellipsis on the snippet */
+}
+
+/* Keep the toggle a fixed-size item so it never pushes the time around */
+.toggle-comment-btn {
+  flex: 0 0 auto;
+  margin-left: 4px; /* tiny gap from the time */
+}
+
+/* Inside the preview row, keep the time in a fixed right column */
+.imrow {
+  display: grid;
+  grid-template-columns: 40px 1fr max-content; /* avatar | text | time */
+  align-items: center;
+  gap: 12px;
+}
+
+/* Ensure snippet can shrink so time never wraps or shifts */
+.imrow__main {
+  min-width: 0;
+}
+.imrow__snippet {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The time stays right-aligned and single-line */
+.imrow__when {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.imrow__main {
+  display: grid;
+  gap: 5px; /* <- adjust to taste (2–4px works well) */
+  min-width: 0; /* keep truncation working */
+}
+
+/* Header remains a flex bar: row fills left, chevron stays fixed on the right */
+.thread__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer; /* big hit area */
+}
+
+/* Let the preview row grow */
+.thread__header > .imrow {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Chevron styling + rotation */
+.thread__chevron {
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--soft-stroke, #e5e7eb);
+  border-radius: 999px;
+  color: var(--brand-600);
+  transition: transform 160ms ease, background-color 120ms ease;
+}
+.thread__chevron:hover {
+  background: color-mix(in srgb, var(--brand) 8%, #fff);
+}
+
+/* Rotate chevron when expanded */
+.thread:not(.is-collapsed) .thread__chevron {
+  transform: rotate(180deg);
+}
+
+/* Keep time pinned on the right; snippet truncates */
+.imrow {
+  display: grid;
+  grid-template-columns: 40px 1fr max-content; /* avatar | text | time */
+  align-items: center;
+  gap: 12px;
+}
+.imrow__main {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+.imrow__snippet {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.imrow__when {
+  white-space: nowrap;
+  text-align: right;
+  margin-left: 12px;
+}
+
+.imrow__name {
+  font-weight: 700;
+}
+/* Received page: single conversation is always open; header is not a toggle */
+.thread--single .thread__header {
+  cursor: default;
+}
+
+/* Keep consistent preview spacing and pinned time (reuses your imrow rules) */
+.thread--single .thread__header > .imrow {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Slight extra air below the header when there is only one thread */
+.thread--single .thread__header {
+  padding-bottom: 10px;
+}
+
+/* Ensure name-to-snippet spacing stays comfy */
+.thread--single .imrow__main {
+  display: grid;
+  gap: 6px; /* tweak as you like */
+}
+
+/* === iMessage-style bubbles left/right === */
+
+/* The list is already a column grid; this is fine. */
+.thread__messages {
+  display: grid;
+  gap: var(--thread-gap, 12px);
+}
+
+/* Message row: stacks bubble then time */
+.msg {
+  display: grid;
+  grid-template-rows: auto auto;
+  max-width: min(75%, 520px);
+}
+
+/* Align each row to its side */
+.msg--theirs {
+  justify-self: start;
+}
+.msg--mine {
+  justify-self: end;
+}
+
+/* Bubbles: reuse your existing .comment-bubble look/tints,
+   but bind it to the new structure */
+.msg__bubble {
+  background: #fff;
+  border: 1px solid var(--soft-stroke, #e5e7eb);
+  border-radius: 18px;
+  padding: 10px 12px;
+  line-height: 1.4;
+  word-wrap: break-word;
+  box-shadow: none;
+}
+
+/* Keep your color tints (was .comment-item .comment-bubble) */
+.msg--mine .msg__bubble {
+  background: color-mix(in srgb, var(--brand) var(--cmt-brand-tint, 6%), #fff);
+  border-color: color-mix(in srgb, var(--brand) 18%, var(--border, #e5e7eb));
+}
+.msg--theirs .msg__bubble {
+  background: color-mix(
+    in srgb,
+    var(--success) var(--cmt-success-tint, 6%),
+    #fff
+  );
+  border-color: color-mix(in srgb, var(--success) 18%, var(--border, #e5e7eb));
+}
+
+/* Tiny timestamp under the bubble */
+.msg__time {
+  margin-top: 4px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+/* Align timestamp with its bubble */
+.msg--theirs .msg__time {
+  text-align: left;
+}
+.msg--mine .msg__time {
+  text-align: right;
+}
+
+/* Optional: classic chat “tails” (subtle) */
+.msg--mine .msg__bubble {
+  border-bottom-right-radius: 6px;
+}
+.msg--theirs .msg__bubble {
+  border-bottom-left-radius: 6px;
+}
+
+/* Hide the old meta line if any instance remains */
+.comment-meta {
+  display: none;
+}
+
+/* Visually hidden (a11y helper) */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* By default, hide the timestamp completely */
+.msg__time {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 160ms ease;
+}
+
+/* Reveal when hovering over or focusing the bubble row */
+.msg:hover .msg__time,
+.msg:focus-within .msg__time {
+  opacity: 1;
+  visibility: visible;
+}
+
+.thread__messages.msgs--time-above .msg__time {
+  order: -1;
+} /* move up */
+.thread__messages.msgs--time-above .msg {
+  row-gap: -3px;
+  margin-bottom: 1px;
+}
+
+/* keep messages tight */
+.thread__messages {
+  gap: 4px;
+}
+.msg {
+  position: relative;
+  margin-top: 12px;
+  max-width: min(75%, 520px);
+}
+.msg--mine + .msg--mine,
+.msg--theirs + .msg--theirs {
+  margin-top: 4px;
+}
+
+/* bubble stays below the timestamp in the stacking order */
+.msg__bubble {
+  position: relative;
+  z-index: 1;
+}
+
+/* timestamp sits above, with its own pill background */
+.msg__time {
+  position: absolute;
+  top: -20px;
+  font-size: 0.7rem;
+  color: var(--muted);
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, #fff 92%, var(--soft-surface, #f7f9fb));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  z-index: 2; /* <- above bubble */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 160ms ease, visibility 0s linear 160ms;
+  pointer-events: none;
+}
+.msg--theirs .msg__time {
+  left: 0;
+  text-align: left;
+}
+.msg--mine .msg__time {
+  right: 0;
+  text-align: right;
+}
+
+.msg:hover .msg__time,
+.msg:focus-within .msg__time {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+/* Timestamp pill: stay single-line and stretch to fit text */
+.msg__time {
+  position: absolute;
+  top: -18px; /* sits above the bubble */
+  white-space: nowrap; /* force single line */
+  width: max-content; /* pill grows to fit text */
+  max-width: 90vw; /* safety for small screens */
+  font-size: 0.67rem;
+  color: var(--muted);
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, #fff 92%, var(--soft-surface, #f7f9fb));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  z-index: 2;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 160ms ease, visibility 0s linear 160ms;
+  pointer-events: none;
+}
+
+.msg--theirs .msg__time {
+  left: 0;
+}
+.msg--mine .msg__time {
+  right: 0;
+}
+
+.msg:hover .msg__time,
+.msg:focus-within .msg__time {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ===== Compact thread header on small screens (no overlap) ===== */
+@media (max-width: 420px) {
+  /* Keep the header bar tidy */
+  .thread__header {
+    gap: 8px; /* tighter than 12px */
+    padding: 12px var(--thread-pad-x, 18px);
+  }
+
+  /* Let the preview row reflow into 2 rows: avatar | name ; time below name */
+  .thread__header > .imrow {
+    min-width: 0;
+    gap: 8px;
+  }
+
+  .imrow {
+    grid-template-columns: 32px 1fr; /* avatar smaller; drop fixed time column */
+    align-items: center;
+  }
+
+  .imrow__avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 0.8rem;
+  }
+
+  /* Name can wrap if needed, but stays truncated to one line */
+  .imrow__name {
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Put the time on its own line under the name */
+  .imrow__when {
+    grid-column: 2 / -1; /* second column, full width */
+    grid-row: 2; /* second row */
+    margin-left: 0;
+    text-align: left;
+    font-size: 0.78rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  /* Hide the snippet at XS so name + time have room */
+  .imrow__snippet {
+    display: none;
+  }
+
+  /* Keep the chevron compact so it doesn't crowd */
+  .thread__chevron {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* Privacy chip: snug on desktop, wraps on small screens */
+.conv-privacy {
+  display: flex; /* shrink to content width */
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  width: max-content; /* 👈 keeps it tight on desktop */
+  margin: 8px auto 12px;
+
+  padding: 4px 12px; /* back to the tighter padding */
+  font-size: 0.9rem;
+  color: var(--muted);
+  background: #fff;
+  border: 1px solid var(--soft-stroke);
+  border-radius: 999px;
+}
+
+.conv-privacy span {
+  /* text lives here (with the lock) */
+  display: inline; /* natural flow */
+  white-space: nowrap; /* default: single line on roomy screens */
+}
+
+/* Small screens: allow wrapping and prevent overflow */
+@media (max-width: 600px) {
+  .conv-privacy {
+    width: auto; /* let the container shrink */
+    max-width: calc(100% - 24px); /* side padding guard */
+    text-align: center;
+  }
+  .conv-privacy span {
+    white-space: normal; /* allow line breaks on mobile */
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}
+
+/* screen-reader only label */
+.sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Optional: hide chip on very small screens if space is tight
+@media (max-width: 380px) {
+  .conv-privacy {
+    display: none;
+  }
+} */
+
+/* unread state in thread headers */
+.thread__header--unread {
+  background: color-mix(in srgb, var(--brand) 6%, #fff);
+}
+
+/* badge next to the time */
+.unread-badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  margin-left: 8px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 700;
+  background: var(--brand-600, #2563eb);
+  color: #fff;
+}
+
+/* alternatively (or additionally) make the name bold when unread */
+.thread__header--unread .imrow__name {
+  font-weight: 900;
+}
+
+.thread {
+  scroll-margin-top: 16px;
+} /* or the height of your fixed header */
+
+/* === Fix vertical centering in the single-thread header (desktop) === */
+
+/* 1) Guarantee the row has at least the avatar’s height and centers its cells */
+.thread--single .thread__header > .imrow {
+  min-height: 40px; /* a hair taller than the 36px avatar */
+  align-items: center; /* center all three grid cells vertically */
+}
+
+/* 2) Make the time cell use a flex line box so it centers reliably */
+.thread--single .imrow__when {
+  display: inline-flex; /* replaces inline flow, keeps width natural */
+  align-items: center; /* vertical center the <time> text */
+}
+
+/* 3) Normalize line-height so text doesn’t sit high on its baseline */
+.thread--single .imrow__name,
+.thread--single .imrow__when time {
+  line-height: 1.5; /* removes baseline “float” */
+}
+
+/* === Fix mobile cards to match message apps=== */
+
+@media (max-width: 575.98px) {
+  .thread,
+  .thread--single {
+    border-radius: 0; /* lose card rounding */
+    margin: 0; /* flush with viewport */
+    border-left: none;
+    border-right: none;
+    box-shadow: none; /* drop desktop shadow */
+  }
+
+  .thread__body {
+    padding: 12px 16px; /* roomy but not cramped */
+    border-radius: 0;
+  }
+
+  .msg__bubble {
+    font-size: 0.9rem; /* down from ~1rem */
+    line-height: 1.35; /* tighter rhythm */
+    padding: 8px 12px;
+  }
+  .msg {
+    max-width: 85%; /* feels less “narrow” */
+  }
+
+  .thread__messages {
+    gap: 6px; /* instead of 12px+ */
+  }
+  .msg {
+    margin-top: 8px;
+  }
+  .msg__time {
+    font-size: 0.65rem;
+    padding: 1px 6px;
+    top: -16px; /* tuck closer */
+    box-shadow: none; /* less visual noise */
+  }
+}
+
+/* Fix send button styling */
+/* Let the input own the row */
+.comment-input {
+  display: flex; /* you already have this */
+  align-items: center;
+  gap: 8px;
+}
+.comment-input .replyTextArea {
+  flex: 1 1 auto; /* grow to fill space */
+}
+
+/* Send button: compact by default */
+.comment-input .sendButton {
+  width: 36px;
+  height: 36px;
+  padding: 0; /* no extra padding */
+  border-radius: 10px; /* softer than full pill */
+  display: inline-grid;
+  place-items: center;
+}
+.comment-input .sendButton svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* MOBILE: make it even smaller and give more room to the textarea */
+@media (max-width: 575.98px) {
+  .comment-input {
+    gap: 6px;
+  }
+
+  .comment-input .sendButton {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+  }
+  .comment-input .sendButton svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* --- Hide the send button until there's text --- */
+/* Works because your <textarea> has a placeholder. */
+.comment-input textarea:placeholder-shown + .sendButton {
+  opacity: 0;
+  pointer-events: none;
+  width: 0; /* collapses the button */
+  padding: 0;
+  margin: 0;
+}
+
+/* Optional: remove the inter-item gap while empty for a seamless look */
+.comment-input:has(textarea:placeholder-shown) {
+  gap: 0;
+}
+
+/* Fallback alignment when parent isn't grid */
+.msg--mine {
+  margin-left: auto;
+} /* stick to the right */
+.msg--theirs {
+  margin-right: auto;
+} /* stick to the left  */
+
+/* Ensure rows shrink to content even in block layout */
+.msg {
+  width: fit-content;
+  max-width: min(75%, 520px);
+}
+
+/* Bubble still fills the row's width (content-sized now) */
+.msg__bubble {
+  display: block;
+}

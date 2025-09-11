@@ -1,0 +1,84 @@
+/* Landing: tiny, page-scoped layer */
+.hero .display-5 {
+  line-height: 1.1;
+}
+
+/* Size Oliver responsively */
+.oliver-hero {
+  width: clamp(220px, 36vw, 360px);
+  height: auto;
+  display: block;
+  margin-inline: auto;
+}
+
+/* Bubble positioning */
+.oliver-wrap {
+  position: relative;
+  display: inline-block; /* shrink-wrap to image */
+  overflow: visible;
+}
+
+/* Caption under Oliver */
+.oliver-caption {
+  margin-top: 8px;
+  font-size: clamp(14px, 1.6vw, 16px);
+  font-weight: 600;
+  color: #0c2233;
+  text-align: center;
+}
+
+/* The bubble */
+.oliver-bubble {
+  position: absolute;
+  right: 100%; /* lock to LEFT of the image */
+  margin-right: -20px;
+  top: 40%; /* vertical placement near the mouth */
+  transform: translateY(-50%);
+  max-width: clamp(140px, 28vw, 220px);
+  padding: 8px 12px;
+  font-weight: 700;
+  font-size: clamp(12px, 1.6vw, 16px);
+  line-height: 1.2;
+  background: #fff;
+  color: #0c2233;
+  border: 1px solid #d9e2ec;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  white-space: normal;
+}
+
+/* Mobile tweaks: keep it compact and a touch higher */
+@media (max-width: 575.98px) {
+  .oliver-bubble {
+    top: 40%;
+    margin-right: -10px;
+    max-width: 56vw;
+    padding: 6px 10px;
+    border-radius: 12px;
+  }
+  .oliver-bubble::after {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+/* Super narrow screens: if space gets tight, let the bubble sit above-left */
+@media (max-width: 330px) {
+  .oliver-bubble {
+    top: 10%;
+  }
+}
+
+.card-body h3 {
+  color: var(--brand-600);
+  font-weight: 700;
+}
+
+.value-header {
+  /* color: var(--brand-600); */
+  font-weight: 600;
+}
+
+.value {
+  padding: 0.75rem 1.25rem; /* vertical + horizontal padding */
+}

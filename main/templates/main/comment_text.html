@@ -1,3 +1,30 @@
-<div class="comment">
-    <p><strong>{{ comment.sender.first_name }} {{ comment.sender.last_name }}</strong>: {{ comment.text|linebreaksbr }}</p>
+{# main/comment_text.html #}
+{% load tz %}
+{% load custom_filters %}  
+
+{# mine vs theirs #}
+{% with is_mine=comment.sender_id|yesno:"true,false" %}
+{% endwith %}
+
+{# Row container aligns itself left/right based on who sent it #}
+<div class="msg {% if comment.sender_id == request.user.id %}msg--mine{% else %}msg--theirs{% endif %}">
+  {# bubble #}
+  <div class="msg__bubble">
+    {{ comment.text|linebreaksbr }}
+  </div>
+
+  {# tiny timestamp under the bubble, aligned with the bubble side #}
+  <div class="msg__time">
+    <time
+      datetime="{{ comment.created_at|date:'c' }}"
+      title="{{ comment.created_at|date:'F j, Y, g:i a T' }}"
+    >
+      {{ comment.created_at|chat_timestamp }}
+    </time>
+</div>
+
+  {# accessibility: keep sender info invisible to sighted users #}
+  <span class="visually-hidden">
+    From {{ comment.sender.first_name }} {{ comment.sender.last_name }}
+  </span>
 </div>

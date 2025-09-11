@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} Server Error {% endblock %}
+
+{% block css_files %}
+  <link rel="stylesheet" href="{% static "css/base.css" %}">
+  <link rel="stylesheet" href="{% static "css/utilities.css" %}">
+  <link rel="stylesheet" href="{% static "css/components.css" %}">
+  <style>
+    /* Fallback styles if main CSS fails */
+    body {
+      font-family: system-ui, sans-serif;
+      text-align: center;
+      padding: 4rem 1rem;
+      background: #fef2f2;
+      color: #7f1d1d;
+    }
+    h1 {
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+    }
+    p {
+      color: #991b1b;
+      margin-bottom: 2rem;
+    }
+    a.btn-fallback {
+      display: inline-block;
+      background: #dc2626;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    a.btn-fallback:hover {
+      background: #b91c1c;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <h1 class="header">Something went wrong</h1>
+  <p>We’re sorry — our server hit an unexpected problem.</p>
+  <a href="{% url 'home' %}" class="btn-fallback">Back to Home</a>
+{% endblock %}

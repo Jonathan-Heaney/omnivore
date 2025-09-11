@@ -1,48 +1,243 @@
-function toggleComments(artPieceId, recipientId) {
-  var commentsSection = document.getElementById(
-    'comments-' + artPieceId + '-' + recipientId + '-container'
-  );
-  var toggleButton = document.getElementById(
-    'toggle-button-' + artPieceId + '-' + recipientId
-  );
+// ---------- intent parsing ----------
+const urlParams = new URLSearchParams(location.search);
+const FOCUS = urlParams.get('focus'); // "piece" | "thread" | null
+const FOCUS_OTHER = urlParams.get('other'); // user id string or null
 
-  if (commentsSection.style.display === 'none') {
-    commentsSection.style.display = 'block';
-    toggleButton.innerHTML = '<i class="fa-solid fa-minus"></i>';
-    localStorage.setItem(
-      'comments-' + artPieceId + '-' + recipientId + '-container',
-      'shown'
-    );
+// Optional: clean the URL once we’ve read intent (prevents re-trigger on refresh)
+window.addEventListener('DOMContentLoaded', () => {
+  if (FOCUS || FOCUS_OTHER || urlParams.get('n')) {
+    history.replaceState({}, '', location.pathname);
+  }
+});
+
+// ---------- helpers ----------
+function getCSRFToken() {
+  const m = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]+)/);
+  return m ? decodeURIComponent(m[1]) : '';
+}
+
+function updateNotificationBell(total) {
+  const link = document.getElementById('notification-link');
+  const icon = document.getElementById('notification-icon');
+  const badge = document.getElementById('notif-badge');
+  if (!link || !icon || !badge) return;
+
+  const n = Number(total || 0);
+  if (n > 0) {
+    link.classList.add('has-unread');
+    icon.classList.remove('fa-regular');
+    icon.classList.add('fa-solid');
+    badge.classList.add('notif-badge--count');
+    badge.removeAttribute('data-dot');
+    badge.textContent = String(n);
   } else {
-    commentsSection.style.display = 'none';
-    toggleButton.innerHTML = '<i class="fa-solid fa-plus"></i>';
-    localStorage.setItem(
-      'comments-' + artPieceId + '-' + recipientId + '-container',
-      'hidden'
-    );
+    link.classList.remove('has-unread');
+    icon.classList.remove('fa-solid');
+    icon.classList.add('fa-regular');
+    badge.classList.remove('notif-badge--count');
+    badge.setAttribute('data-dot', '1'); // tiny dot mode
+    badge.textContent = '';
   }
 }
 
-// Set the initial state based on localStorage
-document.addEventListener('DOMContentLoaded', function () {
-  var commentSections = document.querySelectorAll(
-    '[id^="comments-"][id$="-container"]'
+// Flip header to "read" immediately (idempotent)
+function clearUnreadHeader(headerEl) {
+  if (!headerEl) return;
+  headerEl.classList.remove('thread__header--unread', 'is-unread');
+  headerEl.dataset.markedRead = '1';
+  headerEl.removeAttribute('data-unread');
+  headerEl.closest('article.thread')?.classList.remove('is-unread');
+  const badge = headerEl.querySelector(
+    '.unread-badge, .thread__unread, .badge-unread'
   );
+  if (badge) badge.remove();
+}
 
-  commentSections.forEach(function (section) {
-    var sectionId = section.id;
-    var toggleButton = document.getElementById(
-      'toggle-button-' + sectionId.split('-')[1] + '-' + sectionId.split('-')[2]
+// POST to server to mark a specific thread read (owner view)
+async function markThreadRead(headerEl) {
+  if (!headerEl || headerEl.dataset.markedRead === '1') return;
+
+  const piece = headerEl.getAttribute('data-art');
+  const other = headerEl.getAttribute('data-recipient');
+  const markUrl =
+    headerEl.getAttribute('data-mark-url') || '/threads/mark-read/';
+  if (!piece || !other || !markUrl) return;
+
+  const body = new URLSearchParams({ piece, other });
+
+  try {
+    const resp = await fetch(markUrl, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCSRFToken(),
+        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+      },
+      body,
+      credentials: 'same-origin',
+    });
+    if (!resp.ok) return;
+
+    const data = await resp.json();
+    updateNotificationBell(data.unread_total);
+    clearUnreadHeader(headerEl); // idempotent safety
+  } catch {
+    /* noop */
+  }
+}
+
+function focusReplyWithoutJump(artPieceId, recipientId) {
+  const form = document.querySelector(
+    `#thread-${artPieceId}-${recipientId} .thread__form`
+  );
+  if (!form) return;
+
+  const input = form.querySelector(
+    "textarea, input[type='text'], [contenteditable='true']"
+  );
+  if (input) {
+    try {
+      input.focus({ preventScroll: true });
+    } catch {
+      input.focus();
+    }
+  }
+
+  const article = document.getElementById(
+    `thread-${artPieceId}-${recipientId}`
+  );
+  if (article) {
+    article.scrollIntoView({
+      block: 'nearest',
+      inline: 'nearest',
+      behavior: 'smooth',
+    });
+  }
+
+  const msgs = article?.querySelector('.thread__messages');
+  if (msgs)
+    requestAnimationFrame(() => {
+      msgs.scrollTop = msgs.scrollHeight;
+    });
+}
+
+// Expand/collapse handler wired per thread
+function toggleComments(artPieceId, recipientId) {
+  const article = document.getElementById(
+    `thread-${artPieceId}-${recipientId}`
+  );
+  if (!article) return;
+
+  const header = document.getElementById(
+    `toggle-header-${artPieceId}-${recipientId}`
+  );
+  const body = article.querySelector('.thread__body');
+  const inner = document.getElementById(
+    `comments-${artPieceId}-${recipientId}-container`
+  );
+  const key = `thread-state-${artPieceId}-${recipientId}`;
+  const expanded = header?.getAttribute('aria-expanded') === 'true';
+
+  if (expanded) {
+    if (body) body.hidden = true;
+    if (inner) inner.style.display = 'none';
+    article.classList.add('is-collapsed');
+    header?.setAttribute('aria-expanded', 'false');
+    localStorage.setItem(key, 'collapsed');
+  } else {
+    if (body) body.hidden = false;
+    if (inner) inner.style.display = 'block';
+    article.classList.remove('is-collapsed');
+    header?.setAttribute('aria-expanded', 'true');
+    localStorage.setItem(key, 'expanded');
+
+    // instant UI + async server update
+    clearUnreadHeader(header);
+    markThreadRead(header);
+
+    // polite focus/scroll
+    requestAnimationFrame(() => focusReplyWithoutJump(artPieceId, recipientId));
+  }
+}
+
+// ---------- page init ----------
+document.addEventListener('DOMContentLoaded', () => {
+  const articles = document.querySelectorAll('article.thread[id^="thread-"]');
+
+  articles.forEach((article) => {
+    const parts = article.id.split('-'); // "thread-<pieceId>-<recipientId>"
+    // guard: IDs like "thread-123-45"
+    if (parts.length < 3) return;
+    const artPieceId = parts[1];
+    const recipientId = parts[2];
+
+    const key = `thread-state-${artPieceId}-${recipientId}`;
+    const header = document.getElementById(
+      `toggle-header-${artPieceId}-${recipientId}`
+    );
+    const body = article.querySelector('.thread__body');
+    const inner = document.getElementById(
+      `comments-${artPieceId}-${recipientId}-container`
     );
 
-    var storedState = localStorage.getItem(sectionId);
-    if (storedState === 'hidden') {
-      section.style.display = 'none';
-      toggleButton.innerHTML = '<i class="fa-solid fa-plus"></i>';
+    // ---- Decide initial state (priority: intent > saved state) ----
+    let shouldExpand = false;
+    let shouldFocus = false;
+
+    if (FOCUS === 'piece') {
+      shouldExpand = false;
+      localStorage.setItem(key, 'collapsed');
+    } else if (FOCUS === 'thread') {
+      const isTarget = String(recipientId) === String(FOCUS_OTHER || '');
+      shouldExpand = isTarget;
+      shouldFocus = isTarget;
+      localStorage.setItem(key, isTarget ? 'expanded' : 'collapsed');
     } else {
-      section.style.display = 'block';
-      toggleButton.innerHTML = '<i class="fa-solid fa-minus"></i>';
+      const state = localStorage.getItem(key);
+      shouldExpand = state === 'expanded';
     }
+
+    // ---- Apply state ----
+    if (shouldExpand) {
+      if (body) body.hidden = false;
+      if (inner) inner.style.display = 'block';
+      article.classList.remove('is-collapsed');
+      header?.setAttribute('aria-expanded', 'true');
+
+      if (shouldFocus) {
+        // deep-link target: clear unread immediately and POST
+        clearUnreadHeader(header);
+        markThreadRead(header);
+        requestAnimationFrame(() =>
+          focusReplyWithoutJump(artPieceId, recipientId)
+        );
+      } else if (FOCUS == null && localStorage.getItem(key) === 'expanded') {
+        // legacy restore path
+        requestAnimationFrame(() =>
+          focusReplyWithoutJump(artPieceId, recipientId)
+        );
+        // if it was unread and we restored expanded, clear + POST too
+        if (header?.classList.contains('thread__header--unread')) {
+          clearUnreadHeader(header);
+          markThreadRead(header);
+        }
+      }
+    } else {
+      if (body) body.hidden = true;
+      if (inner) inner.style.display = 'none';
+      article.classList.add('is-collapsed');
+      header?.setAttribute('aria-expanded', 'false');
+    }
+
+    // ---- Listeners ----
+    header?.addEventListener('click', () =>
+      toggleComments(artPieceId, recipientId)
+    );
+    header?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggleComments(artPieceId, recipientId);
+      }
+    });
   });
 });
 
@@ -84,11 +279,65 @@ function clearForm(form) {
   button.disabled = true;
 }
 
-function confirmDelete() {
-  return confirm(
-    'Are you sure you want to delete this post? This cannot be undone.'
-  );
-}
+document.addEventListener('DOMContentLoaded', () => {
+  const modalEl = document.getElementById('deleteConfirmModal');
+  if (!modalEl) return;
+
+  const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+  const titleEl = document.getElementById('delete-item-title');
+  const formEl = document.getElementById('deleteConfirmForm');
+  const confirmBtn = formEl?.querySelector('[type="submit"]');
+
+  // Ensure the modal form has a dedicated hidden next input (create if missing)
+  let nextInput = formEl.querySelector('input[name="next"]');
+  if (!nextInput) {
+    nextInput = document.createElement('input');
+    nextInput.type = 'hidden';
+    nextInput.name = 'next';
+    nextInput.id = 'deleteModalNext';
+    formEl.appendChild(nextInput);
+  }
+
+  // Delegate clicks from any delete button
+  document.body.addEventListener('click', (e) => {
+    const btn = e.target.closest('.js-open-delete');
+    if (!btn) return;
+
+    const url = btn.getAttribute('data-delete-url');
+    const title = btn.getAttribute('data-delete-title') || 'this post';
+
+    // 1) Point the modal form at the right endpoint
+    formEl.setAttribute('action', url);
+
+    // 2) Resolve the "next" target (prefer inline form's value)
+    const inlineForm = btn.closest('form');
+    const inlineNext = inlineForm?.querySelector('input[name="next"]')?.value;
+    const dataNext = btn.getAttribute('data-next');
+    const fallback = location.pathname + location.search;
+
+    nextInput.value = inlineNext || dataNext || fallback;
+
+    // 3) Populate title text
+    titleEl.textContent = title;
+
+    // 4) Enable submit (in case a previous submit disabled it)
+    if (confirmBtn) {
+      confirmBtn.disabled = false;
+      confirmBtn.removeAttribute('data-submitting');
+    }
+
+    // Show modal
+    modal.show();
+  });
+
+  // Optional: guard against double-submits
+  formEl.addEventListener('submit', () => {
+    if (!confirmBtn) return;
+    if (confirmBtn.getAttribute('data-submitting') === '1') return;
+    confirmBtn.setAttribute('data-submitting', '1');
+    confirmBtn.disabled = true;
+  });
+});
 
 // Modal handling
 document.addEventListener('DOMContentLoaded', function () {
@@ -142,16 +391,16 @@ function addPasswordToggles(selectors) {
 
   selectors.forEach((sel) => {
     document.querySelectorAll(sel).forEach((input) => {
-      if (input.dataset.hasToggle) return; // avoid duplicates on re-render
+      if (input.dataset.hasToggle) return; // avoid duplicates
       input.dataset.hasToggle = 'true';
 
-      // Wrap container
+      // Wrap the input in the positioned container our CSS expects
       const wrapper = document.createElement('div');
-      wrapper.className = 'pw-wrap';
+      wrapper.className = 'pw-field'; // <-- was 'pw-wrap'
       input.parentNode.insertBefore(wrapper, input);
       wrapper.appendChild(input);
 
-      // Create button
+      // Create the eye button
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'pw-toggle';
@@ -171,23 +420,21 @@ function addPasswordToggles(selectors) {
           isHidden ? 'Hide password' : 'Show password'
         );
         btn.innerHTML = isHidden ? EYE_SLASH : EYE;
-        // Keep focus in the input for nicer UX
         input.focus({ preventScroll: true });
       });
     });
   });
 }
 
+// One DOMContentLoaded + one HTMX hook is enough
 document.addEventListener('DOMContentLoaded', () => {
-  // enhance only fields with .js-password
   addPasswordToggles([
     'input.js-password[type="password"]',
     'input.js-password[type="text"]',
   ]);
 });
 
-// If you use HTMX anywhere, re-run on swapped content:
-document.body.addEventListener('htmx:afterSwap', (e) => {
+document.body.addEventListener('htmx:afterSwap', () => {
   addPasswordToggles([
     'input.js-password[type="password"]',
     'input.js-password[type="text"]',
@@ -212,4 +459,56 @@ document.body.addEventListener('htmx:afterSwap', (e) => {
 
   document.addEventListener('DOMContentLoaded', focusReply);
   window.addEventListener('pageshow', focusReply); // handles back/forward bfcache
+})();
+
+// iOS fixer to navigate directly to reply box from Received Art
+(function () {
+  // Only when we actually intend to land at the reply box.
+  var params = new URLSearchParams(location.search);
+  var focus = params.get('focus');
+  if (focus !== 'thread') return; // <- ignore focus=piece and no focus
+
+  // iOS WebKit (all iPhone/iPad browsers)
+  var ua = navigator.userAgent || '';
+  var isIOS = /iPad|iPhone|iPod/.test(ua);
+  if (!isIOS) return;
+
+  var reply = document.getElementById('reply');
+  if (!reply) return;
+
+  var ta = reply.querySelector('textarea');
+  if (ta) {
+    try {
+      ta.focus({ preventScroll: true });
+    } catch (e) {
+      ta.focus();
+    }
+  }
+
+  // Ensure the reply area is actually visible once, without smooth scrolling.
+  requestAnimationFrame(function () {
+    var rect = reply.getBoundingClientRect();
+    var headerOffset =
+      parseInt(
+        getComputedStyle(document.documentElement).getPropertyValue(
+          '--nav-offset'
+        )
+      ) || 50;
+
+    // If clipped above or below viewport, nudge it into view.
+    var topNeeded = rect.top - headerOffset - 8; // keep a little air
+    var clippedAbove = rect.top - headerOffset < 0;
+    var clippedBelow = rect.bottom > window.innerHeight;
+
+    if (clippedAbove || clippedBelow) {
+      window.scrollBy({ top: topNeeded, left: 0, behavior: 'auto' });
+    }
+  });
+
+  // Optional: clean the URL so refreshes don’t re-run the nudge
+  try {
+    var clean = new URL(location.href);
+    clean.searchParams.delete('focus');
+    history.replaceState(null, '', clean);
+  } catch (_) {}
 })();

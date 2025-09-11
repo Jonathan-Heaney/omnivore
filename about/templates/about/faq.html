@@ -1,29 +1,102 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %} FAQ {% endblock %}
-{% block css_files %}
-  <link rel="stylesheet" href="{% static "css/styles.css" %}">
-{% endblock %}
+{% block title %}FAQ{% endblock %}
 
 {% block content %}
-<h1 class="header">FAQ</h1>
+<section class="container-narrow py-4">
+  <header>
+    <h1 class="page-title">Frequently Asked Questions</h1>
+  </header>
 
-<h4>When am I supposed to submit my chosen piece of art?</h4>
-<p>We start accepting submissions for a new round on the 1st of every month. You can submit your chosen piece at any time during the month, just keep in mind that you won't receive any art until you have shared something of your own.</p>
+  <div class="accordion" id="faqAccordion">
+    <!-- Q1 -->
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="faq-when-submit-h">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq-when-submit" aria-expanded="true" aria-controls="faq-when-submit">
+          When am I supposed to submit my chosen piece of art?
+        </button>
+      </h2>
+      <div id="faq-when-submit" class="accordion-collapse collapse show" aria-labelledby="faq-when-submit-h" data-bs-parent="#faqAccordion">
+        <div class="accordion-body">
+          We start accepting submissions for a new round on the 1st of every month. You can submit your chosen piece at any time during the month, just keep in mind that you won't receive any art until you have shared something of your own.
+        </div>
+      </div>
+    </div>
 
-<h4>How many pieces of art can I submit?</h4>
-<p>At this time, we're only accepting one submission per person in a given month. We hope this constraint encourages people to be thoughtful and selective about what they submit, and that it will ensure everyone always has a piece of art that they can't wait to share in the next round!</p>
+    <!-- Q2 -->
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="faq-how-many-h">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-how-many" aria-expanded="false" aria-controls="faq-how-many">
+          How many pieces of art can I submit?
+        </button>
+      </h2>
+      <div id="faq-how-many" class="accordion-collapse collapse" aria-labelledby="faq-how-many-h" data-bs-parent="#faqAccordion">
+        <div class="accordion-body">
+          At this time, we're only accepting one submission per person in a given month. We hope this constraint encourages people to be thoughtful and selective about what they submit, and that it will ensure everyone always has a piece of art that they can't wait to share in the next round!
+        </div>
+      </div>
+    </div>
 
-<h4>What types of art can I submit?</h4>
-<p>We're interpreting "art" broadly, as in "the arts" - music, movies, TV, novels, poetry, plays, dance, painting, sculpture, architecture, and much more. You can find more detailed guidelines/suggestions for submissions <a href="/submission-guidelines">here</a>. </p>
+    <!-- Q3 -->
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="faq-what-types-h">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-what-types" aria-expanded="false" aria-controls="faq-what-types">
+          What types of art can I submit?
+        </button>
+      </h2>
+      <div id="faq-what-types" class="accordion-collapse collapse" aria-labelledby="faq-what-types-h" data-bs-parent="#faqAccordion">
+        <div class="accordion-body">
+          We're interpreting "art" broadly, as in "the arts" - music, movies, TV, novels, poetry, plays, dance, painting, sculpture, architecture, and much more. You can find more detailed guidelines/suggestions for submissions <a href="/submission-guidelines">here</a>.
+        </div>
+      </div>
+    </div>
 
-<h4>What am I expected to share about the piece?</h4>
-<p>You can find the submission form <a href="/share-art">here</a>. You'll share the name of the piece, the name of the artist(s), a link to view the piece online (if possible), and a description of the piece. This description is quite open to interpretation - you could talk about the work itself, your personal experiences with it, what you love about it, why you're choosing to share it, or really anything else that comes to mind that you think would be valuable for other people to read. You love this piece - help people understand why, and help them love it too!</p>
+    <!-- Q4 -->
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="faq-what-share-h">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-what-share" aria-expanded="false" aria-controls="faq-what-share">
+          What am I expected to share about the piece?
+        </button>
+      </h2>
+      <div id="faq-what-share" class="accordion-collapse collapse" aria-labelledby="faq-what-share-h" data-bs-parent="#faqAccordion">
+        <div class="accordion-body">
+          You can find the submission form <a href="/share-art">here</a>. You'll share the name of the piece, the name of the artist(s), a link to view the piece online (if applicable), and a description of the piece. This description is quite open to interpretation - you could talk about the work itself, your personal experiences with it, what you love about it, why you're choosing to share it, or really anything else that comes to mind that you think would be valuable for other people to read. You love this piece - help people understand why, and help them love it too!
+        </div>
+      </div>
+    </div>
 
-<h4>How often will I receive art?</h4>
-<p>If you have submitted something, then you'll receive a new piece of art from someone else in the community every Tuesday and Friday of the month (after the 3rd of the month, to give everyone time to submit).</p>
+    <!-- Q5 -->
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="faq-how-often-h">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-how-often" aria-expanded="false" aria-controls="faq-how-often">
+          How often will I receive art?
+        </button>
+      </h2>
+      <div id="faq-how-often" class="accordion-collapse collapse" aria-labelledby="faq-how-often-h" data-bs-parent="#faqAccordion">
+        <div class="accordion-body">
+          If you have submitted something, then you'll receive a new piece of art from someone else in the community every Tuesday and Friday of the month (after the 3rd of the month, to give everyone time to submit).
+        </div>
+      </div>
+    </div>
 
-<h4>How are you choosing what to send to people?</h4>
-<p>Technically, we're not "choosing" at all - it's completely random, which is what makes it fun! We have a database of all the art that people have submitted, and every Tuesday/Friday, we send one of those to you. You won't receive anything you've submitted, or anything you've already received, but other than that, it could be anything! No two people in the community will get the same pieces in the same order.</p>
+    <!-- Q6 -->
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="faq-how-choose-h">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-how-choose" aria-expanded="false" aria-controls="faq-how-choose">
+          How are you choosing what to send to people?
+        </button>
+      </h2>
+      <div id="faq-how-choose" class="accordion-collapse collapse" aria-labelledby="faq-how-choose-h" data-bs-parent="#faqAccordion">
+        <div class="accordion-body">
+          Technically, we're not "choosing" at all - it's completely random, which is what makes it fun! We have a database of all the art that people have submitted, and every Tuesday/Friday, we send one of those to you. You won't receive anything you've submitted, or anything you've already received, but other than that, it could be anything! No two people in the community will get the same pieces in the same order.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center mt-4">
+    <a href="{% url 'share_art' %}" class="btn btn-cta">Share a piece</a>
+  </div>
+</section>
 {% endblock %}

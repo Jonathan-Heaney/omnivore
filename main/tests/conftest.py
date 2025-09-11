@@ -60,3 +60,32 @@ def art_by_b(db, user_b):
         piece_description="Green.",
         approved_status=True,
     )
+
+
+@pytest.fixture
+def user_c(db):
+    return User.objects.create_user(
+        email="c@example.com", username="c", password="pass",
+        first_name="C", last_name="User"
+    )
+
+
+@pytest.fixture(autouse=True)
+def _mute_celery_email_tasks(monkeypatch):
+    """
+    Prevent Celery .delay() calls in signals from trying to connect to a broker.
+    We just no-op them in tests.
+    """
+    try:
+        from main import signals
+        for task_attr in (
+            "send_comment_email_task",
+            "send_like_email_task",
+            "send_shared_art_email_task",
+        ):
+            task = getattr(signals, task_attr, None)
+            if task and hasattr(task, "delay"):
+                monkeypatch.setattr(task, "delay", lambda *a, **k: None)
+    except Exception:
+        # If import paths change, don't fail tests because of the monkeypatch.
+        pass

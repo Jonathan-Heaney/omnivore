@@ -28,7 +28,7 @@ def on_like_created(sender, instance, created, **kwargs):
         sender=liker,
         notification_type="like",
         art_piece=art_piece,
-        message=f"{liker.first_name} {liker.last_name} loved a piece you shared: {art_piece.piece_name}"
+        message=f"❤️ {liker.first_name} {liker.last_name} loved a piece you shared: {art_piece.piece_name}"
     )
 
     # Enqueue the email AFTER the transaction commits successfully
@@ -55,9 +55,9 @@ def create_comment_notification(sender, instance, created, **kwargs):
         return
 
     if art_piece.user_id == recipient_user.id:
-        message = f"{sender_full_name} sent you a message on your piece: {art_piece.piece_name}"
+        message = f"💬 {sender_full_name} sent you a message on your piece: {art_piece.piece_name}"
     else:
-        message = f"{sender_full_name} replied to your message on: {art_piece.piece_name}"
+        message = f"💬 {sender_full_name} replied to your message on: {art_piece.piece_name}"
 
     n = Notification.objects.create(
         recipient=recipient_user,
@@ -96,7 +96,7 @@ def create_sent_art_notification(sender, instance, created, **kwargs):
         sender=sender_user,
         notification_type='shared_art',
         art_piece=art_piece,
-        message=f"{sender_user.first_name} {sender_user.last_name} shared some art with you!"
+        message=f"🎁 {sender_user.first_name} {sender_user.last_name} shared some art with you!"
     )
 
     transaction.on_commit(lambda: send_shared_art_email_task.delay(

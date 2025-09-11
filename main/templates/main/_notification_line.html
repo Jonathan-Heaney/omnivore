@@ -1,0 +1,32 @@
+{# expects: n (Notification) #}
+{% load static %}
+<span class="notif-line">
+  {% if n.notification_type == "like" %}
+    <span class="notif-emoji" aria-hidden="true">❤️</span>
+    <strong class="notif__sender">{{ n.sender.first_name }} {{ n.sender.last_name }}</strong>
+    <span> loved your piece </span>
+    {% if n.art_piece %}
+      <span class="notif__piece">“{{ n.art_piece.piece_name }}”</span>
+    {% endif %}
+  {% elif n.notification_type == "comment" %}
+    <span class="notif-emoji" aria-hidden="true">💬</span>
+    <strong class="notif__sender">{{ n.sender.first_name }} {{ n.sender.last_name }}</strong>
+    {% if n.art_piece and n.art_piece.user_id == n.recipient_id %}
+      <span> sent you a message on </span>
+    {% else %}
+      <span> replied to your message on </span>
+    {% endif %}
+    {% if n.art_piece %}
+      <span class="notif__piece">“{{ n.art_piece.piece_name }}”</span>
+    {% endif %}
+  {% elif n.notification_type == "shared_art" %}
+    <span class="notif-emoji" aria-hidden="true">🎁</span>
+    <strong class="notif__sender">{{ n.sender.first_name }} {{ n.sender.last_name }}</strong>
+    <span> shared some art with you:</span>
+    {% if n.art_piece %}
+      <span></span><span class="notif__piece">“{{ n.art_piece.piece_name }}”</span>
+    {% endif %}
+  {% else %}
+    {{ n.message }} {# fallback for any unexpected type #}
+  {% endif %}
+</span>

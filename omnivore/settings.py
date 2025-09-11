@@ -42,7 +42,7 @@ AWS_SES_REGION_NAME = os.environ.get('AWS_SES_REGION_NAME')
 AWS_SES_REGION_ENDPOINT = os.environ.get('AWS_SES_REGION_ENDPOINT')
 DEFAULT_FROM_EMAIL = os.environ.get(
     'DEFAULT_FROM_EMAIL', 'Omnivore Arts <oliver@omnivorearts.com>')
-SITE_URL = os.getenv("SITE_URL", "http://127.0.0.1/8000")
+SITE_URL = os.getenv("SITE_URL", "http://127.0.0.1:8000")
 
 # Celery configuration
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
@@ -119,7 +119,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'main.middleware.BlockWordPressPathsMiddleware',
-
+    "main.middleware.UserOrCookieTimezoneMiddleware",
 ]
 
 ROOT_URLCONF = 'omnivore.urls'
@@ -138,6 +138,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'main.context_processors.notifications_context',
+                "main.context_processors.unread_notifications",
             ],
         },
     },
@@ -184,9 +185,9 @@ TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
-USE_TZ = True
-
 FORMS_URLFIELD_ASSUME_HTTPS = True
+
+NEW_BADGE_WINDOW_DAYS = 30
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
@@ -210,11 +211,12 @@ LOGOUT_REDIRECT_URL = reverse_lazy('home')    # optional, nice to have
 
 CSRF_TRUSTED_ORIGINS = [
     'https://web-production-4a6f.up.railway.app',
-    'https://web-staging-f21f.up.railway.app'
+    'https://web-staging-f21f.up.railway.app',
     'http://localhost',
     'http://127.0.0.1',
     'http://localhost:8001',
-    'http://127.0.0.1:8001'
+    'http://127.0.0.1:8001',
+    'http://192.168.1.237:8000'
 ]
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 

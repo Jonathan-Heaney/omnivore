@@ -2,92 +2,121 @@
 {% load static %}
 {% load custom_filters %}
 
+{% block title %}My Shared{% endblock %}
 
-{% block title %} My Shared Art {% endblock %}
 {% block css_files %}
-  <link rel="stylesheet" href="{% static "css/styles.css" %}">
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/pages/my_shared.css' %}">
 {% endblock %}
 
 {% block content %}
 
-<h1 class="header">My Shared Art</h1>
+<div class="container-narrow py-4">
+  <h1 class="page-title">My Shared</h1>
 
-{% for piece in pieces %}
-<div id="art-{{ piece.public_id }}" class="card art-piece mb-4">
-    <div class="card-header"><strong>
-      <a href="{% url 'art_detail' piece.public_id %}">
-        <span class="card-title">{{ piece.piece_name }}</span>
-      </a>
-        </strong>({{piece.artist_name}})</div>
-    <div class="card-body">
-      <div>
-        <p>{{piece.piece_description|linebreaksbr}}</p>
+  <div class="shared-list">
+  {% for piece in pieces %}
+    <section id="art-{{ piece.public_id }}" class="shared-card">
+      <header class="shared-card__header">
+        <a class="shared-card__title" href="{% url 'art_detail' piece.public_id %}">
+          <strong>{{ piece.piece_name }}</strong>
+        </a>
+        <span class="shared-card__by">({{ piece.artist_name }})</span>
+      </header>
+
+      <div class="shared-card__body">
+        <p class="shared-card__description">{{ piece.piece_description|linebreaksbr }}</p>
       </div>
-      <div class="art-buttons">
-        <a href="{% url 'edit_art_piece' piece.public_id %}" class="btn btn-primary edit-btn" id="edit-btn">Edit</a>
-        <form method="post" action="{% url 'delete_art_piece' piece.public_id %}" onsubmit="return confirmDelete();">
+
+      <footer class="shared-card__meta">
+        <span class="shared-card__date">Shared {{ piece.created_at|date:"F j, Y" }}</span>
+
+        <div class="shared-card__actions">
+          <!-- Edit -->
+          <a href="{% url 'edit_art_piece' piece.public_id %}"
+             class="btn btn-outline-secondary btn-sm"
+             aria-label="Edit {{ piece.piece_name }}"
+             title="Edit">
+            <i class="fa-solid fa-pen"></i>
+          </a>
+
+          <!-- Delete -->
+          <form class="js-delete-form d-inline"
+              action="{% url 'delete_art_piece' piece.public_id %}"
+              method="post">
           {% csrf_token %}
-          <button type="submit" class="btn btn-danger">Delete</button>
-      </form>
-      </div>
-      {% if piece.link %}
-        <a class="btn btn-sm btn-outline-secondary ms-2" href="{{ piece.link }}" target="_blank" rel="noopener">Source</a>
-      {% endif %}
-    </div>
-    <div class="card-footer text-muted">Shared {{piece.created_at|date:"F j, Y" }}</div>
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button type="button"
+                  class="btn btn-outline-danger btn-sm js-open-delete"
+                  data-delete-url="{% url 'delete_art_piece' piece.public_id %}"
+                  data-delete-title="{{ piece.piece_name|escape }}">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </form>
 
-    {% with users=likes_dict|dict_get:piece %}
+          {% if piece.link %}
+            <a class="btn btn-outline-primary btn-sm"
+               href="{{ piece.link }}"
+               target="_blank"
+               rel="noopener"
+               aria-label="Open source link for {{ piece.piece_name }}"
+               title="Open source">
+              <i class="fa-solid fa-up-right-from-square"></i>
+            </a>
+          {% endif %}
+        </div>
+      </footer>
+
+      {% with users=likes_dict|dict_get:piece %}
         {% if users %}
-          <div class="likes-container" id="likes-{{ piece.id }}-container">
+          <div class="likes">
             {% include 'main/likes_display.html' with piece=piece likes_dict=likes_dict %}
           </div>
         {% endif %}
-    {% endwith %}
+      {% endwith %}
 
+      {% with s=summaries|dict_get:piece.id %}
+        {% if s.conv_count and s.conv_count|add:0 > 0 %}
+          <div class="summary">
+            <div class="summary__left">
+              <div class="summary__line">
+                <span class="summary__label">Conversations</span>
+                <span class="summary__value">{{ s.conv_count }}</span>
 
-    {# --- conversation summary (clean layout + clear CTA) --- #}
-    {% with s=summaries|dict_get:piece.id %}
-      <div class="piece-summary">
-        <div class="row align-items-center gy-2">
-          <div class="col-12 col-md">
-            <div class="summary-line">
-              <span class="summary-label">Conversations</span>
-              <span class="summary-value">{{ s.conv_count }}</span>
+                <span class="summary__badges">
+                  {% if s.new_conv_count and s.new_conv_count|add:0 > 0 %}
+                    <span class="badge badge--newconv"
+                          aria-label="{{ s.new_conv_count }} new conversation{% if s.new_conv_count != 1 %}s{% endif %}">
+                      {{ s.new_conv_count }} new conversation{% if s.new_conv_count != 1 %}s{% endif %}
+                    </span>
+                  {% endif %}
 
-              {% if s.unread_count %}
-                <span class="badge summary-badge" aria-label="{{ s.unread_count }} new conversations">
-                  {{ s.unread_count }} new
-                </span>
-              {% endif %}
-            </div>
-
-            {% if s.last %}
-              <div class="last-message text-muted">
-                <span class="last-label">Last message</span>
-                <span class="last-text">
-                  <strong>{{ s.last.sender.first_name }} {{ s.last.sender.last_name }}</strong> —
-                  {{ s.last.text|truncatechars:120 }}
+                  {% if s.new_msg_count and s.new_msg_count|add:0 > 0 %}
+                    <span class="badge badge--newmsg"
+                          aria-label="{{ s.new_msg_count }} new message{% if s.new_msg_count != 1 %}s{% endif %}">
+                      {{ s.new_msg_count }} new message{% if s.new_msg_count != 1 %}s{% endif %}
+                    </span>
+                  {% endif %}
                 </span>
               </div>
-            {% endif %}
-          </div>
+            </div>
 
-          <div class="col-12 col-md-auto">
-            <a href="{% url 'art_detail' piece.public_id %}"
-              class="btn btn-cta btn-sm"
-              aria-label="View conversations for {{ piece.piece_name }}">
-              <i class="fa-regular fa-comments me-1"></i>
-              View conversations
-            </a>
+            <div class="summary__right">
+              <a href="{% url 'art_detail' piece.public_id %}#conversations"
+                class="btn btn-cta btn-cta--amber btn-sm"
+                aria-label="View conversations for {{ piece.piece_name }}">
+                <i class="fa-regular fa-comments me-1"></i>
+                View conversations
+              </a>
+            </div>
           </div>
-        </div>
-      </div>
-    {% endwith %}
-  
-    
+        {% endif %}
+      {% endwith %}
+    </section>
+  {% empty %}
+    <p>Nothing shared yet — share something <a href="/share-art">here</a>! It's the best way to become a part of the Omnivore community.</p>
+  {% endfor %}
+  </div>
 </div>
 
-  {% empty %}
-  <p>Nothing shared yet - share something <a href="/share-art">here</a>!</p>
-{% endfor %}
 {% endblock %}
