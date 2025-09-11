@@ -43,7 +43,7 @@
                 <strong>[Deleted piece]</strong>
               </span>
             {% else %}
-              <a class="received-card__title" href="{% url 'art_detail' piece.public_id %}">
+              <a class="received-card__title" href="{% url 'art_detail' piece.public_id %}?focus=piece">
                 <strong>{{ piece.piece_name }}</strong>
               </a>
               <span class="received-card__by">({{ piece.artist_name }})</span>
