@@ -28,6 +28,8 @@ import json
 from django.utils.http import url_has_allowed_host_and_scheme
 from zoneinfo import ZoneInfo
 from django.conf import settings
+from django.views.decorators.csrf import requires_csrf_token
+import logging
 
 
 def home(request):
@@ -839,6 +841,21 @@ def custom_404(request, exception):
 
 def custom_500(request):
     return render(request, 'main/500.html', status=500)
+
+
+log = logging.getLogger(__name__)
+
+
+@requires_csrf_token
+def csrf_failure(request, reason=""):
+    log.warning("CSRF failure: %s", reason, extra={
+        "path": request.path,
+        "origin": request.META.get("HTTP_ORIGIN"),
+        "referer": request.META.get("HTTP_REFERER"),
+        "host": request.get_host(),
+        "secure": request.is_secure(),
+    })
+    return render(request, "main/csrf_403.html", status=403, context={"reason": reason})
 
 
 class CustomPasswordResetView(auth_views.PasswordResetView):

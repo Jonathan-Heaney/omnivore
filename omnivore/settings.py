@@ -6,7 +6,13 @@ import warnings
 from django.urls import reverse_lazy
 
 # Figure out which environment we're in
-ENVIRONMENT = os.getenv("ENVIRONMENT", "local")
+ENVIRONMENT = os.getenv("ENVIRONMENT", "local").lower()
+
+
+IS_LOCAL = ENVIRONMENT == "local"
+IS_STAGING = ENVIRONMENT == "staging"
+IS_PROD = ENVIRONMENT == "production"
+IS_LIVE = ENVIRONMENT in ("staging", "production")  # HTTPS on both
 
 
 # Load the appropriate .env file based on the environment
@@ -70,7 +76,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
+DEBUG = (os.getenv("DEBUG", "False").lower() == "true") if IS_LOCAL else False
+
+# Security flags – on for staging & production
+SECURE_SSL_REDIRECT = IS_LIVE
+SESSION_COOKIE_SECURE = IS_LIVE
+CSRF_COOKIE_SECURE = IS_LIVE
+CSRF_COOKIE_SAMESITE = "Lax"
+
 
 ALLOWED_HOSTS = ["*"]
 
@@ -221,6 +234,8 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8001',
     'http://127.0.0.1:8001',
     'http://192.168.1.237:8000'
+    "https://omnivorearts.com",
+    "https://www.omnivorearts.com",
 ]
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
