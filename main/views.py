@@ -518,6 +518,8 @@ def art_piece_detail(request, public_id):
     is_owner = (piece.user_id == user.id)
     has_received = SentArtPiece.objects.filter(
         user=user, art_piece=piece).exists()
+    focus = request.GET.get("focus")            # "piece" | "thread" | None
+    focus_other = request.GET.get("other")      # user id as str or None
 
     if not (is_owner or has_received):
         raise Http404("Not found")
@@ -541,6 +543,16 @@ def art_piece_detail(request, public_id):
                 notification_type__in=["comment", "shared_art"],
             ).update(is_read=True)
 
+         # 3) Owners: clear thread notifications if deep-linked
+        if is_owner and focus == "thread" and focus_other:
+            Notification.objects.filter(
+                recipient=user,
+                art_piece=piece,
+                notification_type="comment",
+                sender_id=focus_other,
+                is_read=False,
+            ).update(is_read=True)
+
     # Mark the SentArtPiece as seen (recipients only; GET)
     if request.method == "GET" and has_received and not is_owner:
         SentArtPiece.objects.filter(
@@ -556,9 +568,6 @@ def art_piece_detail(request, public_id):
         .order_by('-created_at')  # 👈 force recency
     )
     likes_dict[piece] = [like.user for like in likes]  # newest→oldest
-
-    focus = request.GET.get("focus")            # "piece" | "thread" | None
-    focus_other = request.GET.get("other")      # user id as str or None
 
     can_reply = not piece.is_deleted
 
