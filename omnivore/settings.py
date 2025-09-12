@@ -233,11 +233,12 @@ CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1',
     'http://localhost:8001',
     'http://127.0.0.1:8001',
-    'http://192.168.1.237:8000'
+    'http://192.168.1.237:8000',
     "https://omnivorearts.com",
     "https://www.omnivorearts.com",
 ]
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+CSRF_FAILURE_VIEW = 'main.views.csrf_failure'
 
 handler404 = 'main.views.custom_404'
 
