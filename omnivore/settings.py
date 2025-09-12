@@ -245,13 +245,11 @@ handler404 = 'main.views.custom_404'
 
 ADMINS = [("Jonathan", "jonathan@omnivorearts.com")]
 SERVER_EMAIL = "support@omnivorearts.com"
-
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 
 
 class RequestIDFilter:
     def filter(self, record):
-        # Provide a default so formatters never KeyError
         if not hasattr(record, "request_id"):
             record.request_id = "-"
         return True
@@ -260,49 +258,77 @@ class RequestIDFilter:
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+
     "formatters": {
         "verbose": {
             "format": "%(asctime)s [%(levelname)s] %(name)s %(message)s request_id=%(request_id)s",
         },
     },
+
+    "filters": {
+        "request_id": {
+            "()": RequestIDFilter,  # or "omnivore.settings.RequestIDFilter"
+        },
+    },
+
     "handlers": {
         "console": {
-            "level": "INFO",
             "class": "logging.StreamHandler",
             "formatter": "verbose",
-            "filters": ["request_id_filter"],  # <— add
+            "level": LOG_LEVEL,
+            "filters": ["request_id"],
         },
-        # optional email handler below in §2
-    },
-    "filters": {
-        "request_id_filter": {
-            "()": RequestIDFilter,  # <— reference the class above
-        },
-    },
-    "handlers": {
-        "console": {...},
         "mail_admins": {
             "class": "django.utils.log.AdminEmailHandler",
             "level": "ERROR",
             "include_html": True,
-            # optional; adds request_id into the text body
-            "filters": ["request_id_filter"],
+            "filters": ["request_id"],
         },
     },
-    "root": {"handlers": ["console"], "level": "INFO"},
+
+    "root": {"handlers": ["console"], "level": LOG_LEVEL},
+
     "loggers": {
+        # send 4xx/5xx request errors to console + email
         "django.request": {
-            "handlers": ["console", "mail_admins"],  # <— add mail_admins
+            "handlers": ["console", "mail_admins"],
             "level": "ERROR",
             "propagate": False,
         },
-        "django.request": {"handlers": ["console"], "level": "WARNING", "propagate": False},
-        "django.security": {"handlers": ["console"], "level": "WARNING", "propagate": False},
-        "django.db.backends": {"handlers": ["console"], "level": "ERROR", "propagate": False},
-        "whitenoise": {"handlers": ["console"], "level": "WARNING", "propagate": False},
-        "main": {"handlers": ["console"], "level": LOG_LEVEL, "propagate": False},
-        "celery": {"handlers": ["console"], "level": "INFO", "propagate": False},
-        "gunicorn.error": {"handlers": ["console"], "level": "INFO", "propagate": False},
-        "gunicorn.access": {"handlers": ["console"], "level": "INFO", "propagate": False},
+        "django.security": {
+            "handlers": ["console", "mail_admins"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "django.db.backends": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "whitenoise": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "main": {
+            "handlers": ["console"],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+        "celery": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "gunicorn.error": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "gunicorn.access": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
     },
 }
