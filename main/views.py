@@ -1315,3 +1315,8 @@ def healthz(request):
             return JsonResponse({"ok": False, "redis": str(e)}, status=500)
 
     return JsonResponse({"ok": True})
+
+
+def test_error(request):
+    raise RuntimeError("This is a test exception for mail_admins")
+    return HttpResponse("You won't see this")

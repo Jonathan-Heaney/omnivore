@@ -56,4 +56,5 @@ urlpatterns = [
     path("tz-debug", views.tz_debug, name="tz_debug"),
     path("feedback", views.feedback_report, name="feedback_report"),
     path("healthz", views.healthz, name="healthz"),
+    path("trigger-error/", views.test_error),
 ]
