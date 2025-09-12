@@ -55,13 +55,20 @@ function clearUnreadHeader(headerEl) {
 
 // POST to server to mark a specific thread read (owner view)
 async function markThreadRead(headerEl) {
-  if (!headerEl || headerEl.dataset.markedRead === '1') return;
+  if (!headerEl) return;
+
+  // prevent concurrent duplicates, but allow subsequent calls later
+  if (headerEl.dataset.posting === '1') return;
+  headerEl.dataset.posting = '1';
 
   const piece = headerEl.getAttribute('data-art');
   const other = headerEl.getAttribute('data-recipient');
   const markUrl =
     headerEl.getAttribute('data-mark-url') || '/threads/mark-read/';
-  if (!piece || !other || !markUrl) return;
+  if (!piece || !other || !markUrl) {
+    headerEl.dataset.posting = '0';
+    return;
+  }
 
   const body = new URLSearchParams({ piece, other });
 
@@ -84,9 +91,11 @@ async function markThreadRead(headerEl) {
 
     const data = await resp.json();
     updateNotificationBell(data.unread_total);
-    clearUnreadHeader(headerEl); // ✅ only clear after success
+    clearUnreadHeader(headerEl); // ✅ clear after success
   } catch (e) {
     console.error('markThreadRead error:', e);
+  } finally {
+    headerEl.dataset.posting = '0';
   }
 }
 
@@ -208,8 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
       header?.setAttribute('aria-expanded', 'true');
 
       if (shouldFocus) {
-        // deep-link target: clear unread immediately and POST
-        clearUnreadHeader(header);
+        // deep-link target: let the POST clear after success
         markThreadRead(header);
         requestAnimationFrame(() =>
           focusReplyWithoutJump(artPieceId, recipientId)
@@ -221,7 +229,6 @@ document.addEventListener('DOMContentLoaded', () => {
         );
         // if it was unread and we restored expanded, clear + POST too
         if (header?.classList.contains('thread__header--unread')) {
-          clearUnreadHeader(header);
           markThreadRead(header);
         }
       }
