@@ -152,10 +152,7 @@ class TestComments:
 
         html = resp.content.decode()
         # Grab the displayed names in conversation headers, in order of appearance
-        names = re.findall(
-            r'Conversation with\s*<strong>\s*([^<]+?)\s*</strong>',
-            html
-        )
+        names = re.findall(r'data-test="thread-name">\s*([^<]+?)\s*<', html)
 
         # We expect C’s thread (newest) before B’s thread (older)
         assert names[0] == "C User"

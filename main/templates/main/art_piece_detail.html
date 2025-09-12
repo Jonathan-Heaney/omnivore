@@ -144,7 +144,7 @@
                 </div>
 
                 <div class="imrow__main">
-                  <div class="imrow__name">{{ piece.user.first_name }} {{ piece.user.last_name }}</div>
+                  <div class="imrow__name" data-test="thread-name">{{ piece.user.first_name }} {{ piece.user.last_name }}</div>
                 </div>
 
                 <div class="imrow__when">
@@ -215,7 +215,7 @@
                     </div>
 
                     <div class="imrow__main">
-                      <div class="imrow__name">{{ recipient.first_name }} {{ recipient.last_name }}</div>
+                      <div class="imrow__name" data-test="thread-name">{{ recipient.first_name }} {{ recipient.last_name }}</div>
                       <div class="imrow__snippet">
                         {% if last %}{{ last.text|truncatechars:140 }}{% else %}<em>No messages yet</em>{% endif %}
                       </div>
