@@ -12,11 +12,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // ---------- helpers ----------
 function getCSRFToken() {
-  // Prefer the meta tag (guaranteed present), fallback to cookie
-  const meta = document.querySelector('meta[name="csrf-token"]');
-  if (meta && meta.content && meta.content !== 'NOTPROVIDED') {
-    return meta.content;
-  }
   const m = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]+)/);
   return m ? decodeURIComponent(m[1]) : '';
 }

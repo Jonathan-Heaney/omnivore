@@ -48,7 +48,6 @@ AWS_SES_REGION_NAME = os.environ.get('AWS_SES_REGION_NAME')
 AWS_SES_REGION_ENDPOINT = os.environ.get('AWS_SES_REGION_ENDPOINT')
 DEFAULT_FROM_EMAIL = os.environ.get(
     'DEFAULT_FROM_EMAIL', 'Omnivore Arts <oliver@omnivorearts.com>')
-SITE_URL = os.getenv("SITE_URL", "http://127.0.0.1:8000")
 
 # Celery configuration
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
@@ -78,18 +77,50 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = (os.getenv("DEBUG", "False").lower() == "true") if IS_LOCAL else False
 
-# Security flags – on for staging & production
-SECURE_SSL_REDIRECT = IS_LIVE
-SESSION_COOKIE_SECURE = IS_LIVE
-CSRF_COOKIE_SECURE = IS_LIVE
-CSRF_COOKIE_SAMESITE = "Lax"
+# --- Security: strict on staging/prod; relaxed locally ---
+if IS_LIVE:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+    # HSTS only in live
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
+    # Only tell Django we're behind a TLS-terminating proxy in live
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+else:
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    SECURE_HSTS_SECONDS = 0
+    SECURE_PROXY_SSL_HEADER = None
 
 
-ALLOWED_HOSTS = ["*"]
+# ALLOWED_HOSTS
+if IS_LOCAL:
+    ALLOWED_HOSTS = ["localhost", "127.0.0.1", "[::1]", "0.0.0.0"]
+elif IS_STAGING:
+    ALLOWED_HOSTS = [
+        "web-staging-f21f.up.railway.app",
+        "omnivorearts.com", "www.omnivorearts.com",
+    ]
+else:  # production
+    ALLOWED_HOSTS = ["omnivorearts.com", "www.omnivorearts.com"]
+
+# SITE_URL default per env (can still be overridden by env var)
+SITE_URL = os.getenv(
+    "SITE_URL",
+    "http://127.0.0.1:8000" if IS_LOCAL else "https://omnivorearts.com"
+)
 
 # Enable time zone support
 USE_TZ = True
 TIME_ZONE = 'UTC'
+
+
+CSRF_COOKIE_SAMESITE = "Lax"
 
 
 # Throw an exception when getting a naive datetime error - used for debugging
@@ -238,7 +269,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://omnivorearts.com",
     "https://www.omnivorearts.com",
 ]
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 CSRF_FAILURE_VIEW = 'main.views.csrf_failure'
 
 handler404 = 'main.views.custom_404'
