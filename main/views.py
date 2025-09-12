@@ -1269,7 +1269,6 @@ def tz_debug(request):
 
 
 @require_POST
-@login_required  # or remove if you want to allow signed-out users
 def feedback_report(request):
     msg = (request.POST.get("message") or "").strip()
     page = request.POST.get("page") or request.META.get("HTTP_REFERER") or ""

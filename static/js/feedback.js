@@ -22,20 +22,29 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const resp = await fetch(form.action, {
         method: 'POST',
-        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          Accept: 'application/json',
+        },
         body: new FormData(form),
+        credentials: 'same-origin',
       });
-      const data = await resp.json();
 
-      if (resp.ok && data.ok) {
+      // Try to parse JSON; fall back to text
+      const ct = resp.headers.get('content-type') || '';
+      const payload = ct.includes('application/json')
+        ? await resp.json()
+        : { ok: false, error: await resp.text() };
+
+      if (resp.ok && payload.ok) {
         modal.hide();
         form.reset();
-
-        // show the toast only
         const toastEl = document.getElementById('reportToast');
         if (toastEl) bootstrap.Toast.getOrCreateInstance(toastEl).show();
       } else {
-        alert(data.error || 'Could not send report.');
+        // Show a friendly message; optional: log payload.error to console
+        console.warn('Feedback error:', payload);
+        alert(payload.error || 'Could not send report.');
       }
     } catch (err) {
       console.error(err);
