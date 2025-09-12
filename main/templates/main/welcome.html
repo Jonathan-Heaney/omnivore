@@ -50,7 +50,7 @@
           <a class="btn btn-outline-success btn-sm received-card__source"
              href="{{ welcome_piece.link }}" target="_blank" rel="noopener"
              aria-label="Open source for {{ welcome_piece.piece_name }}">
-            View source
+            View 
             <i class="fa-solid fa-up-right-from-square ms-1" aria-hidden="true"></i>
           </a>
         {% endif %}
@@ -59,7 +59,7 @@
 
     <p class="small text-muted mt-2">
       This piece has also been added to your
-      <a href="{% url 'my_received_art' %}#art-{{ welcome_piece.public_id }}">Gallery</a>
+      <a href="{% url 'my_received_art' %}#art-{{ welcome_piece.public_id }}">Received Art</a>
       so you can revisit it later.
     </p>
 

@@ -2,7 +2,7 @@
 {% load static %}
 {% load custom_filters %}
 
-{% block title %}Gallery{% endblock %}
+{% block title %}Received Art{% endblock %}
 
 {% block css_files %}
   {{ block.super }}
@@ -36,7 +36,7 @@
   </div>
 </div>
 
-<h1 class="page-title">Gallery</h1>
+<h1 class="page-title">Received Art</h1>
 
 {% if request.user.is_authenticated and request.user.receive_art_paused %}
 <div class='container-narrow'>
@@ -101,7 +101,7 @@
               <a class="btn btn-outline-success btn-sm received-card__source"
                 href="{{ piece.link }}" target="_blank" rel="noopener"
                 aria-label="Open source for {{ piece.piece_name }}">
-                View source
+                View 
                 <i class="fa-solid fa-up-right-from-square me-1" aria-hidden="true"></i>
               </a>
             {% endif %}
