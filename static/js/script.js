@@ -3,10 +3,9 @@ const urlParams = new URLSearchParams(location.search);
 const FOCUS = urlParams.get('focus'); // "piece" | "thread" | null
 const FOCUS_OTHER = urlParams.get('other'); // user id string or null
 
-// Optional: clean the URL once we’ve read intent (prevents re-trigger on refresh)
 window.addEventListener('DOMContentLoaded', () => {
   if (FOCUS || FOCUS_OTHER || urlParams.get('n')) {
-    history.replaceState({}, '', location.pathname);
+    history.replaceState({}, '', location.pathname + location.hash);
   }
 });
 
@@ -148,7 +147,6 @@ function toggleComments(artPieceId, recipientId) {
   const inner = document.getElementById(
     `comments-${artPieceId}-${recipientId}-container`
   );
-  const key = `thread-state-${artPieceId}-${recipientId}`;
   const expanded = header?.getAttribute('aria-expanded') === 'true';
 
   if (expanded) {
@@ -156,18 +154,15 @@ function toggleComments(artPieceId, recipientId) {
     if (inner) inner.style.display = 'none';
     article.classList.add('is-collapsed');
     header?.setAttribute('aria-expanded', 'false');
-    localStorage.setItem(key, 'collapsed');
   } else {
     if (body) body.hidden = false;
     if (inner) inner.style.display = 'block';
     article.classList.remove('is-collapsed');
     header?.setAttribute('aria-expanded', 'true');
-    localStorage.setItem(key, 'expanded');
 
-    // async server update; UI will clear after success inside markThreadRead()
+    // mark as read on open; UI clears after success in markThreadRead()
     markThreadRead(header);
 
-    // polite focus/scroll
     requestAnimationFrame(() => focusReplyWithoutJump(artPieceId, recipientId));
   }
 }
@@ -178,12 +173,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   articles.forEach((article) => {
     const parts = article.id.split('-'); // "thread-<pieceId>-<recipientId>"
-    // guard: IDs like "thread-123-45"
     if (parts.length < 3) return;
     const artPieceId = parts[1];
     const recipientId = parts[2];
 
-    const key = `thread-state-${artPieceId}-${recipientId}`;
     const header = document.getElementById(
       `toggle-header-${artPieceId}-${recipientId}`
     );
@@ -192,54 +185,29 @@ document.addEventListener('DOMContentLoaded', () => {
       `comments-${artPieceId}-${recipientId}-container`
     );
 
-    // ---- Decide initial state (priority: intent > saved state) ----
-    let shouldExpand = false;
-    let shouldFocus = false;
+    // Default collapsed
+    if (body) body.hidden = true;
+    if (inner) inner.style.display = 'none';
+    article.classList.add('is-collapsed');
+    header?.setAttribute('aria-expanded', 'false');
 
-    if (FOCUS === 'piece') {
-      shouldExpand = false;
-      localStorage.setItem(key, 'collapsed');
-    } else if (FOCUS === 'thread') {
-      const isTarget = String(recipientId) === String(FOCUS_OTHER || '');
-      shouldExpand = isTarget;
-      shouldFocus = isTarget;
-      localStorage.setItem(key, isTarget ? 'expanded' : 'collapsed');
-    } else {
-      const state = localStorage.getItem(key);
-      shouldExpand = state === 'expanded';
-    }
-
-    // ---- Apply state ----
-    if (shouldExpand) {
+    // Only auto-open on deep link (?focus=thread&other=<id>)
+    const isDeepLinked =
+      FOCUS === 'thread' && String(recipientId) === String(FOCUS_OTHER || '');
+    if (isDeepLinked) {
       if (body) body.hidden = false;
       if (inner) inner.style.display = 'block';
       article.classList.remove('is-collapsed');
       header?.setAttribute('aria-expanded', 'true');
 
-      if (shouldFocus) {
-        // deep-link target: let the POST clear after success
-        markThreadRead(header);
-        requestAnimationFrame(() =>
-          focusReplyWithoutJump(artPieceId, recipientId)
-        );
-      } else if (FOCUS == null && localStorage.getItem(key) === 'expanded') {
-        // legacy restore path
-        requestAnimationFrame(() =>
-          focusReplyWithoutJump(artPieceId, recipientId)
-        );
-        // if it was unread and we restored expanded, clear + POST too
-        if (header?.classList.contains('thread__header--unread')) {
-          markThreadRead(header);
-        }
-      }
-    } else {
-      if (body) body.hidden = true;
-      if (inner) inner.style.display = 'none';
-      article.classList.add('is-collapsed');
-      header?.setAttribute('aria-expanded', 'false');
+      // server marks read; UI clears after success
+      markThreadRead(header);
+      requestAnimationFrame(() =>
+        focusReplyWithoutJump(artPieceId, recipientId)
+      );
     }
 
-    // ---- Listeners ----
+    // Listeners
     header?.addEventListener('click', () =>
       toggleComments(artPieceId, recipientId)
     );
@@ -250,6 +218,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
+
+  // If you arrived with #conversations, we'll land there but keep everything closed.
+  if (location.hash === '#conversations') {
+    const conv = document.getElementById('conversations');
+    if (conv) conv.scrollIntoView({ block: 'start', behavior: 'instant' });
+  }
 });
 
 document.addEventListener('DOMContentLoaded', function () {
