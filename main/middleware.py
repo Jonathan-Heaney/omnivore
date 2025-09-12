@@ -3,7 +3,9 @@ from django.http import HttpResponseNotFound
 from urllib.parse import unquote
 from django.utils import timezone
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+import uuid
 import logging
+from django.utils.deprecation import MiddlewareMixin
 
 logger = logging.getLogger(__name__)
 
@@ -102,3 +104,15 @@ class BlockWordPressPathsMiddleware:
         if request.path in blocked_paths:
             return HttpResponseNotFound()
         return self.get_response(request)
+
+
+class RequestIDMiddleware(MiddlewareMixin):
+    def process_request(self, request):
+        request.request_id = request.headers.get(
+            "X-Request-ID", str(uuid.uuid4()))
+
+    def process_response(self, request, response):
+        rid = getattr(request, "request_id", None)
+        if rid:
+            response["X-Request-ID"] = rid
+        return response

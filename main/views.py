@@ -30,6 +30,12 @@ from zoneinfo import ZoneInfo
 from django.conf import settings
 from django.views.decorators.csrf import requires_csrf_token
 import logging
+from django.db import connection
+import redis
+import os
+from time import monotonic
+
+logger = logging.getLogger(__name__)
 
 
 def home(request):
@@ -44,8 +50,17 @@ def sign_up(request):
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
+            logger.info("signup_success", extra={
+                "request_id": getattr(request, "request_id", "-"),
+                "user": user.email,
+            })
             login(request, user)
             return redirect(reverse('welcome_page'))
+        else:
+            logger.info("signup_invalid", extra={
+                "request_id": getattr(request, "request_id", "-"),
+                "errors": form.errors.as_json(),
+            })
     else:
         form = RegisterForm()
 
@@ -65,6 +80,13 @@ def welcome_page(request):
 
     # Optional: banner if the user has paused delivery (copy-only; we still give the welcome)
     paused = getattr(user, "receive_art_paused", False)
+
+    logger.info("welcome_page", extra={
+        "request_id": getattr(request, "request_id", "-"),
+        "user": request.user.email,
+        "has_welcome_piece": bool(welcome_piece),
+        "paused": paused,
+    })
 
     return render(request, "main/welcome.html", {
         "welcome_piece": welcome_piece,
@@ -134,8 +156,19 @@ def share_art(request):
         new_piece.user = user
         new_piece.save()
 
+        logger.info("share_art_submit", extra={
+            "request_id": getattr(request, "request_id", "-"),
+            "user": user.email,
+            "piece_id": new_piece.id,
+        })
+
         # 2) If paused, skip reciprocal and redirect to Thank You (no gift)
         if getattr(user, "receive_art_paused", False):
+            logger.info("share_art_paused_no_reciprocal", extra={
+                "request_id": getattr(request, "request_id", "-"),
+                "user": user.email,
+                "piece_id": new_piece.id,
+            })
             return redirect(reverse("thanks_for_sharing") + "?paused=1")
 
         # 3) Idempotent grant: only create once per submitted piece
@@ -188,6 +221,13 @@ def thanks_for_sharing(request):
         else:
             # fall through silently (no gift), rather than 404ing user
             reciprocal_piece = None
+
+    logger.info("thanks_for_sharing_view", extra={
+        "request_id": getattr(request, "request_id", "-"),
+        "user": request.user.email,
+        "paused": paused,
+        "reciprocal_piece_id": reciprocal_piece.id if reciprocal_piece else None,
+    })
 
     return render(request, "main/thanks_for_sharing.html", {
         "reciprocal_piece": reciprocal_piece,
@@ -341,6 +381,16 @@ def my_shared_art(request):
         'summaries': summaries,
         'likes_dict': dict(likes_by_piece),
     }
+
+    logger.info("my_shared_art_rendered", extra={
+        "request_id": getattr(request, "request_id", "-"),
+        "user": request.user.email,
+        "pieces": len(piece_ids),
+        "with_conversations": sum(1 for v in summaries.values() if v["conv_count"] > 0),
+        "total_unread_msgs": sum(v["new_msg_count"] for v in summaries.values()),
+        "new_conversations": sum(v["new_conv_count"] for v in summaries.values()),
+    })
+
     return render(request, 'main/my_shared_art.html', context)
 
 
@@ -351,6 +401,9 @@ def my_received_art(request):
     Recipient’s home: show received pieces in reverse-chronological order,
     with a compact conversation preview per piece (if any).
     """
+    t0 = monotonic()
+    rid = getattr(request, "request_id", "-")
+
     user = request.user
     received_qs = (
         SentArtPiece.objects
@@ -402,6 +455,8 @@ def my_received_art(request):
     )
 
     previews = {}
+    thread_count = 0
+    unread_total = 0
     for p in pieces:
         t = threads_by_piece.get(p.id, [])
         previews[p.id] = {
@@ -409,10 +464,24 @@ def my_received_art(request):
             "last": t[-1] if t else None,
             "unread_count": unread_by_piece.get(p.id, 0),
         }
+        thread_count += 1 if t else 0
+        unread_total += unread_by_piece.get(p.id, 0)
 
     liked_pieces = set(
         Like.objects.filter(user=user, art_piece_id__in=piece_ids)
         .values_list('art_piece_id', flat=True)
+    )
+
+    logger.info(
+        "my_received_art rendered",
+        extra={
+            "request_id": rid,
+            "user": user.email,
+            "pieces": len(pieces),
+            "with_threads": thread_count,
+            "unread_total": unread_total,
+            "duration_ms": int((monotonic() - t0) * 1000),
+        },
     )
 
     context = {
@@ -543,6 +612,15 @@ def art_piece_detail(request, public_id):
             "focus_other": focus_other,
             "can_reply": can_reply,
         }
+
+        logger.info("art_detail_owner", extra={
+            "request_id": getattr(request, "request_id", "-"),
+            "user": user.email,
+            "piece_public": piece.public_id,
+            "threads": len(conversations_list),
+            "unread_senders": len(unread_by_other),
+        })
+
         return render(request, "main/art_piece_detail.html", context)
 
     # Recipient view: single 1:1 thread (chronological)
@@ -563,6 +641,15 @@ def art_piece_detail(request, public_id):
         "autofocus_reply": (focus == "thread") and can_reply,
         "can_reply": can_reply,
     }
+
+    logger.info("art_detail_recipient", extra={
+        "request_id": getattr(request, "request_id", "-"),
+        "user": user.email,
+        "piece_public": piece.public_id,
+        "thread_len": len(qs),
+        "marked_seen": True,  # happens above on GET
+    })
+
     return render(request, "main/art_piece_detail.html", context)
 
 
@@ -633,6 +720,14 @@ def comments_create(request):
         reply.parent_comment = top
         reply.save()
 
+        logger.info("comment_reply", extra={
+            "request_id": getattr(request, "request_id", "-"),
+            "user": user.email,
+            "art_piece_id": piece.id,
+            "top_id": top.id,
+            "comment_id": reply.id,
+        })
+
         html = render_to_string("main/comment_text.html",
                                 {"comment": reply}, request=request)
         return HttpResponse(html)
@@ -688,6 +783,14 @@ def comments_create(request):
         )
         c.save()
 
+        logger.info("comment_top_level_or_coalesced", extra={
+            "request_id": getattr(request, "request_id", "-"),
+            "user": user.email,
+            "art_piece_id": piece.id,
+            "coalesced": bool(top),
+            "comment_id": c.id,
+        })
+
     html = render_to_string("main/comment_text.html",
                             {"comment": c}, request=request)
     return HttpResponse(html)
@@ -730,6 +833,15 @@ def mark_thread_read(request):
         is_read=False,
     ).count()
 
+    logger.info("mark_thread_read", extra={
+        "request_id": getattr(request, "request_id", "-"),
+        "user": request.user.email,
+        "piece_public": piece_public,
+        "other_id": other_id,
+        "cleared": cleared,
+        "unread_total": unread_total,
+    })
+
     return JsonResponse({"ok": True, "cleared": cleared, "unread_total": unread_total})
 
 
@@ -755,6 +867,14 @@ def toggle_like_api(request, art_piece_id):
     # Ensure any on_commit hooks run after the DB write, but we still return ASAP
     transaction.on_commit(lambda: None)
 
+    logger.info("toggle_like", extra={
+        "request_id": getattr(request, "request_id", "-"),
+        "user": request.user.email,
+        "art_piece_id": art_piece_id,
+        "liked": liked,
+        "likes_count": likes_count,
+    })
+
     return JsonResponse({"ok": True, "liked": liked, "likes_count": likes_count})
 
 
@@ -769,6 +889,13 @@ def notifications_view(request):
     read_notifications = Notification.objects.filter(
         recipient=request.user, is_read=True, timestamp__gte=two_weeks_ago)
 
+    logger.info("notifications_view", extra={
+        "request_id": getattr(request, "request_id", "-"),
+        "user": user.email,
+        "unread": unread_notifications.count(),
+        "recent_read": read_notifications.count(),
+    })
+
     return render(request, 'main/notifications.html', {
         'unread_notifications': unread_notifications,
         'read_notifications': read_notifications,
@@ -782,6 +909,13 @@ def notification_redirect(request, notification_id):
     if not notification.is_read:
         notification.is_read = True
         notification.save()
+
+    logger.info("notification_redirect", extra={
+        "request_id": getattr(request, "request_id", "-"),
+        "user": request.user.email if request.user.is_authenticated else None,
+        "notification_id": notification_id,
+        "dest": notification.get_redirect_url(),
+    })
 
     return redirect(notification.get_redirect_url())
 
@@ -1081,6 +1215,13 @@ def unsubscribe_email(request, token: str):
     setattr(user, field_name, False)
     user.save(update_fields=[field_name])
 
+    logger.info("unsubscribe", extra={
+        "request_id": getattr(request, "request_id", "-"),
+        "user_id": uid,
+        "kind": kind,
+        "ok": True,
+    })
+
     return render(
         request,
         "main/unsubscribe_result.html",
@@ -1100,6 +1241,13 @@ def set_timezone(request):
 
     request.user.timezone = tz
     request.user.save(update_fields=["timezone"])
+
+    logger.info("set_timezone", extra={
+        "request_id": getattr(request, "request_id", "-"),
+        "user": request.user.email,
+        "tz": tz,
+    })
+
     return JsonResponse({"ok": True})
 
 
@@ -1127,6 +1275,12 @@ def feedback_report(request):
         message=msg,
     )
 
+    logger.info("feedback_report", extra={
+        "request_id": getattr(request, "request_id", "-"),
+        "user": request.user.email if request.user.is_authenticated else None,
+        "page": page[:128],
+    })
+
     # Email you a copy
     try:
         send_mail(
@@ -1141,3 +1295,23 @@ def feedback_report(request):
         pass
 
     return JsonResponse({"ok": True, "message": "Thanks — we got your report!"})
+
+
+def healthz(request):
+    # DB
+    try:
+        with connection.cursor() as cur:
+            cur.execute("SELECT 1")
+    except Exception as e:
+        return JsonResponse({"ok": False, "db": str(e)}, status=500)
+
+    # Redis (optional—only if you actually use it in prod)
+    red_url = os.getenv("CELERY_BROKER_URL", "")
+    if red_url.startswith("redis://"):
+        try:
+            r = redis.Redis.from_url(red_url, socket_connect_timeout=1.0)
+            r.ping()
+        except Exception as e:
+            return JsonResponse({"ok": False, "redis": str(e)}, status=500)
+
+    return JsonResponse({"ok": True})
