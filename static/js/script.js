@@ -12,6 +12,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // ---------- helpers ----------
 function getCSRFToken() {
+  // Prefer the meta tag (guaranteed present), fallback to cookie
+  const meta = document.querySelector('meta[name="csrf-token"]');
+  if (meta && meta.content && meta.content !== 'NOTPROVIDED') {
+    return meta.content;
+  }
   const m = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]+)/);
   return m ? decodeURIComponent(m[1]) : '';
 }
@@ -70,18 +75,23 @@ async function markThreadRead(headerEl) {
       method: 'POST',
       headers: {
         'X-CSRFToken': getCSRFToken(),
+        'X-Requested-With': 'XMLHttpRequest',
         'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
       },
       body,
       credentials: 'same-origin',
     });
-    if (!resp.ok) return;
+
+    if (!resp.ok) {
+      console.warn('markThreadRead failed:', resp.status);
+      return; // don’t flip UI if server didn’t accept
+    }
 
     const data = await resp.json();
     updateNotificationBell(data.unread_total);
-    clearUnreadHeader(headerEl); // idempotent safety
-  } catch {
-    /* noop */
+    clearUnreadHeader(headerEl); // ✅ only clear after success
+  } catch (e) {
+    console.error('markThreadRead error:', e);
   }
 }
 
@@ -150,8 +160,7 @@ function toggleComments(artPieceId, recipientId) {
     header?.setAttribute('aria-expanded', 'true');
     localStorage.setItem(key, 'expanded');
 
-    // instant UI + async server update
-    clearUnreadHeader(header);
+    // async server update; UI will clear after success inside markThreadRead()
     markThreadRead(header);
 
     // polite focus/scroll
