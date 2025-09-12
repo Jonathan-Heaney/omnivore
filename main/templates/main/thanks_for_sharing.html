@@ -12,7 +12,7 @@
 {% block content %}
 <div class="container-narrow py-4">
   <header class="mb-4 text-center">
-    <h1 class="page-title">Thanks for sharing!</h1>
+    <h1 class="page-title">Thank You!</h1>
   </header>
 
   {% if paused %}
@@ -33,9 +33,10 @@
   {% else %}
     {% if reciprocal_piece %}
       <p class="lead text-muted">
-        We really appreciate you sharing this work of art with our community! Omnivore Arts is made possible by these gifts from people like you.
+        Thanks for sharing a piece of art with the Omnivore community! Your generosity makes Omnivore possible.
       </p>
-      <p class="lead text-muted">As a small token of our gratitude, here’s something for you:</p>
+      <p class="lead text-muted">As a small thank-you, here’s something for you:
+      </p>
       <br>
       <!-- Match My Received card look, minus likes & conversation preview -->
       <section id="art-{{ reciprocal_piece.public_id }}" class="received-card">
@@ -82,7 +83,7 @@
         <p class="mb-0">
           We couldn’t find a new piece to share with you right now.
           Check back on your
-          <a href="{% url 'my_received_art' %}">My Received Art</a> page soon.
+          <a href="{% url 'my_received_art' %}">Received Art</a> page soon.
         </p>
       </div>
     {% endif %}
