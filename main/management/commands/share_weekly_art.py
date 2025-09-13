@@ -74,7 +74,7 @@ class Command(BaseCommand):
             if dry_run:
                 if piece:
                     self.stdout.write(
-                        f"[DRY RUN] {u.get_full_name()} <- '{piece.piece_name}' by {piece.user}")
+                        f"[DRY RUN] {u.get_full_name()} <- '{piece.piece_name}' from {piece.user}")
                 else:
                     self.stdout.write(
                         f"[DRY RUN] {u.get_full_name()} <- (no eligible art)")
@@ -82,7 +82,7 @@ class Command(BaseCommand):
                 if piece:
                     sent += 1
                     self.stdout.write(
-                        f"[SENT] {u.get_full_name()} <- '{piece.piece_name}' by {piece.artist_name}")
+                        f"[SENT] {u.get_full_name()} <- '{piece.piece_name}' by {piece.artist_name}, from {piece.user}")
                 else:
                     self.stdout.write(
                         f"[SKIP] {u.get_full_name()} — no eligible art")
