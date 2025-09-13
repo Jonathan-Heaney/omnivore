@@ -1,56 +1,95 @@
 # main/management/commands/share_weekly_art.py
 from django.core.management.base import BaseCommand
-from django.core.mail import get_connection
 from main.models import CustomUser
-from main.services.sharing import share_weekly_to_user
+from main.services.sharing import share_weekly_to_user  # your new service
 
 
 class Command(BaseCommand):
-    help = "Share art with all eligible users weekly. Use --dry-run to preview."
+    help = "Share art with users. Defaults to non-paused users, but can target specific users."
 
     def add_arguments(self, parser):
-        parser.add_argument('--dry-run', action='store_true')
         parser.add_argument(
-            '--only-email', help='Process only this email (optional)')
-        parser.add_argument('--limit', type=int,
-                            help='Max users to process (optional)')
+            '--dry-run',
+            action='store_true',
+            help='Preview who would get what without writing or emailing anything.',
+        )
+        parser.add_argument(
+            '--emails',
+            nargs='+',
+            help='One or more email addresses to target (space-separated).',
+        )
+        parser.add_argument(
+            '--ids',
+            nargs='+',
+            type=int,
+            help='One or more user IDs to target (space-separated).',
+        )
+        parser.add_argument(
+            '--limit',
+            type=int,
+            help='Limit the number of users processed (after filtering).',
+        )
+        parser.add_argument(
+            '--all',
+            action='store_true',
+            help='Confirm sending to everyone that matches filters (guard for non-dry runs).',
+        )
 
     def handle(self, *args, **opts):
-        dry = opts['dry_run']
-        qs = CustomUser.objects.filter(
-            receive_art_paused=False, email_on_art_shared=True)
-        if opts.get('only_email'):
-            qs = qs.filter(email=opts['only_email'])
-        if opts.get('limit'):
-            qs = qs.order_by('id')[:opts['limit']]
+        dry_run = opts['dry_run']
+        emails = opts.get('emails') or []
+        ids = opts.get('ids') or []
+        limit = opts.get('limit')
+        all_flag = opts.get('all', False)
 
-        processed = sent_ok = skipped = failed = 0
+        # Base: respect receive_art_paused=False
+        qs = CustomUser.objects.filter(receive_art_paused=False)
 
-        with get_connection() as conn:
-            for user in qs.iterator():
-                processed += 1
-                try:
-                    art = share_weekly_to_user(
-                        user=user, dry_run=dry, connection=conn)
-                    if art:
-                        if dry:
-                            self.stdout.write(
-                                f"[DRY RUN] {user.email} <- '{art.piece_name}' by {art.user.get_full_name()}")
-                        else:
-                            sent_ok += 1
-                            self.stdout.write(
-                                f"[SENT] {user.email} <- '{art.piece_name}'")
-                    else:
-                        skipped += 1
-                        self.stdout.write(
-                            f"[SKIP] {user.email}: no eligible art or paused")
-                except Exception as e:
-                    failed += 1
-                    self.stderr.write(f"[FAIL] {user.email}: {e}")
+        if emails:
+            qs = qs.filter(email__in=emails)
+        if ids:
+            qs = qs.filter(id__in=ids)
 
-        if dry:
+        # Safety guard: in non-dry runs, require either a target list or --all
+        if not dry_run and not emails and not ids and not all_flag:
+            self.stderr.write(
+                self.style.ERROR(
+                    "Refusing to send to the entire cohort. "
+                    "Pass --all to confirm, or target users with --emails/--ids."
+                )
+            )
+            return
+
+        if limit:
+            qs = qs.order_by('id')[:limit]
+
+        users = list(qs)
+        self.stdout.write(
+            f"Processing {len(users)} user(s). Dry run: {dry_run}")
+
+        sent = 0
+        for u in users:
+            piece = share_weekly_to_user(
+                user=u, dry_run=dry_run)  # returns ArtPiece | None
+            if dry_run:
+                if piece:
+                    self.stdout.write(
+                        f"[DRY RUN] {u.get_full_name()} <- '{piece.piece_name}' by {piece.user}")
+                else:
+                    self.stdout.write(
+                        f"[DRY RUN] {u.get_full_name()} <- (no eligible art)")
+            else:
+                if piece:
+                    sent += 1
+                    self.stdout.write(
+                        f"[SENT] {u.get_full_name()} <- '{piece.piece_name}' by {piece.artist_name}")
+                else:
+                    self.stdout.write(
+                        f"[SKIP] {u.get_full_name()} — no eligible art")
+
+        if dry_run:
             self.stdout.write(self.style.WARNING(
-                "Dry run complete. No emails sent."))
-        self.stdout.write(self.style.SUCCESS(
-            f"Processed={processed}  Sent={sent_ok}  Skipped={skipped}  Failed={failed}"
-        ))
+                "Dry run complete. No emails or DB writes."))
+        else:
+            self.stdout.write(self.style.SUCCESS(
+                f"Shared art with {sent} user(s)."))
