@@ -1,5 +1,27 @@
 from django.contrib import admin
 from .models import ArtPiece, SentArtPiece, CustomUser, Comment, Like, Notification
+from django.http import HttpResponse
+import csv
+
+
+@admin.action(description="Export emails (CSV)")
+def export_emails_csv(modeladmin, request, queryset):
+    # de-dupe + ignore blanks
+    emails = (
+        queryset
+        .exclude(email__isnull=True)
+        .exclude(email__exact="")
+        .values_list("email", flat=True)
+        .distinct()
+    )
+
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = 'attachment; filename="emails.csv"'
+    writer = csv.writer(response)
+    writer.writerow(["email"])
+    for e in emails:
+        writer.writerow([e])
+    return response
 
 
 class ArtPieceAdmin(admin.ModelAdmin):
@@ -15,7 +37,8 @@ class ArtPieceAdmin(admin.ModelAdmin):
         "welcome_weight",
     )
 
-    actions = ["mark_as_welcome_eligible", "unmark_as_welcome_eligible"]
+    actions = ["mark_as_welcome_eligible",
+               "unmark_as_welcome_eligible", "export_emails_csv"]
 
     def mark_as_welcome_eligible(self, request, queryset):
         updated = queryset.update(welcome_eligible=True)
