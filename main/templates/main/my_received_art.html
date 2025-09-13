@@ -191,7 +191,7 @@
                   <span class="preview__hint">No messages yet — say hi to {{ piece.user.first_name }}!</span>
                 </div>
                 <div class="preview__right">
-                  <a href="{% url 'art_detail' piece.public_id %}"
+                  <a href="{% url 'art_detail' piece.public_id %}?focus=thread"
                     class="btn btn-cta btn-sm"
                     aria-label="Start a conversation about {{ piece.piece_name }}">
                     <i class="fa-regular fa-paper-plane me-1" aria-hidden="true"></i>
