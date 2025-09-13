@@ -14,6 +14,7 @@ def send_templated_email(
     reply_to: list[str] | None = None,
     bcc: list[str] | None = None,
     fail_silently: bool = False,
+    connection=None,
 ):
     """
     template_base: e.g. 'emails/comment' -> expects:
@@ -47,6 +48,7 @@ def send_templated_email(
         bcc=bcc,
         reply_to=reply_to,
         headers=headers or None,
+        connection=connection,
     )
 
     if html_body:

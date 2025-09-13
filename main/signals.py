@@ -81,7 +81,7 @@ def create_sent_art_notification(sender, instance, created, **kwargs):
         return
 
     # Skip notifications for welcome and reciprocal art sharing
-    if instance.source in {"welcome", "reciprocal"}:
+    if instance.source in {"welcome", "reciprocal", "weekly"}:
         return
 
     recipient = instance.user

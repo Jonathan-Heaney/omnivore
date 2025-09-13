@@ -86,7 +86,7 @@ def send_like_email(*, recipient, liker, art_piece, notification_id=None):
     send_templated_email(recipient, subject, "emails/like", context)
 
 
-def send_shared_art_email(*, recipient, sender, art_piece, notification_id=None):
+def send_shared_art_email(*, recipient, sender, art_piece, notification_id=None, connection=None):
     """
     Email a user when they receive a piece of art.
     recipient: user who received the art (SentArtPiece.user)
@@ -123,4 +123,5 @@ def send_shared_art_email(*, recipient, sender, art_piece, notification_id=None)
 
     subject = f"{sender.get_full_name()} shared some art with you!"
     subject = f"You have new art from {sender.get_full_name()}!"
-    send_templated_email(recipient, subject, "emails/shared_art", context)
+    send_templated_email(recipient, subject,
+                         "emails/shared_art", context, connection=connection)
