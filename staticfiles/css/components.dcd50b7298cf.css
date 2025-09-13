@@ -1,0 +1,681 @@
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  border: 1px solid transparent;
+  cursor: pointer;
+  background: var(--surface);
+  color: var(--text);
+}
+.btn:hover {
+  box-shadow: var(--shadow-1);
+}
+.btn-outline {
+  background: transparent;
+  border-color: var(--border);
+}
+
+.btn-cta {
+  background: var(--brand);
+  color: #fff !important;
+  border-color: transparent;
+  border-radius: 999px;
+}
+.btn-cta:hover {
+  background: var(--brand-600);
+  color: #fff;
+}
+
+/* Keep amber on hover/focus/active and readable text */
+/* Amber CTA variant + robust hover */
+.btn-cta--amber {
+  background: #eab308;
+  color: #1f2937 !important;
+  border: 2px solid #d4a106;
+  box-shadow: 0 6px 20px -6px rgba(234, 179, 8, 0.5);
+}
+.btn-cta.btn-cta--amber:hover,
+.btn-cta.btn-cta--amber:focus {
+  background: #d4a106; /* slightly darker amber */
+  border-color: #b88e05;
+  color: #111827 !important; /* keep dark text for contrast */
+  filter: none; /* avoid unexpected darkening */
+  box-shadow: 0 8px 26px -8px rgba(234, 179, 8, 0.55);
+}
+
+/* SUCCESS (outline-success → green fill on hover) */
+.received-card__source.btn-outline-success {
+  color: #fff;
+  background-color: var(--success);
+  border-color: 1px solid #1b5d5a;
+}
+
+.received-card__source.btn-outline-success:hover,
+.received-card__source.btn-outline-success:focus {
+  color: #fff;
+  background: #1b7e5a;
+  /* border-color: 1px solid #1b5d5a; */
+  box-shadow: 0 2px 8px rgba(27, 143, 90, 0.25); /* subtle green glow */
+}
+
+/* Optional: prevent the base .btn-cta:hover rule from hijacking amber */
+.btn-cta:not(.btn-cta--amber):hover {
+  background: var(--brand-600);
+  color: #fff;
+}
+
+/* Sizing helpers often used in strips */
+.btn-cta.btn-sm {
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+}
+
+/* ---------- Cards ---------- */
+.card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-1);
+}
+.card-header,
+.card-footer {
+  padding: var(--s2) var(--s3);
+}
+.card-body {
+  padding: var(--s3);
+}
+.card + .card {
+  margin-top: var(--s3);
+}
+
+/* ---------- Inputs ---------- */
+.input,
+textarea,
+select {
+  width: 100%;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: var(--fs-md);
+}
+.input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--brand-200);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand) 20%, transparent);
+}
+
+/* Bootstrap field smoothing */
+.form-control {
+  border-radius: 10px;
+}
+
+/* Labels / hints */
+.form-label {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.form-hint {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: var(--fs-sm);
+}
+
+/* Softer success alerts */
+.alert-success {
+  background: #f0fbf4;
+  border-color: #d3f5df;
+  color: #0f5132;
+}
+
+/* ---------- Badge ---------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: var(--fs-sm);
+  background: var(--surface);
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+
+/* ---------- Navbar image (kept single source-of-truth) ---------- */
+.navbar-oliver {
+  height: 30px;
+  width: auto;
+  vertical-align: top;
+}
+
+/* ---------- Comment UI ---------- */
+.comment-item + .comment-item {
+  margin-top: var(--s2);
+}
+.comment-meta {
+  margin: 0 0 6px;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+.comment-dot {
+  margin: 0 6px;
+  color: var(--border);
+}
+.comment-bubble {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--s2);
+  box-shadow: var(--shadow-1);
+}
+.prose-comment p {
+  margin: 0;
+}
+.prose-comment p + p {
+  margin-top: 0.5em;
+}
+
+/* Input + send */
+.input-pill {
+  border-radius: 999px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-1);
+}
+.input-pill:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(30, 90, 150, 0.12);
+}
+.icon-btn {
+  border: none;
+  color: var(--brand);
+  background: transparent;
+  padding: 0 6px 0 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+.icon-btn svg {
+  opacity: 0.9;
+}
+.icon-btn:hover svg {
+  opacity: 1;
+  color: var(--brand-600);
+}
+.icon-btn:disabled svg {
+  opacity: 0.4;
+}
+.comment-input {
+  align-items: center;
+  gap: 6px;
+}
+.comment-input .form-control {
+  min-height: 42px;
+  border-radius: var(--radius-sm); /* same rounding as other form inputs */
+  padding: 10px 12px;
+  resize: none;
+}
+
+/* Comment form layout + rounding */
+.comment-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.comment-input .form-control {
+  min-height: 42px;
+  resize: none;
+  border-radius: var(--radius-sm); /* 10px from your tokens */
+  padding: 10px 12px;
+}
+
+/* tiny spacing so the icon doesn't visually “attach” to the field */
+.comment-input .icon-btn {
+  margin-left: 2px;
+}
+
+/* ---------- Likes (button + inline names + modal) ---------- */
+.like-button {
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 999px;
+  padding: 6px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1;
+  box-shadow: var(--shadow-1);
+  transition: background 120ms ease, border-color 120ms ease,
+    box-shadow 120ms ease, transform 60ms ease;
+}
+.like-button:hover {
+  background: var(--surface);
+  border-color: #dfe3ea;
+}
+.like-button:active {
+  transform: translateY(0.5px);
+}
+.like-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(30, 90, 150, 0.14);
+  border-color: var(--brand);
+}
+.like-button .heart-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.like-button .heart-svg {
+  display: block;
+  color: var(--muted);
+  fill: currentColor;
+}
+.like-button.liked .heart-svg {
+  color: #e11d48;
+} /* rose-600 */
+.like-button .heart-fallback {
+  display: none;
+}
+.like-button.liked .like-text {
+  font-weight: 600;
+}
+
+.likes,
+.likes-container {
+  padding: var(--s0) 0;
+}
+
+.likes-inline {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+.likes-heart {
+  font-size: 0.95rem;
+  line-height: 1;
+  transform: translateY(1px);
+}
+.likes-names {
+  color: var(--text);
+}
+.link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--brand);
+  text-decoration: underline;
+  cursor: pointer;
+  font: inherit;
+}
+.link-button:hover {
+  text-decoration: none;
+}
+
+/* Make the likes line behave like a single sentence */
+.shared-card .likes-inline,
+.piece .likes-inline {
+  display: inline; /* override inline-flex */
+  white-space: normal;
+}
+
+.shared-card .likes-heart,
+.piece .likes-heart {
+  margin-right: 0.4rem; /* tiny gap after the heart */
+}
+
+.shared-card .likes-more,
+.piece .likes-more {
+  display: inline; /* not a flex item */
+  white-space: nowrap; /* keep "and others" together */
+}
+
+/* Modal shell */
+.likes-modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  z-index: 2000;
+}
+.likes-modal.is-open {
+  display: block;
+}
+.likes-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: saturate(110%) blur(2px);
+}
+.likes-modal__dialog {
+  position: relative;
+  max-width: 520px;
+  width: calc(100% - 2rem);
+  margin: 7vh auto 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-2);
+  outline: none;
+}
+.likes-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s1);
+  padding: var(--s2) var(--s3);
+  border-bottom: 1px solid var(--border);
+}
+.likes-modal__title {
+  margin: 0;
+  font-size: var(--fs-lg);
+  font-weight: 700;
+}
+.likes-modal__close {
+  border: 0;
+  background: none;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+}
+.likes-modal__close:hover {
+  color: var(--text);
+}
+.likes-modal__body {
+  padding: var(--s2) var(--s3) var(--s3);
+  max-height: min(60vh, 520px);
+  overflow: auto;
+}
+
+.likes-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.likes-list__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--border);
+}
+.likes-list__item:last-child {
+  border-bottom: 0;
+}
+.likes-list__icon {
+  width: 1.1rem;
+  text-align: center;
+}
+.likes-list__name {
+  font-weight: 500;
+}
+
+/* ---------- Form card wrapper (reused across forms) ---------- */
+.form-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-2);
+  padding: var(--s3);
+}
+
+/* Password eye. Ensure the eye sits inside the field and input text doesn’t run under it */
+.pw-field {
+  position: relative;
+}
+.pw-field .pw-toggle {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.pw-field .pw-toggle svg {
+  width: 20px;
+  height: 20px;
+  opacity: 0.65;
+}
+.pw-field .pw-toggle:hover svg {
+  opacity: 0.9;
+}
+.pw-field .pw-toggle[aria-pressed='true'] svg {
+  opacity: 1;
+}
+
+/* Leave room for the eye */
+.pw-field .form-control {
+  padding-right: 2.25rem;
+}
+
+/* ---------- Notification cards ---------- */
+.notification-card {
+  position: relative;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+.notification-card.unread {
+  border-left: 4px solid var(--cta);
+  background: #fffbeb;
+}
+.notification-card.read {
+  background: #f9fafb;
+}
+.notification-card:hover {
+  background: #f8fafc;
+  box-shadow: 0 3px 12px -4px rgba(0, 0, 0, 0.08);
+}
+.timestamp {
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+/* Notification line emphasis */
+.notif__sender {
+  font-weight: 700; /* still pops even when the whole card is bold */
+  color: #0c2233; /* slightly stronger than body text */
+}
+
+.notif__piece {
+  color: #0c2233; /* readable, not shouty */
+  /* if you wanted italics instead of quotes, you could use: font-style: italic; */
+}
+
+.notification-card .notif-emoji {
+  margin-right: 6px;
+}
+
+/* Remove bullets from error lists */
+.messages {
+  list-style: none;
+  padding-left: 0;
+  margin: var(--s1) 0;
+}
+.messages li {
+  list-style: none;
+  margin: 0 0 var(--s1);
+}
+
+/* Scope settings actions so we don't disturb buttons sitewide */
+.settings-actions .btn-save {
+  /* neutral base */
+  background: #eef2f6; /* soft gray surface */
+  color: #6b7280; /* slate-500 */
+  border: 1px solid #e5e7eb; /* light border */
+  cursor: not-allowed;
+  box-shadow: none;
+  transition: background 140ms ease, color 140ms ease, box-shadow 140ms ease,
+    transform 50ms ease;
+}
+
+.settings-actions .btn-save:disabled {
+  /* keep the same neutral look; important for Safari */
+  background: #eef2f6;
+  color: #6b7280;
+  border-color: #e5e7eb;
+}
+
+/* Enabled state (no Bootstrap blue) */
+.settings-actions .btn-save:not(:disabled) {
+  cursor: pointer;
+  background: var(--brand);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: var(--shadow-1);
+}
+
+.settings-actions .btn-save:not(:disabled):hover {
+  background: var(--brand-600);
+  box-shadow: var(--shadow-2);
+}
+
+.settings-actions .btn-save:not(:disabled):active {
+  transform: translateY(0.5px);
+}
+
+/* Remove bullet points from Django form error lists */
+.alert-danger ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0 0 0.5rem 0; /* optional: tighten spacing */
+}
+
+.received-card--deleted {
+  opacity: 0.9;
+  border-style: dashed;
+}
+.received-card--deleted .received-card__title {
+  color: #64748b;
+}
+.received-deleted-title {
+  color: #64748b;
+}
+
+.preview--deleted .preview__badge,
+.preview--deleted .preview__label {
+  opacity: 0.8;
+}
+.tombstone {
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+/* Stronger, branded toast style */
+.custom-toast {
+  background: var(--brand-600, #1884bd);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  opacity: 0.95;
+}
+
+/* Icon to make it instantly recognizable */
+.custom-toast .toast-icon {
+  font-size: 1.25rem;
+  color: #fff;
+}
+
+/* Hover/focus states for dismiss button */
+.custom-toast .btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+  opacity: 0.8;
+}
+.custom-toast .btn-close:hover {
+  opacity: 1;
+}
+
+/* Slightly larger container padding for breathing room */
+.toast-container {
+  z-index: 2000; /* stay above modals */
+}
+
+.form-check-input:checked {
+  background-color: var(--brand);
+  border-color: var(--brand);
+}
+
+/* --- Password input sizing sanity (iOS + Bootstrap harmony) --- */
+
+/* Ensure Bootstrap’s baseline metrics are intact */
+.form-control {
+  font-size: 1rem; /* 16px */
+  line-height: 1.5; /* Bootstrap default */
+}
+
+/* Make Safari/iOS stop inflating password glyphs by tying height to the baseline */
+input[type='password'].form-control {
+  /* Bootstrap’s default explicit height (calc for line-height + padding + border) */
+  height: calc(1.5em + 0.75rem + 2px);
+  font-size: 16px; /* iOS stays happy at 16px, avoids “zoom” behavior */
+}
+
+/* Keep space for the eye without changing overall height */
+.pw-field .form-control {
+  padding-right: 2.25rem; /* you already had this; keep it */
+}
+
+/* Nudge the eye slightly so any 1–2px rounding differences don’t look like a jump */
+.pw-field .pw-toggle {
+  right: 0.65rem; /* tiny visual tweak; optional */
+}
+
+/* iOS-specific: don’t upscale text inside inputs */
+@supports (-webkit-touch-callout: none) {
+  input[type='password'].form-control {
+    -webkit-text-size-adjust: 100%;
+  }
+}
+
+/* Auth action row */
+.auth-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap; /* allows graceful wrap on mid-widths */
+}
+
+/* Keep the primary from wrapping and turning circular */
+.auth-actions .auth-primary {
+  white-space: nowrap; /* prevent “Log” / “in” split */
+  border-radius: var(--radius); /* softer than 999px on forms */
+  padding-block: 10px; /* consistent height */
+}
+
+/* Mobile: stack, make primary full-width, use link for “Forgot?” */
+@media (max-width: 575.98px) {
+  .auth-actions {
+    flex-direction: column;
+  }
+
+  .auth-forgot-link {
+    display: inline-block;
+    text-align: center;
+    font-weight: 600;
+    color: var(--brand);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+}

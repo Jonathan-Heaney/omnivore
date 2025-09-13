@@ -1,0 +1,434 @@
+/* Page: My Received Art (revamped to match My Shared) */
+
+/* Wrap centers the whole unit (bubble + Oliver) */
+.welcome-hero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(16px, 4vw, 32px);
+  margin: -24px 0 24px;
+  text-align: left; /* bubble text */
+}
+
+/* Bubble sizing so it never gets skinny */
+.welcome-bubble {
+  position: relative;
+  width: clamp(260px, 34vw, 380px);
+  max-width: 90vw;
+  padding: clamp(14px, 2.2vw, 18px) clamp(14px, 2.6vw, 20px);
+  background: #fff;
+  color: #0c2233;
+  border: 1px solid #d9e2ec;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+.welcome-bubble strong {
+  font-weight: 700;
+}
+
+/* Oliver: preserve aspect ratio; never distort */
+.welcome-oliver {
+  display: block;
+  width: clamp(220px, 32vw, 360px);
+  height: auto; /* key: no distortion */
+}
+
+/* Center image + caption as a sub-block */
+.welcome-oliver-wrap {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Caption */
+.welcome-caption {
+  margin-top: 8px;
+  font-size: clamp(14px, 1.6vw, 16px);
+  font-weight: 600;
+  color: #0c2233;
+  text-align: center;
+}
+
+/* --- Mobile tweaks --- */
+@media (max-width: 575.98px) {
+  .welcome-hero {
+    gap: 12px;
+    padding-inline: 8px;
+  }
+  .welcome-bubble {
+    width: min(64vw, 360px);
+    font-size: 0.8rem;
+    padding: 12px 14px;
+  }
+  .welcome-bubble::after {
+    right: -24px;
+    width: 34px;
+    height: 14px;
+  }
+  .welcome-oliver {
+    width: clamp(180px, 42vw, 300px);
+  }
+}
+
+/* Very narrow safety nets */
+@media (max-width: 360px) {
+  .welcome-bubble {
+    width: 68vw;
+    font-size: 0.6rem;
+  }
+  .welcome-oliver {
+    width: 40vw;
+  }
+}
+
+/* Massive, responsive spacing just for this list */
+.shared-list {
+  display: grid;
+  gap: clamp(72px, 8.5vw, 112px);
+}
+
+/* Use the same card proportions, accent, and subtle tints */
+.received-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #fff;
+  box-shadow: var(--shadow-1);
+  overflow: hidden;
+  border-left: 4px solid var(--border);
+  transition: box-shadow 160ms ease;
+}
+.received-card:hover {
+  box-shadow: var(--shadow-2);
+}
+
+/* ----- Header ----- */
+.received-card__header {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  padding: 1.05rem 1.25rem; /* was 0.9rem 1rem */
+  gap: 0.6rem 0.9rem;
+  align-items: center;
+  background: color-mix(in srgb, var(--brand) var(--tint-brand-pct, 6%), #fff);
+}
+
+.received-card__titlewrap {
+  min-width: 0; /* allow ellipsis if needed */
+}
+.received-card__title {
+  color: var(--brand);
+}
+.received-card__title:hover {
+  color: var(--brand);
+  filter: brightness(0.9);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.received-card__by {
+  color: var(--muted);
+  margin-left: 0.35rem;
+}
+
+.received-card__from {
+  justify-self: end;
+  color: color-mix(in srgb, #000 60%, #fff);
+  white-space: nowrap;
+}
+.badge-new {
+  justify-self: end;
+}
+
+/* "New" badge */
+
+.badge-new {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.775rem;
+  letter-spacing: 0.01em;
+  background: linear-gradient(135deg, #ffd86f, #ff9f6e);
+  color: #1f1f1f;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.badge-new .emoji {
+  line-height: 1;
+}
+
+/* Entry pop (one-time) */
+.badge-new.in-view {
+  animation: badge-pop-in 320ms cubic-bezier(0.22, 1.2, 0.36, 1) both;
+}
+
+/* Optional gentle pulse after it’s visible (2 cycles max) */
+.badge-new.pulse {
+  animation: badge-pulse 1500ms ease-in-out 400ms 2 both;
+}
+
+/* Optional shimmer sheen (only while in view) */
+.badge-new.shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0) 20%,
+    rgba(255, 255, 255, 0.35) 40%,
+    rgba(255, 255, 255, 0) 60%
+  );
+  transform: translateX(-120%);
+  animation: badge-shimmer 1600ms ease-in-out 1;
+  pointer-events: none;
+}
+
+.badge-new {
+  position: relative;
+} /* needed for ::after */
+
+/* Keyframes */
+@keyframes badge-pop-in {
+  0% {
+    transform: scale(0.85);
+    filter: blur(0.5px);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    filter: none;
+    opacity: 1;
+  }
+}
+
+@keyframes badge-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes badge-shimmer {
+  0% {
+    transform: translateX(-120%);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .badge-new,
+  .badge-new.in-view,
+  .badge-new.pulse,
+  .badge-new.shimmer::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* XS (<576px): stack everything; put badge under the sharer */
+@media (max-width: 575.98px) {
+  .received-card__header {
+    grid-template-columns: 1fr; /* single column */
+    grid-auto-rows: auto;
+  }
+  .received-card__from {
+    grid-column: 1; /* its own line */
+    justify-self: start;
+  }
+  .badge-new {
+    grid-column: 1; /* NEW: below the sharer */
+    justify-self: start; /* align with text, not the right edge */
+    margin-top: 2px; /* tiny breathing room */
+  }
+}
+/* ----- Body ----- */
+.received-card__body {
+  display: grid;
+  padding: 1.25rem 1.25rem; /* was 1rem */
+  gap: 1rem;
+}
+.received-card__description {
+  margin: 0;
+}
+
+/* Big, catchy Source CTA inside the body */
+.received-card__source {
+  align-self: start;
+  width: fit-content;
+  border-radius: 999px;
+}
+
+/* ----- Like button placement (re-uses global like styles) ----- */
+.likes-container {
+  padding: 0.85rem 1.25rem 1rem;
+  background: color-mix(in srgb, var(--danger) var(--tint-like-pct, 3%), #fff);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* Center the single like button vertically inside the strip */
+.received-card .likes-container {
+  display: flex;
+  align-items: center; /* vertical centering */
+  /* optional: slightly tighter vertical rhythm */
+  padding-top: 0.65rem;
+  padding-bottom: 0.65rem;
+}
+
+/* Ensure the button doesn’t introduce baseline weirdness */
+.received-card .likes-container .like-button {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1; /* optical centering */
+  margin: 0; /* just in case */
+}
+
+/* iOS Safari: strip native button tinting and lock text color */
+.like-button {
+  -webkit-appearance: none;
+  appearance: none;
+  background-clip: padding-box; /* keeps borders clean on iOS */
+  color: var(--text) !important;
+}
+
+.like-button .like-text {
+  color: inherit !important; /* ensure it follows the button */
+  -webkit-text-fill-color: currentColor; /* iOS sometimes ignores `color` */
+}
+
+/* Keep the same color through focus/active */
+.like-button:focus,
+.like-button:active,
+.like-button:focus-visible {
+  color: var(--text) !important;
+}
+
+/* ----- Conversation preview (no count, just preview) ----- */
+.preview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.05rem 1.25rem; /* was 0.9rem 1rem */
+  gap: 1.1rem;
+  background: color-mix(in srgb, var(--success) var(--tint-cta-pct, 3%), #fff);
+}
+
+.preview__left {
+  display: flex; /* NEW */
+  align-items: baseline; /* tidy vertical alignment */
+  gap: 0.5rem;
+  min-width: 0; /* allow children to shrink */
+}
+
+.preview__label {
+  /* stays natural size */
+  flex: 0 0 auto;
+  color: color-mix(in srgb, #000 55%, #fff);
+  margin-right: 0.1rem; /* small separation before text */
+}
+
+.preview__text {
+  /* this is the shrinky bit */
+  flex: 1 1 auto; /* NEW: take remaining space */
+  min-width: 0; /* REQUIRED for ellipsis in flex */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: inherit;
+}
+
+.preview__badge {
+  /* keep badge from shrinking */
+  flex: 0 0 auto;
+  background: #eaf2ff; /* cooler, calmer */
+  color: #0b4aa2;
+  border: 1px solid #cfe0ff;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* “No messages yet — say hi …” variant */
+.preview__hint {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--muted);
+}
+
+.preview__right {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 767.98px) {
+  .preview {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0; /* spacing is controlled by the left block only when needed */
+  }
+
+  /* default: no extra space */
+  .preview__left {
+    margin-bottom: 0;
+  }
+
+  /* add space when the "no messages yet" hint is visible on mobile */
+  .preview__left:has(.preview__hint) {
+    margin-bottom: 0.75rem;
+  }
+
+  /* keep the CTA row tidy */
+  .preview__right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  .preview__right > .btn {
+    margin: 0 !important;
+    line-height: 1;
+  }
+
+  .preview__text,
+  .preview__label {
+    display: none;
+  } /* as you had */
+
+  .preview__badge {
+    margin-bottom: 12px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .received-card__header,
+  .received-card__body,
+  .likes-container,
+  .preview {
+    padding-left: 1.35rem;
+    padding-right: 1.35rem;
+  }
+  .received-card__body {
+    padding-top: 1.35rem;
+    padding-bottom: 1.35rem;
+  }
+  .preview {
+    row-gap: 0.25rem;
+  } /* keeps the “View conversation” row comfy */
+}

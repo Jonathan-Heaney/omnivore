@@ -1,0 +1,427 @@
+:root {
+  /* Brand */
+  --brand: #1884bd; /* primary */
+  --brand-600: #136a97; /* hover/active */
+  --brand-200: #c5e0ee; /* focus ring / subtle bg */
+
+  /* Accent used in badges/alerts, also for landing CTA modifier */
+  --cta: #eab308;
+
+  /* Palette */
+  --bg: #ffffff;
+  --surface: #f8f9fb;
+  --text: #0c0d0e;
+  --muted: #636a74;
+  --border: #e6e8ec;
+
+  --success: #3ba776;
+  --warning: #b97317;
+  --danger: #c0392b;
+
+  /* Radius */
+  --radius: 14px;
+  --radius-sm: 10px;
+
+  /* Spacing (8px base) */
+  --s-1: 4px;
+  --s0: 8px;
+  --s1: 12px;
+  --s2: 16px;
+  --s3: 24px;
+  --s4: 32px;
+  --s5: 48px;
+
+  /* Type */
+  --font-sans: 'Noto Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    Roboto, Inter, 'Helvetica Neue', Arial, 'Apple Color Emoji',
+    'Segoe UI Emoji';
+  --font-brand: 'Madimi One', var(--font-sans);
+
+  --fs-xxl: clamp(28px, 5vw, 44px);
+  --fs-xl: clamp(22px, 3.5vw, 28px);
+  --fs-lg: 20px;
+  --fs-md: 16px;
+  --fs-sm: 14px;
+
+  /* Shadows */
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-2: 0 8px 30px rgba(0, 0, 0, 0.08);
+
+  /* Sticky-nav offset for anchored sections */
+  --nav-offset: 50px;
+}
+
+/* ---------- Reset / Base ---------- */
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  height: 100%;
+}
+body {
+  font-family: var(--font-sans);
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+a {
+  color: var(--brand);
+  text-decoration: none;
+}
+hr {
+  border: 0;
+  height: 1px;
+  background: var(--border);
+  margin: var(--s4) 0;
+}
+
+/* Layout shell */
+.site {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+  backdrop-filter: saturate(180%) blur(6px);
+  background: rgba(255, 255, 255, 0.85);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+.site-main {
+  flex: 1 1 auto;
+}
+
+/* Navbar */
+.site-nav {
+  padding: 0.4rem 0;
+}
+.site-nav .navbar-brand {
+  font-family: var(--font-brand);
+  font-size: 1.25rem;
+  letter-spacing: 0.2px;
+  color: var(--text);
+}
+.site-nav .brand-text {
+  margin-top: 2px;
+} /* optical align */
+.navbar-oliver {
+  height: 28px;
+  width: auto;
+}
+
+.site-nav .nav-link {
+  color: #263238;
+  font-weight: 600;
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  transition: background 0.15s ease, color 0.15s ease;
+  text-underline-offset: 3px;
+}
+.site-nav .nav-link:hover {
+  background: rgba(30, 90, 150, 0.06);
+  text-decoration: none;
+}
+
+/* --- Navbar dropdown sizing & polish --- */
+.site-nav .dropdown-menu {
+  /* Let the menu size to its content instead of the Bootstrap 10rem min */
+  min-width: unset;
+  width: max-content; /* fit to items */
+  max-width: 260px; /* safety so long labels don't explode width */
+  padding: 12px; /* a little tighter */
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-2);
+  margin: 0 auto;
+}
+
+.site-nav .dropdown-item {
+  padding: 8px 12px; /* slightly tighter rows */
+  white-space: nowrap; /* keep single-line, keeps menu compact */
+  font-weight: 500;
+}
+
+/* Divider spacing inside dropdown */
+.site-nav .dropdown-divider {
+  margin: 6px 0;
+}
+
+/* Notifications bell */
+
+#notification-link .fa-bell {
+  position: relative; /* new container for the dot */
+  display: inline-block;
+}
+
+#notification-link .notif-dot {
+  position: absolute;
+  top: -4px;
+  right: -7px; /* adjust to snugly hug the bell */
+  width: 8px;
+  height: 8px;
+  background: #dc3545;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px #fff;
+}
+
+/* Footer */
+.site-footer {
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  background: #f9fafb;
+}
+.site-footer .footer-brand {
+  font-family: var(--font-brand);
+  font-size: 1.05rem;
+}
+
+/* Prevent long links from blowing up mobile width */
+.site-footer .footer-link {
+  font-weight: 600;
+  color: var(--brand);
+  word-break: break-word; /* break at arbitrary points if needed */
+  overflow-wrap: anywhere; /* let the browser wrap long strings */
+  line-break: anywhere;
+}
+
+.site-footer .footer-link:hover {
+  text-decoration: underline;
+}
+
+.footer-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.footer-heading {
+  font-size: 1rem;
+}
+
+/* Footer layout that mirrors the header’s edge-to-edge feel */
+.footer-inner {
+  display: flex;
+  justify-content: space-between; /* pushes left and right sections to edges */
+  align-items: flex-start;
+  gap: clamp(16px, 4vw, 48px);
+}
+
+/* Let middle column grow a bit if needed, but keep brand/support snug */
+.footer-brandcol,
+.footer-col:last-child {
+  flex: 0 0 auto;
+}
+.footer-col {
+  min-width: 180px;
+}
+
+/* Stack on mobile/tablet for readability */
+/* Stack on mobile/tablet for readability */
+@media (max-width: 460px) {
+  .footer-inner {
+    flex-direction: column;
+    align-items: center; /* center the column blocks themselves */
+    gap: 18px;
+  }
+
+  /* Center the content inside each column */
+  .footer-brandcol,
+  .footer-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* centers headings + list */
+    text-align: center; /* centers link text */
+    /* width: 100%;  <-- remove this so columns don't stretch full-width */
+  }
+
+  /* (optional) tighter vertical rhythm on the lists */
+  .footer-list li + li {
+    margin-top: 6px;
+  }
+}
+
+@media (min-width: 992px) {
+  .site-footer .row > [class*='col-'] {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+}
+
+/* Anchors don’t hide under sticky nav */
+section[id],
+[id^='art-'] {
+  scroll-margin-top: calc(var(--nav-offset) + 6px);
+}
+
+/* Reduced motion respect */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Mobile nav alignment */
+@media (max-width: 575.98px) {
+  .navbar-nav .nav-item {
+    text-align: center;
+  }
+}
+
+/* ---------- Form polish shared sitewide ---------- */
+.pw-field {
+  position: relative;
+}
+.pw-toggle {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.pw-toggle svg {
+  width: 20px;
+  height: 20px;
+  opacity: 0.65;
+}
+.pw-toggle:hover svg {
+  opacity: 0.9;
+}
+.pw-toggle[aria-pressed='true'] svg {
+  opacity: 1;
+}
+
+/* Inline errors for password fields (and generally keep feedback visible when invalid) */
+.pw-field:has(.form-control.is-invalid) .invalid-feedback {
+  display: block;
+}
+.pw-field .form-control.is-invalid + .pw-toggle + .invalid-feedback,
+.pw-field .form-control.is-invalid ~ .invalid-feedback {
+  display: block;
+}
+.invalid-feedback {
+  display: block;
+}
+
+/* Shared small helpers used by forms/pages */
+.page-title {
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin: 0 0 2rem;
+}
+.max-w-700 {
+  max-width: 700px;
+}
+.text-muted {
+  color: var(--muted) !important;
+}
+
+/* --- Notifications bell --- */
+
+/* Keep bell color consistent; the badge supplies the "unread" affordance */
+#notification-link.has-unread {
+  color: inherit;
+}
+
+/* Make the <i> the positioning context */
+#notification-icon {
+  position: relative;
+  display: inline-block;
+  line-height: 1; /* tighter box so the badge sits predictably */
+}
+
+/* Base badge (hidden by default) */
+#notif-badge {
+  position: absolute;
+  top: 0; /* start at the icon’s top-right corner */
+  right: 0;
+  transform: translate(
+    85%,
+    -65%
+  ); /* nudge outward so it doesn’t cover the bell */
+  display: none;
+
+  z-index: 2; /* always above the bell glyph */
+  box-shadow: 0 0 0 2px #fff; /* white ring so the badge “floats” off the bell */
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+#notification-link.has-unread {
+  color: #0000008c;
+}
+
+/* Show the badge whenever there’s unread (class added server- or client-side) */
+#notification-link.has-unread #notif-badge,
+#notif-badge.notif-badge--count {
+  display: inline-grid;
+  place-items: center;
+}
+
+/* Tiny red dot version (no number) */
+#notif-badge[data-dot='1'] {
+  width: 9px;
+  height: 9px;
+  background: #dc3545;
+  transform: translate(40%, -40%); /* slightly tighter for the dot */
+}
+
+/* Numbered pill version */
+#notif-badge.notif-badge--count {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+  line-height: 18px;
+  font-size: 11px;
+  color: #fff;
+  background: #dc3545; /* FB-style blue; use #dc3545 if you prefer red */
+}
+
+/* Keep mobile password dots from looking huge on iOS */
+input[type='password'].form-control,
+input[type='password'] {
+  font-size: 16px; /* 16–18px is a good target */
+  line-height: 1.25; /* avoid very tall lines */
+  height: auto; /* don’t force tall boxes */
+  padding: 10px 12px; /* control height with padding instead */
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+/* If you have global input sizing that inflates things on small screens,
+   keep it modest for form controls */
+@media (max-width: 640px) {
+  .form-control {
+    font-size: 16px;
+    line-height: 1.25;
+  }
+}
+
+/* Prevent iOS from oddly scaling text */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Fix navbar gap widths */
+/* Default: mobile (collapsed menu) */
+.nav-gap {
+  gap: 0.25rem; /* ~Bootstrap gap-2 */
+}
+
+/* Medium and up (desktop nav) */
+@media (min-width: 575.98px) {
+  .nav-gap {
+    gap: 1.25rem; /* a little more breathing room */
+  }
+}

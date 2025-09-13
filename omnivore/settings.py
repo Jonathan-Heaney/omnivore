@@ -82,6 +82,7 @@ if IS_LIVE:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    WHITENOISE_MANIFEST_STRICT = False
 
     # HSTS only in live
     SECURE_HSTS_SECONDS = 31536000
@@ -243,7 +244,7 @@ NEW_BADGE_WINDOW_DAYS = 30
 
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
