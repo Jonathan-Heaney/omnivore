@@ -1,0 +1,4 @@
+<h2>{{ post.title }}</h2>
+<p>{{ post.created_at|date:"F j, Y" }}</p>
+<p>{{ post.body|linebreaks }}</p>
+<a href="{{ SITE_URL }}{% url 'blog_detail' post.slug %}">Read more on Omnivore</a>

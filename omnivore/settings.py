@@ -137,6 +137,7 @@ CSRF_COOKIE_SAMESITE = "Lax"
 INSTALLED_APPS = [
     'main.apps.MainConfig',
     'about',
+    'blog',
     'crispy_forms',
     'crispy_bootstrap5',
     'django.contrib.admin',
@@ -146,6 +147,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    "django_ckeditor_5",
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -249,6 +251,42 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+# Where uploaded images go
+# works with MEDIA_ROOT
+CKEDITOR_5_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+DJANGO_CKEDITOR_5_UPLOAD_FILE_TYPES = ["jpg", "jpeg", "png", "gif", "webp"]
+
+CKEDITOR_5_CONFIGS = {
+    "default": {
+        "toolbar": [
+            "heading", "|",
+            "bold", "italic", "link", "|",
+            "bulletedList", "numberedList", "blockQuote", "|",
+            "insertImage", "insertTable", "horizontalLine", "|",
+            "undo", "redo", "sourceEditing"
+        ],
+        # Image plugin includes captions & styles (side/inline/block)
+        "image": {
+            "toolbar": [
+                "imageTextAlternative",
+                "toggleImageCaption",
+                "|",
+                "imageStyle:alignLeft",
+                "imageStyle:alignCenter",
+                "imageStyle:alignRight",
+                "imageStyle:inline",
+                "imageStyle:block",
+                "imageStyle:side",
+            ],
+        },
+        "table": {"contentToolbar": ["tableColumn", "tableRow", "mergeTableCells"]},
+        "height": 400,
+    }
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

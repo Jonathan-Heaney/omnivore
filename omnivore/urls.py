@@ -18,15 +18,21 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls import handler404, handler500, handler403
 from main import views as main_views
+from django.conf import settings
+from django.conf.urls.static import static
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('main.urls')),
     path('', include('about.urls')),
+    path('blog/', include('blog.urls')),
+    path('ckeditor5/', include('django_ckeditor_5.urls')),
     path('', include('django.contrib.auth.urls'))
 ]
 
 handler404 = main_views.custom_404
 handler500 = main_views.custom_500
 handler403 = main_views.csrf_failure
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
