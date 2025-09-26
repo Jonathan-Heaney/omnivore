@@ -1,0 +1,44 @@
+/* Default: scale images down but keep block layout */
+.prose img,
+.prose figure img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* CKEditor alignment classes */
+.prose figure.image.image-style-align-center {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.prose figure.image.image-style-align-left {
+  float: left;
+  margin-right: 1rem;
+}
+
+.prose figure.image.image-style-align-right {
+  float: right;
+  margin-left: 1rem;
+}
+
+/* Captions */
+.prose figure.image figcaption {
+  font-size: 0.9rem;
+  color: #555;
+  margin-top: 0.5rem;
+  font-style: italic;
+  text-align: center; /* captions should follow the image alignment */
+}
+
+/* If you ever allow tables/iframes in posts, keep them responsive too */
+.prose table {
+  width: 100%;
+  overflow: auto;
+}
+.prose iframe,
+.prose video {
+  max-width: 100%;
+  height: auto;
+}
