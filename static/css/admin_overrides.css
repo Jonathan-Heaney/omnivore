@@ -2,3 +2,15 @@
   color: #000 !important; /* normal black text */
   background: #fff !important; /* white background */
 }
+
+.ck-editor__editable img {
+  max-width: 100% !important;
+  height: auto !important;
+}
+.ck-editor__editable figure.image {
+  margin: 1rem auto !important;
+}
+.ck-editor__editable figure.image figcaption {
+  color: #555 !important;
+  font-style: italic;
+}

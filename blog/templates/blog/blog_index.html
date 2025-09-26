@@ -5,7 +5,8 @@
 
 
 {% block content %}
-  <h1>Blog</h1>
+<section class="container-narrow py-4">
+  <h1 class="page-title">Blog</h1>
   <ul>
     {% for post in posts %}
       <li>
@@ -16,4 +17,5 @@
       <li>No posts yet.</li>
     {% endfor %}
   </ul>
+</section>  
 {% endblock %}
