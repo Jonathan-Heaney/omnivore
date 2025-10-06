@@ -258,14 +258,14 @@ USE_S3_MEDIA = IS_LIVE  # True for staging and production
 
 if USE_S3_MEDIA:
     AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_MEDIA_BUCKET_NAME")
-    AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME", "us-east-1")
+    AWS_S3_REGION_NAME = os.getenv("AWS_SES_REGION_NAME", "us-east-2")
     AWS_S3_SIGNATURE_VERSION = "s3v4"
     AWS_S3_FILE_OVERWRITE = False  # don't overwrite files with same name
     AWS_DEFAULT_ACL = None
     AWS_QUERYSTRING_AUTH = False   # False = public URLs; True = signed temporary URLs
 
     DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-    MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/"
+    MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_SES_REGION_NAME}.amazonaws.com/"
 else:
     MEDIA_URL = "/media/"
     MEDIA_ROOT = BASE_DIR / "media"
