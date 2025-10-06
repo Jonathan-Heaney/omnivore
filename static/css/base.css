@@ -219,6 +219,19 @@ hr {
   min-width: 180px;
 }
 
+/* Stronger keyboard focus on footer links */
+.site-footer .footer-link:focus-visible {
+  outline: 2px solid var(--brand-200);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Optional: style for an “active” footer link (if you ever add it) */
+.site-footer .footer-link.is-active {
+  color: var(--text);
+  text-decoration: underline;
+}
+
 /* Stack on mobile/tablet for readability */
 /* Stack on mobile/tablet for readability */
 @media (max-width: 460px) {

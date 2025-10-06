@@ -164,8 +164,18 @@
             <div class="text-muted small mb-2">© 2025 Omnivore Arts</div>
           </div>
 
+          <!-- NEW: Explore -->
+          <nav class="footer-col" aria-label="Explore">
+            <h3 class="footer-heading">Explore</h3>
+            <ul class="footer-list">
+              <li>
+                <a class="footer-link" href="{% url 'blog_index' %}">Blog</a>
+              </li>
+            </ul>
+          </nav>
+
           <!-- Support -->
-          <nav class="footer-col">
+          <nav class="footer-col" aria-label="Support">
             <h3 class="footer-heading">Support</h3>
             <ul class="footer-list">
               <li><a class="footer-link" href="#" id="open-report">Report a problem</a></li>
