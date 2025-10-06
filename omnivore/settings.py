@@ -193,13 +193,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'omnivore.wsgi.application'
 
-STORAGES = {
-    # ...
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -253,26 +246,47 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-# Use S3 for media in staging/prod
-USE_S3_MEDIA = IS_LIVE  # True for staging and production
+# --- Static/Media storage backends (Django 5 style) ---
+
+# True for staging & production
+USE_S3_MEDIA = IS_LIVE
 
 if USE_S3_MEDIA:
     AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_MEDIA_BUCKET_NAME")
-    AWS_S3_REGION_NAME = os.getenv("AWS_SES_REGION_NAME", "us-east-2")
+    # Prefer a dedicated S3 region var; fallback to your SES region if you want
+    AWS_S3_REGION_NAME = os.getenv(
+        "AWS_S3_REGION_NAME", os.getenv("AWS_SES_REGION_NAME", "us-east-2"))
     AWS_S3_SIGNATURE_VERSION = "s3v4"
-    AWS_S3_FILE_OVERWRITE = False  # don't overwrite files with same name
+    AWS_S3_FILE_OVERWRITE = False
     AWS_DEFAULT_ACL = None
-    AWS_QUERYSTRING_AUTH = False   # False = public URLs; True = signed temporary URLs
+    # If you want public, unsigned URLs from S3, keep this False AND make bucket objects publicly readable
+    AWS_QUERYSTRING_AUTH = False
 
-    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-    MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_SES_REGION_NAME}.amazonaws.com/"
+    MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/"
+
+    STORAGES = {
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+        "default": {
+            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        },
+    }
 else:
     MEDIA_URL = "/media/"
     MEDIA_ROOT = BASE_DIR / "media"
 
+    STORAGES = {
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+    }
+
 # Where uploaded images go
 # works with MEDIA_ROOT
-CKEDITOR_5_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 DJANGO_CKEDITOR_5_UPLOAD_FILE_TYPES = ["jpg", "jpeg", "png", "gif", "webp"]
 
 CKEDITOR_5_CONFIGS = {
