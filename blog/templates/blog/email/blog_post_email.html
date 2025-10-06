@@ -1,6 +1,16 @@
-<h2>{{ post.title }}</h2>
-<p>{{ post.created_at|date:"F j, Y" }}</p>
+<h2 style="margin:0 0 8px 0; font-weight:700;">{{ post.title }}</h2>
+<p style="margin:0 0 16px 0; color:#666; font-size:14px;">
+  {{ post.created_at|date:"F j, Y" }}
+  • <a href="{{ SITE_URL }}{% url 'blog_detail' post.slug %}">View online</a>
+</p>
+
 <div>
   {{ post.body|safe }}
 </div>
-<a href="{{ SITE_URL }}{% url 'blog_detail' post.slug %}">Read more on Omnivore</a>
+
+<!-- Small footer -->
+<hr style="border:0; border-top:1px solid #e6e8ec; margin:20px 0;">
+<p style="font-size:12px; color:#666; margin:0;">
+  You’re receiving this because you opted into Omnivore blog emails.
+  <a href="{{ unsubscribe_url }}">Unsubscribe</a>
+</p>

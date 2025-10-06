@@ -1176,12 +1176,14 @@ KIND_TO_FIELD = {
     "art": "email_on_art_shared",
     "comment": "email_on_comment",
     "like": "email_on_like",
+    "blog": "receive_blog_emails",
 }
 
 KIND_LABELS = {
     "art": "new art shared",
     "comment": "comments & replies",
     "like": "likes",
+    "blog": "blog posts",
 }
 
 

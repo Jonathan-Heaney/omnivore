@@ -57,7 +57,7 @@ class CustomUserAdmin(admin.ModelAdmin):
     list_filter = ("date_joined", "last_login", "is_active", "is_staff")
 
     list_display = ("first_name",
-                    "last_name", "email", "username", "receive_art_paused", "email_on_art_shared", "email_on_comment", "email_on_like", "date_joined", "last_login", "is_active")
+                    "last_name", "email", "username", "receive_art_paused", "email_on_art_shared", "email_on_comment", "email_on_like", "receive_blog_emails", "date_joined", "last_login", "is_active")
 
     list_display_links = ("email",)
 
@@ -80,6 +80,7 @@ class CustomUserAdmin(admin.ModelAdmin):
         "email_on_comment",
         "email_on_like",
         "receive_art_paused",
+        "receive_blog_emails"
     )
 
 

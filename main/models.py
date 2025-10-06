@@ -22,6 +22,7 @@ class CustomUser(AbstractUser):
     email_on_art_shared = models.BooleanField(default=True)
     email_on_comment = models.BooleanField(default=True)
     email_on_like = models.BooleanField(default=False)
+    receive_blog_emails = models.BooleanField(default=True)
 
     # User can pause actually receiving new art (in-app + email)
     receive_art_paused = models.BooleanField(default=False)
