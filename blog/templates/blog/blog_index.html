@@ -3,18 +3,23 @@
 
 {% block title %}Blog{% endblock %}
 
-
 {% block content %}
 <section class="container-narrow py-4">
   <h1 class="page-title">Blog</h1>
-  <ul>
+
+  <ul class="post-list">
     {% for post in posts %}
-      <li>
-        <a href="{% url 'blog_detail' post.slug %}">{{ post.title }}</a><br>
-        <small>{{ post.created_at|date:"F j, Y" }}</small>
+      <li class="post-item">
+        <a class="post-link" href="{% url 'blog_detail' post.slug %}">
+          <span class="post-title">{{ post.title }}</span>
+          <time class="post-date" datetime="{{ post.created_at|date:'c' }}">
+            {{ post.created_at|date:"F j, Y" }}
+          </time>
+          <span class="post-link-arrow" aria-hidden="true">→</span>
+        </a>
       </li>
     {% empty %}
-      <li>No posts yet.</li>
+      <li class="post-empty">No posts yet.</li>
     {% endfor %}
   </ul>
 </section>  

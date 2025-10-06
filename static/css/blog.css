@@ -42,3 +42,105 @@
   max-width: 100%;
   height: auto;
 }
+
+/* ---------- Index list ---------- */
+.post-list {
+  list-style: none; /* remove bullets */
+  padding: 0; /* remove left indent */
+  margin: 0;
+  border-top: 1px solid #eee; /* subtle separators */
+}
+
+.post-item {
+  border-bottom: 1px solid #eee;
+}
+
+.post-link {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 0.5rem 1rem;
+  align-items: center;
+  padding: 0.9rem 0.2rem;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 120ms ease, color 120ms ease;
+}
+
+.post-title {
+  font-weight: 600;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.post-date {
+  font-size: 0.9rem;
+  color: #666;
+  white-space: nowrap;
+}
+
+.post-link-arrow {
+  opacity: 0.2;
+  transform: translateX(-2px);
+  transition: transform 120ms ease, opacity 120ms ease;
+}
+
+.post-link:hover .post-link-arrow {
+  opacity: 0.45;
+  transform: translateX(2px);
+}
+
+.post-link:hover .post-title {
+  text-decoration: underline;
+}
+
+/* Small screens: stack nicely */
+@media (max-width: 600px) {
+  .post-link {
+    grid-template-columns: 1fr auto;
+  }
+  .post-link-arrow {
+    display: none;
+  }
+}
+
+/* ---------- Detail header ---------- */
+.post-header {
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.75rem;
+}
+
+.post-date-line {
+  display: inline-block;
+  margin-top: 0.2rem;
+  font-size: 0.95rem;
+  color: #666;
+}
+
+/* ---------- Prose defaults ---------- */
+.prose a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Already present image/caption responsiveness kept as-is… */
+
+/* (Optional) nicer code blocks if you ever add them */
+.prose pre,
+.prose code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono',
+    monospace;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+  color: #666;
+  text-decoration: none;
+  transition: color 100ms ease;
+}
+.back-link:hover {
+  color: #000;
+  text-decoration: underline;
+}
